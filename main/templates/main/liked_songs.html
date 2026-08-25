@@ -1,0 +1,551 @@
+{% extends 'main/base.html' %}
+
+{% block body %}
+
+<style>
+    /* =========================================================
+       LIKED SONGS PAGE
+       ========================================================= */
+
+    .liked-page {
+        width: 100%;
+        max-width: 1280px;
+        margin: 0 auto;
+    }
+
+    /* =========================================================
+       PAGE HEADER
+       ========================================================= */
+
+    .liked-header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 28px;
+    }
+
+    .liked-header-content h1 {
+        margin: 0 0 8px;
+        color: #ffffff;
+        font-family: "Montserrat", sans-serif;
+        font-size: clamp(1.8rem, 4vw, 2.5rem);
+        font-weight: 800;
+        letter-spacing: -0.04em;
+    }
+
+    .liked-header-content h1 span {
+        color: #4ade80;
+    }
+
+    .liked-header-content p {
+        margin: 0;
+        color: #8d98a9;
+        font-size: 0.92rem;
+    }
+
+    .liked-count {
+        flex-shrink: 0;
+        padding: 8px 13px;
+        border: 1px solid rgba(74, 222, 128, 0.20);
+        border-radius: 999px;
+        background: rgba(34, 197, 94, 0.08);
+        color: #4ade80;
+        font-size: 0.78rem;
+        font-weight: 700;
+    }
+
+    /* =========================================================
+       SONG GRID
+       ========================================================= */
+
+    .liked-songs-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 20px;
+    }
+
+    /* =========================================================
+       SONG CARD
+       ========================================================= */
+
+    .liked-song-card {
+        position: relative;
+        min-width: 0;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 18px;
+        background: #141820;
+        transition:
+            transform 0.25s ease,
+            border-color 0.25s ease,
+            background 0.25s ease,
+            box-shadow 0.25s ease;
+    }
+
+    .liked-song-card:hover {
+        transform: translateY(-6px);
+        border-color: rgba(74,222,128,0.20);
+        background: #191f29;
+        box-shadow: 0 18px 45px rgba(0,0,0,0.30);
+    }
+
+    /* =========================================================
+       COVER
+       ========================================================= */
+
+    .liked-cover-wrapper {
+        position: relative;
+        aspect-ratio: 1 / 1;
+        overflow: hidden;
+        background: #202630;
+    }
+
+    .liked-cover {
+        width: 100% !important;
+        height: 100%;
+        display: block;
+        object-fit: cover;
+        transition: transform 0.35s ease;
+    }
+
+    .liked-song-card:hover .liked-cover {
+        transform: scale(1.05);
+    }
+
+    /* Dark overlay */
+
+    .liked-cover-overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: flex-end;
+        justify-content: flex-end;
+        padding: 14px;
+        background:
+            linear-gradient(
+                to top,
+                rgba(0,0,0,0.60),
+                transparent 45%
+            );
+        opacity: 0;
+        transition: opacity 0.25s ease;
+    }
+
+    .liked-song-card:hover .liked-cover-overlay {
+        opacity: 1;
+    }
+
+    /* =========================================================
+       PLAY BUTTON
+       ========================================================= */
+
+    .liked-play-button {
+        width: 46px;
+        height: 46px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 0;
+        border-radius: 50%;
+        background: #22c55e;
+        color: #052e16 !important;
+        font-size: 1.15rem;
+        font-weight: 800;
+        text-decoration: none;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+        transition:
+            transform 0.2s ease,
+            background 0.2s ease;
+    }
+
+    .liked-play-button:hover {
+        background: #4ade80;
+        color: #052e16 !important;
+        transform: scale(1.08);
+    }
+
+    /* =========================================================
+       SONG INFORMATION
+       ========================================================= */
+
+    .liked-song-info {
+        padding: 15px;
+    }
+
+    .liked-song-title {
+        overflow: hidden;
+        margin: 0 0 6px;
+        color: #ffffff;
+        font-family: "Montserrat", sans-serif;
+        font-size: 0.95rem;
+        font-weight: 700;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .liked-song-artist {
+        overflow: hidden;
+        margin: 0 0 13px;
+        color: #8d98a9;
+        font-size: 0.78rem;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* =========================================================
+       BOTTOM CONTROLS
+       ========================================================= */
+
+    .liked-song-controls {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    /* Like / unlike */
+
+    .liked-like-form {
+        margin: 0;
+    }
+
+    .liked-like-button {
+        width: 34px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        border: 1px solid rgba(74,222,128,0.25);
+        border-radius: 9px;
+        background: rgba(34,197,94,0.10);
+        color: #4ade80;
+        font-size: 1.05rem;
+        line-height: 1;
+        cursor: pointer;
+        transition:
+            background 0.18s ease,
+            border-color 0.18s ease,
+            transform 0.18s ease;
+    }
+
+    .liked-like-button:hover {
+        background: rgba(34,197,94,0.18);
+        border-color: rgba(74,222,128,0.40);
+        transform: translateY(-1px);
+    }
+
+    /* Play text button */
+
+    .liked-small-play {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 34px;
+        padding: 0 12px;
+        border-radius: 9px;
+        background: #202833;
+        color: #4ade80 !important;
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-decoration: none;
+        transition:
+            background 0.2s ease,
+            color 0.2s ease,
+            transform 0.2s ease;
+    }
+
+    .liked-small-play:hover {
+        background: #22c55e;
+        color: #052e16 !important;
+        transform: translateY(-1px);
+    }
+
+    /* =========================================================
+       EMPTY STATE
+       ========================================================= */
+
+    .liked-empty {
+        padding: 70px 20px;
+        border: 1px dashed rgba(255,255,255,0.12);
+        border-radius: 20px;
+        background: rgba(255,255,255,0.02);
+        text-align: center;
+    }
+
+    .liked-empty-icon {
+        margin-bottom: 16px;
+        color: #4ade80;
+        font-size: 3.5rem;
+        line-height: 1;
+    }
+
+    .liked-empty h2 {
+        margin: 0 0 8px;
+        color: #ffffff;
+        font-family: "Montserrat", sans-serif;
+        font-size: 1.4rem;
+        font-weight: 800;
+    }
+
+    .liked-empty p {
+        margin: 0 0 22px;
+        color: #8d98a9;
+        font-size: 0.9rem;
+    }
+
+    .liked-explore-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 0 18px;
+        border-radius: 10px;
+        background: #22c55e;
+        color: #052e16 !important;
+        font-size: 0.85rem;
+        font-weight: 800;
+        text-decoration: none;
+        transition:
+            transform 0.2s ease,
+            background 0.2s ease;
+    }
+
+    .liked-explore-button:hover {
+        background: #4ade80;
+        color: #052e16 !important;
+        transform: translateY(-2px);
+    }
+
+    /* =========================================================
+       RESPONSIVE
+       ========================================================= */
+
+    @media (max-width: 1100px) {
+
+        .liked-songs-grid {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+
+    }
+
+    @media (max-width: 900px) {
+
+        .liked-songs-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+    }
+
+    @media (max-width: 700px) {
+
+        .liked-songs-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .liked-header {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+    }
+
+    @media (max-width: 480px) {
+
+        .liked-songs-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .liked-song-info {
+            padding: 11px;
+        }
+
+        .liked-song-title {
+            font-size: 0.82rem;
+        }
+
+        .liked-song-artist {
+            font-size: 0.7rem;
+        }
+
+    }
+</style>
+
+
+<div class="liked-page">
+
+    <!-- =====================================================
+         PAGE HEADER
+         ===================================================== -->
+
+    <div class="liked-header">
+
+        <div class="liked-header-content">
+
+            <h1>
+                ❤️ <span>Liked</span> Songs
+            </h1>
+
+            <p>
+                Songs you have liked
+            </p>
+
+        </div>
+
+        {% if liked_songs %}
+            <div class="liked-count">
+                {{ liked_songs|length }} song{{ liked_songs|length|pluralize }}
+            </div>
+        {% endif %}
+
+    </div>
+
+
+    <!-- =====================================================
+         LIKED SONGS
+         ===================================================== -->
+
+    {% if liked_songs %}
+
+        <div class="liked-songs-grid">
+
+            {% for song in liked_songs %}
+
+                <article class="liked-song-card">
+
+                    <!-- Cover -->
+
+                    <div class="liked-cover-wrapper">
+
+                        {% if song.cover_image %}
+
+                            <img
+                                class="liked-cover"
+                                src="{{ song.cover_image.url }}"
+                                alt="{{ song.title }}"
+                                loading="lazy"
+                            >
+
+                        {% endif %}
+
+
+                        <!-- Play button -->
+
+                        <div class="liked-cover-overlay">
+
+                            <a
+                                href="{% url 'index' %}?play={{ song.id }}"
+                                class="liked-play-button"
+                                aria-label="Play {{ song.title }}"
+                            >
+                                ▶
+                            </a>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Song information -->
+
+                    <div class="liked-song-info">
+
+                        <h3
+                            class="liked-song-title"
+                            title="{{ song.title }}"
+                        >
+                            {{ song.title }}
+                        </h3>
+
+                        <p
+                            class="liked-song-artist"
+                            title="{{ song.artist }}"
+                        >
+                            {{ song.artist }}
+                        </p>
+
+
+                        <!-- Controls -->
+
+                        <div class="liked-song-controls">
+
+                            <!-- Unlike -->
+
+                            <form
+                                method="post"
+                                action="{% url 'toggle_like' song.id %}"
+                                class="liked-like-form"
+                            >
+
+                                {% csrf_token %}
+
+                                <button
+                                    type="submit"
+                                    class="liked-like-button"
+                                    title="Remove from liked songs"
+                                    aria-label="Remove {{ song.title }} from liked songs"
+                                >
+                                    ♥
+                                </button>
+
+                            </form>
+
+
+                            <!-- Play -->
+
+                            <a
+                                href="{% url 'index' %}?play={{ song.id }}"
+                                class="liked-small-play"
+                            >
+                                ▶ Play
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+            {% endfor %}
+
+        </div>
+
+
+    {% else %}
+
+        <!-- =================================================
+             EMPTY STATE
+             ================================================= -->
+
+        <div class="liked-empty">
+
+            <div class="liked-empty-icon">
+                ♡
+            </div>
+
+            <h2>
+                No liked songs yet
+            </h2>
+
+            <p>
+                Songs you like will appear here.
+            </p>
+
+            <a
+                href="{% url 'index' %}"
+                class="liked-explore-button"
+            >
+                🎵 Explore Songs
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

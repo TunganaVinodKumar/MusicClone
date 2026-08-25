@@ -1,0 +1,478 @@
+{% extends 'main/base.html' %}
+
+{% block heading %}
+    <title>Profile - My Music Clone</title>
+{% endblock %}
+
+{% block body %}
+
+<style>
+    /* =========================================================
+       PROFILE PAGE
+    ========================================================= */
+
+    .profile-page {
+        width: min(850px, 100%);
+        margin: 0 auto;
+    }
+
+    /* Profile Card */
+
+    .profile-card {
+        padding: 45px 35px 35px;
+
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 22px;
+
+        background:
+            linear-gradient(
+                145deg,
+                rgba(21, 25, 34, 0.96),
+                rgba(16, 19, 26, 0.96)
+            );
+
+        box-shadow:
+            0 20px 50px rgba(0, 0, 0, 0.35);
+
+        text-align: center;
+    }
+
+    /* Profile Picture */
+
+    .profile-picture-wrapper {
+        position: relative;
+
+        width: 120px;
+        height: 120px;
+
+        margin: 0 auto 20px;
+    }
+
+    .profile-picture,
+    .profile-letter {
+        width: 120px;
+        height: 120px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 50%;
+    }
+
+    .profile-picture {
+        object-fit: cover;
+
+        border: 3px solid rgba(34, 197, 94, 0.35);
+
+        box-shadow:
+            0 12px 35px rgba(34, 197, 94, 0.18);
+    }
+
+    .profile-letter {
+        background:
+            linear-gradient(
+                135deg,
+                #4ade80,
+                #16a34a
+            );
+
+        color: #052e16;
+
+        font-family: "Montserrat", sans-serif;
+        font-size: 2.7rem;
+        font-weight: 800;
+
+        border: 3px solid rgba(74, 222, 128, 0.25);
+
+        box-shadow:
+            0 12px 35px rgba(34, 197, 94, 0.18);
+    }
+
+    /* Username */
+
+    .profile-username {
+        margin: 0;
+
+        color: #f5f7fb;
+
+        font-family: "Montserrat", sans-serif;
+        font-size: 1.65rem;
+        font-weight: 800;
+
+        letter-spacing: -0.03em;
+    }
+
+    /* Subtitle */
+
+    .profile-subtitle {
+        margin: 6px 0 0;
+
+        color: #9ca6b5;
+
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    /* Picture Controls */
+
+    .profile-picture-actions {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        gap: 8px;
+
+        margin-top: 20px;
+    }
+
+    .profile-picture-action {
+        padding: 8px 13px;
+
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        border-radius: 9px;
+
+        background: rgba(255, 255, 255, 0.045);
+
+        color: #a3adbd;
+
+        font-size: 0.78rem;
+        font-weight: 600;
+
+        cursor: pointer;
+
+        transition:
+            background 0.2s ease,
+            border-color 0.2s ease,
+            color 0.2s ease,
+            transform 0.2s ease;
+    }
+
+    .profile-picture-action:hover {
+        background: rgba(34, 197, 94, 0.08);
+
+        border-color: rgba(34, 197, 94, 0.28);
+
+        color: #4ade80;
+
+        transform: translateY(-1px);
+    }
+
+    /* Statistics */
+
+    .profile-stats {
+        display: grid;
+
+        grid-template-columns:
+            repeat(3, 1fr);
+
+        margin-top: 38px;
+
+        padding-top: 30px;
+
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .profile-stat {
+        position: relative;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        gap: 5px;
+
+        padding: 5px 15px;
+    }
+
+    .profile-stat:not(:last-child)::after {
+        content: "";
+
+        position: absolute;
+
+        top: 4px;
+        right: 0;
+
+        width: 1px;
+        height: 55px;
+
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    .profile-stat-icon {
+        font-size: 1.15rem;
+
+        line-height: 1;
+    }
+
+    .profile-stat-number {
+        color: #f5f7fb;
+
+        font-family: "Montserrat", sans-serif;
+        font-size: 1.35rem;
+        font-weight: 800;
+    }
+
+    .profile-stat-label {
+        color: #8f9bad;
+
+        font-size: 0.76rem;
+        font-weight: 600;
+    }
+
+
+    /* =========================================================
+       MOBILE
+    ========================================================= */
+
+    @media (max-width: 600px) {
+
+        .profile-card {
+            padding: 35px 20px 25px;
+
+            border-radius: 18px;
+        }
+
+        .profile-picture-wrapper,
+        .profile-picture,
+        .profile-letter {
+            width: 100px;
+            height: 100px;
+        }
+
+        .profile-letter {
+            font-size: 2.2rem;
+        }
+
+        .profile-username {
+            font-size: 1.4rem;
+        }
+
+        .profile-stats {
+            margin-top: 30px;
+            padding-top: 25px;
+        }
+
+        .profile-stat {
+            padding: 5px 8px;
+        }
+
+        .profile-stat-number {
+            font-size: 1.15rem;
+        }
+
+        .profile-stat-label {
+            font-size: 0.7rem;
+        }
+    }
+</style>
+
+
+<div class="profile-page">
+
+    <div class="profile-card">
+
+        <!-- =====================================================
+             PROFILE PICTURE
+        ====================================================== -->
+
+        <div class="profile-picture-wrapper">
+
+            {% if user_profile.profile_picture %}
+
+                <img
+                    src="{{ user_profile.profile_picture.url }}"
+                    alt="{{ request.user.username }} profile picture"
+                    class="profile-picture"
+                >
+
+            {% else %}
+
+                <div class="profile-letter">
+                    {{ request.user.username|first|upper }}
+                </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- =====================================================
+             USERNAME
+        ====================================================== -->
+
+        <h1 class="profile-username">
+            {{ request.user.username }}
+        </h1>
+
+        <p class="profile-subtitle">
+            Music Listener
+        </p>
+
+
+        <!-- =====================================================
+             PROFILE PICTURE ACTIONS
+        ====================================================== -->
+
+       <!-- =====================================================
+     PROFILE PICTURE ACTIONS
+====================================================== -->
+
+<div class="profile-picture-actions">
+
+    <!-- Change Picture -->
+    <form
+        method="POST"
+        action="{% url 'change_profile_picture' %}"
+        enctype="multipart/form-data"
+        id="profilePictureForm"
+    >
+        {% csrf_token %}
+
+        <input
+            type="file"
+            name="profile_picture"
+            id="profilePictureInput"
+            accept="image/*"
+            hidden
+        >
+
+        <button
+            type="button"
+            class="profile-picture-action"
+            onclick="document.getElementById('profilePictureInput').click()"
+        >
+            📷 Change Picture
+        </button>
+    </form>
+
+
+    <!-- Remove Picture -->
+    {% if user_profile.profile_picture %}
+
+        <form
+            method="POST"
+            action="{% url 'remove_profile_picture' %}"
+        >
+            {% csrf_token %}
+
+            <button
+                type="submit"
+                class="profile-picture-action"
+                onclick="return confirm('Remove your profile picture?')"
+            >
+                🗑️ Remove Picture
+            </button>
+        </form>
+
+    {% endif %}
+
+</div>
+
+
+        <!-- =====================================================
+             MUSIC STATISTICS
+        ====================================================== -->
+
+        <div class="profile-stats">
+
+            <!-- Songs -->
+
+            <div class="profile-stat">
+
+                <span class="profile-stat-icon">
+                    🎵
+                </span>
+
+                <span class="profile-stat-number">
+                    {{ song_count }}
+                </span>
+
+                <span class="profile-stat-label">
+                    Songs
+                </span>
+
+            </div>
+
+
+            <!-- Liked -->
+
+            <div class="profile-stat">
+
+                <span class="profile-stat-icon">
+                    ❤️
+                </span>
+
+                <span class="profile-stat-number">
+                    {{ liked_count }}
+                </span>
+
+                <span class="profile-stat-label">
+                    Liked
+                </span>
+
+            </div>
+
+
+            <!-- Playlists -->
+
+            <div class="profile-stat">
+
+                <span class="profile-stat-icon">
+                    🎧
+                </span>
+
+                <span class="profile-stat-number">
+                    {{ playlist_count }}
+                </span>
+
+                <span class="profile-stat-label">
+                    Playlists
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    const profilePictureInput =
+        document.getElementById("profilePictureInput");
+
+    const profilePictureForm =
+        document.getElementById("profilePictureForm");
+
+    if (profilePictureInput) {
+
+        profilePictureInput.addEventListener("change", function () {
+
+            if (this.files && this.files.length > 0) {
+
+                const file = this.files[0];
+
+                // Basic image validation
+                if (!file.type.startsWith("image/")) {
+                    alert("Please select an image file.");
+                    this.value = "";
+                    return;
+                }
+
+                // Maximum 5 MB
+                if (file.size > 5 * 1024 * 1024) {
+                    alert("Image must be smaller than 5 MB.");
+                    this.value = "";
+                    return;
+                }
+
+                // Automatically submit
+                profilePictureForm.submit();
+            }
+
+        });
+
+    }
+</script>
+{% endblock %}

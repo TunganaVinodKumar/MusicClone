@@ -1,0 +1,256 @@
+{% extends 'main/base.html' %}
+
+{% block heading %}
+    <title>Settings - My Music Clone</title>
+{% endblock %}
+
+{% block body %}
+
+<style>
+    .settings-page {
+        width: min(760px, 100%);
+        margin: 0 auto;
+    }
+
+    .settings-card {
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 20px;
+        background:
+            linear-gradient(
+                145deg,
+                rgba(21, 25, 34, 0.96),
+                rgba(16, 19, 26, 0.96)
+            );
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.30);
+    }
+
+    .settings-header {
+        padding: 28px 30px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .settings-header h1 {
+        margin: 0 0 6px;
+        color: #f5f7fb;
+        font-family: "Montserrat", sans-serif;
+        font-size: 1.6rem;
+        font-weight: 800;
+    }
+
+    .settings-header p {
+        margin: 0;
+        color: #8f9bad;
+        font-size: 0.85rem;
+    }
+
+    .settings-section {
+        padding: 28px 30px;
+    }
+
+    .settings-section-title {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+
+        margin: 0 0 22px;
+
+        color: #ffffff;
+        font-family: "Montserrat", sans-serif;
+        font-size: 1rem;
+        font-weight: 750;
+    }
+
+    /* Username */
+
+   .settings-item {
+    display: flex;
+    align-items: center;
+    gap: 60px;
+
+    padding: 16px 0;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.settings-item-label {
+    min-width: 100px;
+    color: #9ca6b5;
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+.settings-item-value {
+    color: #f5f7fb;
+    font-size: 0.9rem;
+    font-weight: 650;
+}
+
+    /* Danger zone */
+
+    .danger-zone {
+        margin-top: 8px;
+        padding: 20px;
+
+        border: 1px solid rgba(248, 113, 113, 0.16);
+        border-radius: 14px;
+
+        background: rgba(239, 68, 68, 0.035);
+    }
+
+    .danger-title {
+        margin: 0 0 7px;
+
+        color: #fca5a5;
+        font-size: 0.92rem;
+        font-weight: 750;
+    }
+
+    .danger-description {
+        margin: 0 0 18px;
+
+        color: #8f9bad;
+        font-size: 0.78rem;
+        line-height: 1.6;
+    }
+
+    .delete-account-button {
+        min-height: 40px;
+        padding: 0 16px;
+
+        border: 1px solid rgba(248, 113, 113, 0.28);
+        border-radius: 9px;
+
+        background: rgba(239, 68, 68, 0.10);
+
+        color: #fca5a5;
+
+        font-size: 0.8rem;
+        font-weight: 700;
+
+        cursor: pointer;
+
+        transition:
+            background 0.2s ease,
+            border-color 0.2s ease,
+            color 0.2s ease,
+            transform 0.2s ease;
+    }
+
+    .delete-account-button:hover {
+        background: rgba(239, 68, 68, 0.18);
+        border-color: rgba(248, 113, 113, 0.45);
+        color: #ffffff;
+        transform: translateY(-1px);
+    }
+
+    @media (max-width: 600px) {
+
+        .settings-header,
+        .settings-section {
+            padding: 22px 20px;
+        }
+
+        .settings-item {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .danger-zone {
+            padding: 16px;
+        }
+    }
+</style>
+
+
+<div class="settings-page">
+
+    <div class="settings-card">
+
+        <!-- Header -->
+
+        <div class="settings-header">
+
+            <h1>
+                ⚙️ Settings
+            </h1>
+
+            <p>
+                Manage your account
+            </p>
+
+        </div>
+
+
+        <!-- Account -->
+
+        <section class="settings-section">
+
+            <h2 class="settings-section-title">
+                🔐 Account
+            </h2>
+
+
+            <!-- Username -->
+
+            <div class="settings-item">
+
+                <span class="settings-item-label">
+                    Username
+                </span>
+
+                <span class="settings-item-value">
+                    {{ request.user.username }}
+                </span>
+
+            </div>
+
+
+            <!-- Delete Account -->
+
+            <div class="danger-zone">
+
+                <h3 class="danger-title">
+                    Delete Account
+                </h3>
+
+                <p class="danger-description">
+                    Permanently delete your account and all associated data.
+                    This action cannot be undone.
+                </p>
+
+                <form
+    method="POST"
+    action="{% url 'delete_account' %}"
+    onsubmit="return confirmDeleteAccount();"
+>
+    {% csrf_token %}
+
+    <button
+        type="submit"
+        class="delete-account-button"
+    >
+        Delete Account
+    </button>
+</form>
+
+            </div>
+
+        </section>
+
+    </div>
+
+</div>
+
+<script>
+    function confirmDeleteAccount() {
+        return confirm(
+            "Are you sure you want to permanently delete your account?\n\n" +
+            "Your playlists, likes, and profile data will be deleted.\n\n" +
+            "Your music library and songs will NOT be deleted."
+        );
+    }
+</script>
+
+{% endblock %}

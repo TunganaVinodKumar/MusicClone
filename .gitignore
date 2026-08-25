@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+music_project_env/
+venv/
+env/
+.venv/
+
+# Django
+*.log
+
+# Database
+db.sqlite3
+db.sqlite3-journal
+
+# Environment variables
+.env
+
+# Media files
+media/
+
+# Static collected files
+staticfiles/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

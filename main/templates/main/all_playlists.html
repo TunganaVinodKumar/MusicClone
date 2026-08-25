@@ -1,0 +1,139 @@
+{% extends 'main/base.html' %}
+
+{% block heading %}
+    <title>Playlists</title>
+
+    <style>
+    .playlist-item {
+        padding: 0 !important;
+        overflow: hidden;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .playlist-link {
+        display: block;
+        flex: 1;
+        min-width: 0;
+        padding: 16px 18px;
+    }
+
+    .playlist-delete-form {
+        margin: 0;
+        padding-right: 12px;
+    }
+
+    .playlist-delete-button {
+        width: 38px;
+        height: 38px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border: 1px solid rgba(248, 113, 113, 0.20);
+        border-radius: 10px;
+
+        background: rgba(239, 68, 68, 0.08);
+        color: #fca5a5;
+
+        cursor: pointer;
+        font-size: 0.95rem;
+
+        transition: 0.2s ease;
+    }
+
+    .playlist-delete-button:hover {
+        background: rgba(239, 68, 68, 0.16);
+        border-color: rgba(248, 113, 113, 0.40);
+        color: #ffffff;
+        transform: scale(1.05);
+    }
+    .playlist-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.playlist-create-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 11px 18px;
+
+    border: 1px solid rgba(34, 197, 94, 0.35);
+    border-radius: 10px;
+
+    background: rgba(34, 197, 94, 0.12);
+    color: #4ade80;
+
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+
+    transition: 0.2s ease;
+}
+
+.playlist-create-button:hover {
+    background: rgba(34, 197, 94, 0.20);
+    border-color: rgba(34, 197, 94, 0.55);
+    color: #86efac;
+    transform: translateY(-1px);
+}
+</style>
+{% endblock %}
+
+{% block body %}
+
+    <div class="playlist-header">
+
+        <h2 class="playlist-title">Your Playlists</h2>
+
+        <a
+            href="{% url 'create_playlist' %}"
+            class="playlist-create-button"
+        >
+            ＋ Create Playlist
+        </a>
+
+    </div>
+
+    <ul class="playlist-list">
+        {% for playlist in playlists %}
+            <li class="playlist-item">
+
+    <a
+        href="{% url 'view_playlist' playlist.pk %}"
+        class="playlist-link"
+    >
+        {{ playlist.name }}
+    </a>
+
+    <form
+        method="POST"
+        action="{% url 'delete_playlist' playlist.pk %}"
+        class="playlist-delete-form"
+        onsubmit="return confirm('Are you sure you want to delete &quot;{{ playlist.name }}&quot;? This cannot be undone.');"
+    >
+        {% csrf_token %}
+
+        <button
+            type="submit"
+            class="playlist-delete-button"
+            title="Delete playlist"
+            aria-label="Delete {{ playlist.name }}"
+        >
+            🗑️
+        </button>
+    </form>
+
+</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

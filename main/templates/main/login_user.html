@@ -1,0 +1,210 @@
+{% extends 'main/base.html' %}
+
+{% block heading %}
+    <title>Login Today!</title>
+{% endblock %}
+
+{% block body %}
+
+<div class="authentication-page">
+
+    <div class="authentication-card">
+
+        <div class="authentication-header">
+            <div class="authentication-icon">♫</div>
+
+            <h1>Welcome Back</h1>
+
+            <p>
+                Login to continue listening to your music.
+            </p>
+        </div>
+
+        {% if error %}
+            <div class="authentication-error">
+                ⚠️ {{ error }}
+            </div>
+        {% endif %}
+
+        <form method="post" class="authentication-form">
+
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="username">Username</label>
+
+                <input
+                    id="username"
+                    placeholder="Enter your username"
+                    type="text"
+                    name="username"
+                    value="{{ username|default:'' }}"
+                    autocomplete="username"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+
+                <input
+                    id="password"
+                    placeholder="Enter your password"
+                    type="password"
+                    name="password"
+                    autocomplete="current-password"
+                    required
+                >
+            </div>
+
+            <button type="submit" class="authentication-button">
+                Login
+            </button>
+
+        </form>
+
+        <p class="authentication-footer">
+            Don't have an account?
+            <a href="{% url 'register_user' %}">
+                Create one
+            </a>
+        </p>
+
+    </div>
+
+</div>
+
+<style>
+
+.authentication-page {
+    min-height: calc(100vh - 180px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.authentication-card {
+    width: min(100%, 460px);
+    padding: 34px;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 22px;
+    background: rgba(20, 24, 32, 0.92);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+.authentication-header {
+    text-align: center;
+    margin-bottom: 26px;
+}
+
+.authentication-icon {
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 16px;
+    display: grid;
+    place-items: center;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #4ade80, #16a34a);
+    color: #052e16;
+    font-size: 1.5rem;
+    font-weight: 800;
+}
+
+.authentication-header h1 {
+    margin: 0 0 8px;
+    font-size: 1.8rem;
+    font-weight: 800;
+}
+
+.authentication-header p {
+    margin: 0;
+    color: #a3adbd;
+    font-size: 0.92rem;
+}
+
+.authentication-error {
+    margin-bottom: 18px;
+    padding: 12px 14px;
+    border: 1px solid rgba(248, 113, 113, 0.35);
+    border-radius: 12px;
+    background: rgba(127, 29, 29, 0.20);
+    color: #fca5a5;
+    font-size: 0.88rem;
+    line-height: 1.5;
+}
+
+.authentication-form {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.form-group label {
+    color: #e5e7eb;
+    font-size: 0.86rem;
+    font-weight: 600;
+}
+
+.form-group input {
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 14px;
+    border-radius: 12px;
+}
+
+.authentication-button {
+    width: 100%;
+    min-height: 48px;
+    margin-top: 4px;
+    border-radius: 12px;
+    background: #22c55e;
+    color: #052e16;
+    font-weight: 800;
+}
+
+.authentication-footer {
+    margin: 22px 0 0;
+    color: #a3adbd;
+    text-align: center;
+    font-size: 0.88rem;
+}
+
+.authentication-footer a {
+    color: #4ade80;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.authentication-footer a:hover {
+    color: #86efac;
+    text-decoration: underline;
+}
+
+@media (max-width: 520px) {
+
+    .authentication-page {
+        padding: 25px 14px;
+    }
+
+    .authentication-card {
+        padding: 25px 20px;
+    }
+
+}
+
+</style>
+
+{% endblock %}
