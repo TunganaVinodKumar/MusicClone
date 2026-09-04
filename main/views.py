@@ -28,18 +28,14 @@ def index(request):
     # Popular Songs - remove duplicate title + artist entries
     # --------------------------------------------------------
 
-    popular_songs = []
-    seen_songs = set()
+    popular_songs = Song.objects.filter(
+    is_popular=True
+).order_by('-id')[:15]
+    recent_songs = Song.objects.order_by(
+    '-created_at'
+)[:6]
 
-    for song in songs:
-        song_key = (
-            song.title.strip().lower(),
-            song.artist.strip().lower()
-        )
-
-        if song_key not in seen_songs:
-            seen_songs.add(song_key)
-            popular_songs.append(song)
+    
 
     featured_playlists = Playlist.objects.filter(
         is_featured=True
@@ -70,6 +66,7 @@ def index(request):
     shuffle_mode = request.GET.get('shuffle') == 'true'
 
     play_song = None
+    player_origin = request.build_absolute_uri('/').rstrip('/')
     previous_song = None
     next_song = None
     shuffle_song = None
@@ -128,6 +125,9 @@ def index(request):
             id=play_song_id
         )
 
+        player_origin = request.build_absolute_uri('/')
+        player_origin = player_origin.rstrip('/')
+
         # Convert songs into a list
         song_list = list(songs)
 
@@ -180,6 +180,7 @@ def index(request):
 
             'search_songs': search_songs,
             'popular_songs': popular_songs,
+            'recent_songs': recent_songs,
 
             'search_query': search_query,
             'search_results': search_results,
@@ -187,6 +188,7 @@ def index(request):
 
             'play_song': play_song,
             'playlists': playlists,
+            'player_origin': player_origin,
 
             # Player
             'previous_song': previous_song,
@@ -480,10 +482,6 @@ def logout_user(request):
 # USER PROFILE
 # ============================================================
 
-# ============================================================
-# USER PROFILE
-# ============================================================
-
 @login_required
 def profile(request):
 
@@ -711,34 +709,7 @@ def create_playlist(request):
         'main/create_playlist.html'
     )
 
-# ============================================================
-# DELETE PLAYLIST
-# ============================================================
 
-@login_required
-def delete_playlist(request, pk):
-
-    if request.method != "POST":
-        return redirect("all_playlists")
-
-    # Only allow the logged-in user to delete their own playlist
-    playlist = get_object_or_404(
-        Playlist,
-        id=pk,
-        user=request.user
-    )
-
-    playlist_name = playlist.name
-
-    # Delete the playlist
-    playlist.delete()
-
-    messages.success(
-        request,
-        f'Playlist "{playlist_name}" was deleted successfully.'
-    )
-
-    return redirect("all_playlists")
 
 
 
@@ -781,52 +752,55 @@ def view_playlist(request, pk):
 
     if request.method == "POST":
 
-        # Featured playlists are read-only.
-        if playlist.is_featured:
+        # Featured playlists are completely read-only
+            # inside the normal application.
+            # They are managed only from Django Admin.
 
+        if playlist.is_featured:
             if not request.user.is_superuser:
                 return redirect(
-                                'view_playlist',
-                                pk=playlist.pk
-                            )
-
-            
-
-        # Normal playlist:
-        # only its owner can modify it.
+                    'view_playlist',
+                    pk=playlist.pk
+                )
+                
+        
+            # Normal playlist:
+            # only its owner can modify it.
         else:
+
             if playlist.user != request.user:
                 return redirect(
-                                'view_playlist',
-                                pk=playlist.pk
-                            )
-        remove_song_id = request.POST.get(
-        "remove_song_id"
-    )
-            
-
+                    'view_playlist',
+                    pk=playlist.pk
+                )
+        
+        remove_song_id = request.POST.get("remove_song_id")
+        
         if remove_song_id:
-
+        
             song = get_object_or_404(
-                Song,
-                id=remove_song_id
+                    Song,
+                    id=remove_song_id
+                )
+        
+            if playlist.song.filter(
+                    pk=song.pk
+                ).exists():
+        
+                playlist.song.remove(song)
+        
+                messages.success(
+                        request,
+                        f'Removed "{song.title}" from "{playlist.name}".'
+                    )
+        
+        return redirect(
+                'view_playlist',
+                pk=playlist.pk
             )
 
-            if playlist.song.filter(
-                pk=song.pk
-            ).exists():
-
-                playlist.song.remove(song)
-
-                messages.success(
-                    request,
-                    f'Removed "{song.title}" from "{playlist.name}".'
-                )
-
-        return redirect(
-            'view_playlist',
-            pk=playlist.pk
-        )
+    
+    
 
     # --------------------------------------------------------
     # Player
@@ -934,6 +908,10 @@ def view_playlist(request, pk):
                 possible_songs
             )
 
+    user_playlists = Playlist.objects.filter(
+    user=request.user
+)
+
     # --------------------------------------------------------
     # Render playlist
     # --------------------------------------------------------
@@ -944,6 +922,7 @@ def view_playlist(request, pk):
         {
             'playlist': playlist,
             'playlist_songs': playlist_list,
+            'playlists': user_playlists,
             'next_song': next_song,
             'previous_song': previous_song,
             'shuffle_song': shuffle_song,

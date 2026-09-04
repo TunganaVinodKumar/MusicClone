@@ -27,6 +27,16 @@
             font-size: 1rem;
         }
 
+        .playlist-cover {
+    width: 220px;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 18px;
+    display: block;
+    margin-bottom: 22px;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
+}
+
         .playlist-actions {
             display: flex;
             align-items: center;
@@ -198,31 +208,229 @@
             }
         }
 
-        .song-actions {
+       /* =========================================================
+   SONG ACTIONS
+   ========================================================= */
+
+.song-actions {
     display: flex;
     align-items: center;
     gap: 10px;
+    flex-shrink: 0;
 }
 
-.remove-song-form {
+
+/* =========================================================
+   THREE DOT MENU
+   ========================================================= */
+
+.playlist-song-menu {
+    position: relative;
+    flex-shrink: 0;
+}
+
+
+.playlist-song-menu summary {
+    width: 42px;
+    height: 42px;
+
+    display: grid;
+    place-items: center;
+
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 50%;
+
+    background: #171d27;
+    color: #ffffff;
+
+    cursor: pointer;
+
+    font-size: 1.35rem;
+    font-weight: 800;
+    line-height: 1;
+
+    list-style: none;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+
+.playlist-song-menu summary::-webkit-details-marker {
+    display: none;
+}
+
+
+.playlist-song-menu summary:hover,
+.playlist-song-menu[open] summary {
+    background: #22c55e;
+    border-color: #22c55e;
+    color: #052e16;
+}
+
+
+/* =========================================================
+   MENU POPUP
+   ========================================================= */
+
+.playlist-song-popup {
+    position: absolute;
+    top: 48px;
+    right: 0;
+
+    z-index: 100;
+
+    width: 220px;
+    max-width: calc(100vw - 40px);
+
+    padding: 8px;
+
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 13px;
+
+    background: #1b202a;
+
+    box-shadow:
+        0 18px 40px rgba(0,0,0,0.45);
+}
+
+
+/* =========================================================
+   MENU ITEMS
+   ========================================================= */
+
+.playlist-song-form {
     margin: 0;
 }
 
-.remove-song-button {
-    width: 42px;
-    height: 42px;
-    padding: 0;
-    border: 1px solid rgba(251, 113, 133, 0.25);
-    border-radius: 50%;
-    background: rgba(251, 113, 133, 0.10);
-    color: #fda4af;
+
+.playlist-song-action {
+    display: flex;
+    align-items: center;
+
+    width: 100%;
+
+    gap: 10px;
+
+    padding: 10px 11px;
+
+    border: 0;
+    border-radius: 8px;
+
+    background: transparent;
+
+    color: #ffffff;
+
+    text-align: left;
+    text-decoration: none;
+
     cursor: pointer;
+
+    font-size: 0.82rem;
+    font-weight: 600;
+
+    box-sizing: border-box;
+
+    transition:
+        background 0.18s ease,
+        color 0.18s ease;
+}
+
+
+.playlist-song-action:hover {
+    background: rgba(34,197,94,0.14);
+    color: #4ade80;
+}
+
+
+.playlist-song-action.active {
+    background: rgba(34, 197, 94, 0.14);
+    color: #4ade80;
+
+    border: 1px solid rgba(74, 222, 128, 0.18);
+}
+
+.playlist-song-action.active:hover {
+    background: rgba(34, 197, 94, 0.20);
+    color: #86efac;
+}
+
+.playlist-song-action.added {
+    cursor: default;
+}
+
+.playlist-song-action.added:hover {
+    background: rgba(34, 197, 94, 0.20);
+    color: #86efac;
+}
+
+
+.playlist-song-action-icon {
+    width: 20px;
+
+    flex-shrink: 0;
+
+    text-align: center;
+
     font-size: 1rem;
 }
 
-.remove-song-button:hover {
-    background: rgba(251, 113, 133, 0.20);
-    color: #ffffff;
+
+/* =========================================================
+   MENU HEADING
+   ========================================================= */
+
+.playlist-song-menu-heading {
+    margin: 6px 8px 7px;
+
+    color: #8d98a9;
+
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   MENU DIVIDER
+   ========================================================= */
+
+.playlist-song-divider {
+    height: 1px;
+
+    margin: 7px 4px;
+
+    background: rgba(255,255,255,0.08);
+}
+
+
+/* =========================================================
+   REMOVE ACTION
+   ========================================================= */
+
+.playlist-song-remove {
+    color: #fda4af;
+}
+
+
+.playlist-song-remove:hover {
+    background: rgba(239,68,68,0.12);
+    color: #fb7185;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .playlist-song-popup {
+        right: 0;
+        width: 205px;
+    }
+
 }
 
 .playlist-message {
@@ -253,6 +461,14 @@
 
     <div class="playlist-header">
 
+        {% if playlist.cover_image %}
+    <img
+        src="{{ playlist.cover_image.url }}"
+        alt="{{ playlist.name }}"
+        class="playlist-cover"
+    >
+{% endif %}
+
         <h1>{{ playlist.name }}</h1>
 
         <p>
@@ -261,34 +477,40 @@
 
         <div class="playlist-actions">
 
-            <form method="GET">
-                {% if play_song %}
-                    <input
-                        type="hidden"
-                        name="play"
-                        value="{{ play_song.id }}"
-                    >
-                {% endif %}
+    {% if not playlist.is_featured %}
 
+        <form method="GET">
+
+            {% if play_song %}
                 <input
                     type="hidden"
-                    name="shuffle"
-                    value="{% if shuffle %}false{% else %}true{% endif %}"
+                    name="play"
+                    value="{{ play_song.id }}"
                 >
+            {% endif %}
 
-                <button type="submit" class="shuffle-button">
-                    {% if shuffle %}
-                        🔀 Disable Shuffle
-                    {% else %}
-                        🔀 Shuffle
-                    {% endif %}
-                </button>
-            </form>
+            <input
+                type="hidden"
+                name="shuffle"
+                value="{% if shuffle %}false{% else %}true{% endif %}"
+            >
+
+            <button type="submit" class="shuffle-button">
+                {% if shuffle %}
+                    🔀 Disable Shuffle
+                {% else %}
+                    🔀 Shuffle
+                {% endif %}
+            </button>
+
+        </form>
+
+    {% endif %}
 
 
         </div>
         <!-- Delete Playlist -->
-         {% if not playlist.is_featured or user.is_superuser %}
+         {% if not playlist.is_featured %}
         <form
             method="POST"
             action="{% url 'delete_playlist' playlist.pk %}"
@@ -346,6 +568,10 @@
 
                         <div class="song-actions">
 
+    <!-- =====================================================
+         PLAY
+         ===================================================== -->
+
     <a
         href="?play={{ song.id }}&shuffle={{ shuffle }}"
         class="song-play-link"
@@ -358,30 +584,203 @@
             ▶
         </button>
     </a>
-{% if not playlist.is_featured or user.is_superuser %}
-    <form
-        method="post"
-        class="remove-song-form"
-        onsubmit="return confirm('Remove {{ song.title }} from this playlist?');"
-    >
-        {% csrf_token %}
 
-        <input
-            type="hidden"
-            name="remove_song_id"
-            value="{{ song.id }}"
+
+    <!-- =====================================================
+         THREE DOT SONG MENU
+         ===================================================== -->
+
+    <details class="playlist-song-menu">
+
+        <summary
+            aria-label="More options for {{ song.title }}"
+            title="More options"
+        >
+            ⋮
+        </summary>
+
+
+        <div class="playlist-song-popup">
+
+            {% if user.is_authenticated %}
+
+                <!-- =================================================
+                     LIKE / UNLIKE
+                     ================================================= -->
+
+                <form
+                    method="post"
+                    action="{% url 'toggle_like' song.id %}"
+                    class="playlist-song-form"
+                >
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="playlist-song-action {% if user in song.liked_by.all %}active{% endif %}"
+                        aria-label="{% if user in song.liked_by.all %}Unlike{% else %}Like{% endif %} {{ song.title }}"
+                    >
+
+                        <span class="playlist-song-action-icon">
+
+                            {% if user in song.liked_by.all %}
+                                ♥
+                            {% else %}
+                                ♡
+                            {% endif %}
+
+                        </span>
+
+                        {% if user in song.liked_by.all %}
+                            Liked
+                        {% else %}
+                            Like
+                        {% endif %}
+
+                    </button>
+
+                </form>
+
+
+                <div class="playlist-song-divider"></div>
+
+
+                <!-- =================================================
+                     ADD TO PLAYLIST
+                     ================================================= -->
+
+                <p class="playlist-song-menu-heading">
+                    Add to playlist
+                </p>
+
+
+{% for user_playlist in playlists %}
+
+    {% if song in user_playlist.song.all %}
+
+        <!-- =================================================
+             SONG ALREADY EXISTS IN THIS PLAYLIST
+             ================================================= -->
+
+        <div
+            class="playlist-song-action active added"
+            title="Already in {{ user_playlist.name }}"
         >
 
-        <button
-            type="submit"
-            class="remove-song-button"
-            aria-label="Remove {{ song.title }}"
-            title="Remove from playlist"
+            <span class="playlist-song-action-icon">
+                ✓
+            </span>
+
+            {{ user_playlist.name }}
+
+        </div>
+
+    {% else %}
+
+        <!-- =================================================
+             SONG NOT IN THIS PLAYLIST
+             ================================================= -->
+
+        <form
+            method="post"
+            action="{% url 'index' %}"
+            class="playlist-song-form"
         >
-            ✕
-        </button>
-    </form>
+            {% csrf_token %}
+
+            <input
+                type="hidden"
+                name="song_id"
+                value="{{ song.id }}"
+            >
+
+            <input
+                type="hidden"
+                name="playlist_id"
+                value="{{ user_playlist.id }}"
+            >
+
+            <button
+                type="submit"
+                class="playlist-song-action"
+            >
+
+                <span class="playlist-song-action-icon">
+                    ＋
+                </span>
+
+                {{ user_playlist.name }}
+
+            </button>
+
+        </form>
+
     {% endif %}
+
+{% empty %}
+
+    <a
+        href="{% url 'create_playlist' %}"
+        class="playlist-song-action"
+    >
+
+        <span class="playlist-song-action-icon">
+            ＋
+        </span>
+
+        Create playlist
+
+    </a>
+
+{% endfor %}
+
+
+                <!-- =================================================
+                     REMOVE FROM CURRENT PLAYLIST
+                     ONLY NORMAL PLAYLISTS
+                     ================================================= -->
+
+                {% if not playlist.is_featured %}
+
+                    <div class="playlist-song-divider"></div>
+
+                    <form
+                        method="post"
+                        class="playlist-song-form"
+                        onsubmit="return confirm('Remove {{ song.title }} from this playlist?');"
+                    >
+                        {% csrf_token %}
+
+                        <input
+                            type="hidden"
+                            name="remove_song_id"
+                            value="{{ song.id }}"
+                        >
+
+                        <button
+                            type="submit"
+                            class="playlist-song-action playlist-song-remove"
+                            aria-label="Remove {{ song.title }} from this playlist"
+                        >
+
+                            <span class="playlist-song-action-icon">
+                                ✕
+                            </span>
+
+                            Remove from playlist
+
+                        </button>
+
+                    </form>
+
+                {% endif %}
+
+
+            {% endif %}
+
+        </div>
+
+    </details>
 
 </div>
 

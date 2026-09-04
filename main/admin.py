@@ -2,9 +2,30 @@ from django.contrib import admin
 from .models import Song, Playlist
 
 
-# Register your models here.
+@admin.register(Song)
+class SongAdmin(admin.ModelAdmin):
 
-admin.site.register(Song)
+    list_display = (
+        'title',
+        'artist',
+        'gerne',
+        'is_popular',
+        'created_at',
+    )
+
+    list_filter = (
+        'is_popular',
+    )
+
+    list_editable = (
+        'is_popular',
+    )
+
+    search_fields = (
+        'title',
+        'artist',
+        'gerne',
+    )
 
 
 @admin.register(Playlist)
@@ -14,6 +35,7 @@ class PlaylistAdmin(admin.ModelAdmin):
         'name',
         'user',
         'is_featured',
+        'cover_image',
     )
 
     list_filter = (
@@ -27,4 +49,16 @@ class PlaylistAdmin(admin.ModelAdmin):
     search_fields = (
         'name',
         'user__username',
+    )
+
+    filter_horizontal = (
+        'song',
+    )
+
+    fields = (
+        'name',
+        'user',
+        'song',
+        'is_featured',
+        'cover_image',
     )

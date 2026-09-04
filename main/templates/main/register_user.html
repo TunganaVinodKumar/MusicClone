@@ -1,25 +1,389 @@
 {% extends 'main/base.html' %}
 
 {% block heading %}
-    <title>Create Account</title>
+<title>Create Account</title>
+
+<style>
+/* =====================================================
+   FULL-PAGE OVERRIDE
+   ===================================================== */
+body { background: #060a10 !important; }
+.main-content { width: 100% !important; padding: 0 !important; margin: 0 !important; }
+
+/* =====================================================
+   ANIMATED BACKGROUND
+   ===================================================== */
+#auth-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.auth-mesh {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.auth-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.15;
+    animation: authBlobFloat 10s ease-in-out infinite;
+}
+
+.auth-blob-1 {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, #22c55e, transparent 70%);
+    top: -120px; right: -80px;
+    animation-delay: 0s;
+}
+
+.auth-blob-2 {
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, #3b82f6, transparent 70%);
+    bottom: -80px; left: -100px;
+    animation-delay: -5s;
+}
+
+.auth-blob-3 {
+    width: 280px; height: 280px;
+    background: radial-gradient(circle, #8b5cf6, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    animation-delay: -3s;
+}
+
+@keyframes authBlobFloat {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33%  { transform: translate(20px, -30px) scale(1.05); }
+    66%  { transform: translate(-15px, 15px) scale(0.95); }
+}
+
+/* =====================================================
+   PAGE WRAPPER
+   ===================================================== */
+.authentication-page {
+    position: relative;
+    z-index: 2;
+    min-height: calc(100vh - 74px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+/* =====================================================
+   CARD — GLASSMORPHISM
+   ===================================================== */
+.authentication-card {
+    position: relative;
+    width: min(100%, 460px);
+    padding: 38px 36px;
+    border-radius: 28px;
+    border: 1px solid rgba(255,255,255,0.09);
+    background: rgba(13, 17, 25, 0.75);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    box-shadow:
+        0 40px 80px rgba(0,0,0,0.5),
+        0 0 0 1px rgba(255,255,255,0.04) inset;
+    animation: cardSlideIn 0.6s cubic-bezier(0.23, 1, 0.32, 1) both;
+    overflow: hidden;
+}
+
+@keyframes cardSlideIn {
+    from { opacity: 0; transform: translateY(40px) scale(0.96); }
+    to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+/* Shimmer top border */
+.authentication-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(74,222,128,0.6) 30%,
+        rgba(74,222,128,1) 50%,
+        rgba(74,222,128,0.6) 70%,
+        transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmerBorder 3s linear infinite;
+}
+
+@keyframes shimmerBorder {
+    0%   { background-position: -200% 0; }
+    100% { background-position:  200% 0; }
+}
+
+/* Inner glow blob */
+.authentication-card::after {
+    content: '';
+    position: absolute;
+    top: -80px; right: -60px;
+    width: 260px; height: 260px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(34,197,94,0.07), transparent 70%);
+    pointer-events: none;
+}
+
+/* =====================================================
+   HEADER
+   ===================================================== */
+.authentication-header {
+    text-align: center;
+    margin-bottom: 28px;
+    animation: fadeInDown 0.5s ease 0.2s both;
+}
+
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.authentication-icon {
+    width: 58px;
+    height: 58px;
+    margin: 0 auto 16px;
+    display: grid;
+    place-items: center;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #4ade80, #16a34a);
+    color: #052e16;
+    font-size: 1.5rem;
+    font-weight: 800;
+    box-shadow:
+        0 8px 24px rgba(34,197,94,0.35),
+        0 0 0 4px rgba(74,222,128,0.12);
+    animation: iconPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both,
+               iconGlow 3s ease-in-out 1s infinite;
+}
+
+@keyframes iconPop {
+    from { opacity: 0; transform: scale(0.5) rotate(-15deg); }
+    to   { opacity: 1; transform: scale(1)   rotate(0deg);   }
+}
+
+@keyframes iconGlow {
+    0%, 100% { box-shadow: 0 8px 24px rgba(34,197,94,0.35), 0 0 0 4px rgba(74,222,128,0.12); }
+    50%       { box-shadow: 0 8px 36px rgba(34,197,94,0.6),  0 0 0 6px rgba(74,222,128,0.22); }
+}
+
+.authentication-header h1 {
+    margin: 0 0 8px;
+    font-family: "Montserrat", sans-serif;
+    font-size: 1.85rem;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: -0.04em;
+}
+
+.authentication-header p {
+    margin: 0;
+    color: #8d9daf;
+    font-size: 0.92rem;
+}
+
+/* =====================================================
+   ERROR
+   ===================================================== */
+.authentication-error {
+    margin-bottom: 18px;
+    padding: 12px 14px;
+    border: 1px solid rgba(248,113,113,0.35);
+    border-radius: 12px;
+    background: rgba(127,29,29,0.25);
+    color: #fca5a5;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    animation: shakeError 0.4s ease both;
+}
+
+@keyframes shakeError {
+    0%,100% { transform: translateX(0); }
+    20%     { transform: translateX(-6px); }
+    40%     { transform: translateX(6px); }
+    60%     { transform: translateX(-4px); }
+    80%     { transform: translateX(4px); }
+}
+
+/* =====================================================
+   FORM
+   ===================================================== */
+.authentication-form {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    animation: fadeInUp 0.5s ease both;
+}
+
+.form-group:nth-child(1) { animation-delay: 0.25s; }
+.form-group:nth-child(2) { animation-delay: 0.35s; }
+.form-group:nth-child(3) { animation-delay: 0.45s; }
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.form-group label {
+    color: #c8d3df;
+    font-size: 0.84rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+.form-group input {
+    width: 100%;
+    min-height: 50px;
+    padding: 13px 16px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.04);
+    color: #fff;
+    font-size: 0.95rem;
+    transition: all 0.25s ease;
+    outline: none;
+}
+
+.form-group input:hover {
+    border-color: rgba(255,255,255,0.14);
+    background: rgba(255,255,255,0.06);
+}
+
+.form-group input:focus {
+    border-color: rgba(74,222,128,0.5);
+    background: rgba(34,197,94,0.05);
+    box-shadow:
+        0 0 0 3px rgba(34,197,94,0.12),
+        0 4px 16px rgba(0,0,0,0.2);
+    transform: translateY(-1px);
+}
+
+.field-help {
+    color: #6b7a8d;
+    font-size: 0.74rem;
+    line-height: 1.4;
+}
+
+/* =====================================================
+   BUTTON
+   ===================================================== */
+.authentication-button {
+    position: relative;
+    width: 100%;
+    min-height: 52px;
+    margin-top: 6px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: #fff;
+    font-weight: 800;
+    font-size: 1rem;
+    letter-spacing: 0.01em;
+    border: none;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+    box-shadow: 0 8px 24px rgba(34,197,94,0.3), 0 0 0 1px rgba(74,222,128,0.2) inset;
+    animation: fadeInUp 0.5s ease 0.55s both;
+}
+
+.authentication-button::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transform: skewX(-20deg);
+    transition: left 0.55s ease;
+}
+
+.authentication-button:hover::after { left: 150%; }
+
+.authentication-button:hover {
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 16px 36px rgba(34,197,94,0.5), 0 0 0 1px rgba(74,222,128,0.3) inset;
+}
+
+.authentication-button:active {
+    transform: translateY(0) scale(0.99);
+}
+
+/* =====================================================
+   FOOTER LINK
+   ===================================================== */
+.authentication-footer {
+    margin: 22px 0 0;
+    color: #7a8899;
+    text-align: center;
+    font-size: 0.88rem;
+    animation: fadeInUp 0.5s ease 0.6s both;
+}
+
+.authentication-footer a {
+    color: #4ade80;
+    font-weight: 700;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.authentication-footer a:hover {
+    color: #86efac;
+    text-decoration: underline;
+}
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+@media (max-width: 520px) {
+    .authentication-page { padding: 25px 14px; }
+    .authentication-card { padding: 28px 22px; border-radius: 22px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
 {% endblock %}
 
 {% block body %}
 
-<div class="authentication-page">
+<!-- Background FX -->
+<div class="auth-mesh" aria-hidden="true">
+    <div class="auth-blob auth-blob-1"></div>
+    <div class="auth-blob auth-blob-2"></div>
+    <div class="auth-blob auth-blob-3"></div>
+</div>
+<canvas id="auth-canvas" aria-hidden="true"></canvas>
 
+<div class="authentication-page">
     <div class="authentication-card">
 
         <div class="authentication-header">
-
             <div class="authentication-icon">♫</div>
-
             <h1>Create Account</h1>
-
-            <p>
-                Join your personal music space.
-            </p>
-
+            <p>Join your personal music space.</p>
         </div>
 
         {% if error %}
@@ -29,15 +393,10 @@
         {% endif %}
 
         <form method="post" class="authentication-form">
-
             {% csrf_token %}
 
             <div class="form-group">
-
-                <label for="username">
-                    Username
-                </label>
-
+                <label for="username">Username</label>
                 <input
                     id="username"
                     placeholder="Choose a username"
@@ -48,19 +407,11 @@
                     autocomplete="username"
                     required
                 >
-
-                <small class="field-help">
-                    4–20 characters. Letters, numbers and _ only.
-                </small>
-
+                <small class="field-help">4–20 characters. Letters, numbers and _ only.</small>
             </div>
 
             <div class="form-group">
-
-                <label for="password">
-                    Password
-                </label>
-
+                <label for="password">Password</label>
                 <input
                     id="password"
                     placeholder="Create a strong password"
@@ -69,20 +420,11 @@
                     autocomplete="new-password"
                     required
                 >
-
-                <small class="field-help">
-                    Minimum 8 characters with uppercase, lowercase,
-                    number and special character.
-                </small>
-
+                <small class="field-help">Minimum 8 characters with uppercase, lowercase, number and special character.</small>
             </div>
 
             <div class="form-group">
-
-                <label for="password2">
-                    Confirm Password
-                </label>
-
+                <label for="password2">Confirm Password</label>
                 <input
                     id="password2"
                     placeholder="Enter your password again"
@@ -91,169 +433,63 @@
                     autocomplete="new-password"
                     required
                 >
-
             </div>
 
-            <button
-                type="submit"
-                class="authentication-button"
-            >
+            <button type="submit" class="authentication-button">
                 Create Account
             </button>
-
         </form>
 
         <p class="authentication-footer">
-
             Already have an account?
-
-            <a href="{% url 'login_user' %}">
-                Login
-            </a>
-
+            <a href="{% url 'login_user' %}">Login</a>
         </p>
 
     </div>
-
 </div>
 
-<style>
+<script>
+(function () {
+    const canvas = document.getElementById('auth-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let W, H, stars = [];
 
-.authentication-page {
-    min-height: calc(100vh - 180px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 40px 20px;
-}
+    function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
 
-.authentication-card {
-    width: min(100%, 460px);
-    padding: 34px;
-    border: 1px solid rgba(255, 255, 255, 0.09);
-    border-radius: 22px;
-    background: rgba(20, 24, 32, 0.92);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
-}
-
-.authentication-header {
-    text-align: center;
-    margin-bottom: 26px;
-}
-
-.authentication-icon {
-    width: 52px;
-    height: 52px;
-    margin: 0 auto 16px;
-    display: grid;
-    place-items: center;
-    border-radius: 15px;
-    background: linear-gradient(135deg, #4ade80, #16a34a);
-    color: #052e16;
-    font-size: 1.5rem;
-    font-weight: 800;
-}
-
-.authentication-header h1 {
-    margin: 0 0 8px;
-    font-size: 1.8rem;
-    font-weight: 800;
-}
-
-.authentication-header p {
-    margin: 0;
-    color: #a3adbd;
-    font-size: 0.92rem;
-}
-
-.authentication-error {
-    margin-bottom: 18px;
-    padding: 12px 14px;
-    border: 1px solid rgba(248, 113, 113, 0.35);
-    border-radius: 12px;
-    background: rgba(127, 29, 29, 0.20);
-    color: #fca5a5;
-    font-size: 0.88rem;
-    line-height: 1.5;
-}
-
-.authentication-form {
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    box-shadow: none;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
-}
-
-.form-group label {
-    color: #e5e7eb;
-    font-size: 0.86rem;
-    font-weight: 600;
-}
-
-.form-group input {
-    width: 100%;
-    min-height: 48px;
-    padding: 12px 14px;
-    border-radius: 12px;
-}
-
-.field-help {
-    color: #7f8da3;
-    font-size: 0.74rem;
-    line-height: 1.4;
-}
-
-.authentication-button {
-    width: 100%;
-    min-height: 48px;
-    margin-top: 4px;
-    border-radius: 12px;
-    background: #22c55e;
-    color: #052e16;
-    font-weight: 800;
-}
-
-.authentication-footer {
-    margin: 22px 0 0;
-    color: #a3adbd;
-    text-align: center;
-    font-size: 0.88rem;
-}
-
-.authentication-footer a {
-    color: #4ade80;
-    font-weight: 700;
-    text-decoration: none;
-}
-
-.authentication-footer a:hover {
-    color: #86efac;
-    text-decoration: underline;
-}
-
-@media (max-width: 520px) {
-
-    .authentication-page {
-        padding: 25px 14px;
+    function createStars(n) {
+        stars = [];
+        for (let i = 0; i < n; i++) {
+            stars.push({
+                x: Math.random() * W,
+                y: Math.random() * H,
+                r: Math.random() * 1.4 + 0.2,
+                op: Math.random() * 0.45 + 0.08,
+                sp: Math.random() * 0.015 + 0.004,
+                ph: Math.random() * Math.PI * 2,
+            });
+        }
     }
 
-    .authentication-card {
-        padding: 25px 20px;
+    let t = 0;
+    function draw() {
+        ctx.clearRect(0, 0, W, H);
+        t += 0.008;
+        for (const s of stars) {
+            const op = s.op * (0.5 + 0.5 * Math.sin(t * s.sp * 80 + s.ph));
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(255,255,255,${op})`;
+            ctx.fill();
+        }
+        requestAnimationFrame(draw);
     }
 
-}
-
-</style>
+    resize();
+    createStars(100);
+    draw();
+    window.addEventListener('resize', () => { resize(); createStars(100); });
+}());
+</script>
 
 {% endblock %}

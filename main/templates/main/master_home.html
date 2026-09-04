@@ -4,657 +4,1052 @@
 <title>My Music Clone</title>
 
 <style>
-    .master-page {
-        width: min(1240px, calc(100% - 40px));
-        margin: 0 auto;
-        padding: 34px 0 80px;
-    }
+/* =====================================================
+   FONTS & RESET
+   ===================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Montserrat:wght@700;800;900&display=swap');
 
-    .master-hero {
-        position: relative;
-        overflow: hidden;
-        min-height: 470px;
-        padding: 70px 64px;
-        display: flex;
-        align-items: center;
-        border: 1px solid rgba(255,255,255,0.08);
-        border-radius: 28px;
-        background:
-            radial-gradient(circle at 82% 25%, rgba(34,197,94,0.22), transparent 30%),
-            radial-gradient(circle at 15% 90%, rgba(59,130,246,0.12), transparent 34%),
-            linear-gradient(135deg, #151a22, #0d1118);
-        box-shadow: 0 25px 70px rgba(0,0,0,0.30);
-    }
+/* =====================================================
+   FULL PAGE TRANSPARENCY — override base.html backgrounds
+   ===================================================== */
+body {
+    background: #060a10 !important;  /* single flat dark — canvas/mesh sit on top */
+}
 
-    .master-hero-content {
-        position: relative;
-        z-index: 3;
-        max-width: 680px;
-    }
+/* Remove the main-content container's width/padding constraints
+   so it doesn't create a visible box around the landing page */
+.main-content {
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
 
-    .master-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 20px;
-        padding: 8px 14px;
-        border: 1px solid rgba(74,222,128,0.22);
-        border-radius: 999px;
-        background: rgba(34,197,94,0.09);
-        color: #4ade80;
-        font-size: .78rem;
-        font-weight: 700;
-        letter-spacing: .05em;
-        text-transform: uppercase;
-    }
+/* =====================================================
+   PAGE WRAPPER
+   ===================================================== */
+.master-page {
+    width: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+    background: transparent;
+}
 
-    .master-badge span {
-        width: 7px;
-        height: 7px;
-        border-radius: 50%;
-        background: #22c55e;
-        box-shadow: 0 0 12px rgba(34,197,94,.8);
-    }
+/* =====================================================
+   PARTICLE CANVAS BACKGROUND
+   ===================================================== */
+#master-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
 
-    .master-hero h1 {
-        margin: 0 0 20px;
-        color: #fff;
-        font-family: "Montserrat", sans-serif;
-        font-size: clamp(2.7rem, 6vw, 5rem);
-        line-height: 1;
-        letter-spacing: -.055em;
-    }
+/* =====================================================
+   ANIMATED MESH GRADIENT BACKGROUND
+   ===================================================== */
+.master-mesh {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
 
-    .master-hero h1 span {
-        color: #4ade80;
-    }
+.mesh-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.18;
+    animation: blobFloat 12s ease-in-out infinite;
+}
 
-    .master-hero p {
-        max-width: 590px;
-        margin: 0 0 30px;
-        color: #a3adbd;
-        font-size: 1.02rem;
-        line-height: 1.75;
-    }
+.mesh-blob-1 {
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, #22c55e, transparent 70%);
+    top: -150px; right: -100px;
+    animation-delay: 0s;
+}
 
-    .master-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-    }
+.mesh-blob-2 {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, #3b82f6, transparent 70%);
+    bottom: -100px; left: -150px;
+    animation-delay: -4s;
+}
 
-    .master-btn {
-        min-height: 46px;
-        padding: 0 21px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 12px;
-        text-decoration: none !important;
-        font-weight: 700;
-        transition: transform .2s ease, background .2s ease, border-color .2s ease;
-    }
+.mesh-blob-3 {
+    width: 350px; height: 350px;
+    background: radial-gradient(circle, #8b5cf6, transparent 70%);
+    top: 40%; left: 40%;
+    animation-delay: -8s;
+}
 
-    .master-btn-primary {
-        background: #22c55e;
-        color: #052e16 !important;
-    }
+@keyframes blobFloat {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -40px) scale(1.05); }
+    66% { transform: translate(-20px, 20px) scale(0.95); }
+}
 
-    .master-btn-primary:hover {
-        background: #4ade80;
-        transform: translateY(-2px);
-    }
+/* =====================================================
+   CONTENT LAYER
+   ===================================================== */
+.master-content {
+    position: relative;
+    z-index: 2;
+    width: min(1240px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: 50px 0 100px;
+}
 
-    .master-btn-secondary {
-        border: 1px solid rgba(255,255,255,.12);
-        background: rgba(255,255,255,.04);
-        color: #fff !important;
-    }
+/* =====================================================
+   3D HERO SECTION
+   ===================================================== */
+.hero-3d-scene {
+    perspective: 1200px;
+    margin-bottom: 80px;
+}
 
-    .master-btn-secondary:hover {
-        border-color: rgba(74,222,128,.35);
-        background: rgba(255,255,255,.08);
-        transform: translateY(-2px);
-    }
+.master-hero {
+    position: relative;
+    overflow: hidden;
+    min-height: 500px;
+    padding: 72px 68px;
+    display: flex;
+    align-items: center;
+    border-radius: 32px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background:
+        radial-gradient(circle at 80% 20%, rgba(34,197,94,0.18) 0%, transparent 40%),
+        radial-gradient(circle at 10% 80%, rgba(59,130,246,0.12) 0%, transparent 38%),
+        linear-gradient(145deg, #111820 0%, #0a0f18 100%);
+    box-shadow:
+        0 40px 100px rgba(0,0,0,0.5),
+        0 0 0 1px rgba(255,255,255,0.04) inset,
+        0 1px 0 rgba(255,255,255,0.12) inset;
+    transform-style: preserve-3d;
+    transform: rotateX(2deg);
+    transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+    cursor: default;
+}
 
-    /* =========================================================
-   MASTER HOME — MUSIC WAVE ANIMATION
-   ========================================================= */
+.master-hero:hover {
+    transform: rotateX(0deg) rotateY(0deg) scale(1.008);
+}
 
+/* Shimmering top border */
+.master-hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(74,222,128,0.6) 30%,
+        rgba(74,222,128,1) 50%,
+        rgba(74,222,128,0.6) 70%,
+        transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmerLine 3s linear infinite;
+}
+
+@keyframes shimmerLine {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+/* Inner light reflection */
+.master-hero::after {
+    content: '';
+    position: absolute;
+    top: -60px; left: -60px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(74,222,128,0.06), transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+/* =====================================================
+   HERO CONTENT
+   ===================================================== */
+.master-hero-content {
+    position: relative;
+    z-index: 3;
+    max-width: 580px;
+    transform: translateZ(30px);
+}
+
+.master-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 24px;
+    padding: 8px 16px;
+    border: 1px solid rgba(74,222,128,0.25);
+    border-radius: 999px;
+    background: rgba(34,197,94,0.08);
+    backdrop-filter: blur(10px);
+    color: #4ade80;
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    animation: fadeInDown 0.7s ease both;
+}
+
+.master-badge .badge-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 0 3px rgba(34,197,94,0.2), 0 0 14px rgba(34,197,94,0.8);
+    animation: pulseDot 2s ease-in-out infinite;
+}
+
+@keyframes pulseDot {
+    0%, 100% { box-shadow: 0 0 0 3px rgba(34,197,94,0.2), 0 0 10px rgba(34,197,94,0.6); }
+    50% { box-shadow: 0 0 0 6px rgba(34,197,94,0.1), 0 0 20px rgba(34,197,94,1); }
+}
+
+.master-hero h1 {
+    margin: 0 0 20px;
+    font-family: "Montserrat", sans-serif;
+    font-size: clamp(2.8rem, 5.5vw, 4.8rem);
+    font-weight: 900;
+    line-height: 1.0;
+    letter-spacing: -.055em;
+    color: #fff;
+    animation: fadeInUp 0.7s ease 0.15s both;
+}
+
+.master-hero h1 .text-green {
+    background: linear-gradient(135deg, #4ade80, #22c55e 40%, #16a34a);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 20px rgba(34,197,94,0.4));
+}
+
+.master-hero p {
+    max-width: 480px;
+    margin: 0 0 32px;
+    color: #8d9daf;
+    font-size: 1.05rem;
+    line-height: 1.75;
+    animation: fadeInUp 0.7s ease 0.25s both;
+}
+
+.master-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    animation: fadeInUp 0.7s ease 0.35s both;
+}
+
+.master-btn {
+    min-height: 50px;
+    padding: 0 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 14px;
+    text-decoration: none !important;
+    font-weight: 700;
+    font-size: 0.92rem;
+    letter-spacing: 0.01em;
+    transition: all 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.master-btn::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    transform: skewX(-20deg);
+    transition: left 0.5s ease;
+}
+
+.master-btn:hover::after {
+    left: 150%;
+}
+
+.master-btn-primary {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: #fff !important;
+    box-shadow: 0 8px 30px rgba(34,197,94,0.35), 0 0 0 1px rgba(74,222,128,0.2) inset;
+}
+
+.master-btn-primary:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 16px 40px rgba(34,197,94,0.5), 0 0 0 1px rgba(74,222,128,0.3) inset;
+}
+
+.master-btn-secondary {
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.05);
+    color: #fff !important;
+    backdrop-filter: blur(10px);
+}
+
+.master-btn-secondary:hover {
+    border-color: rgba(74,222,128,0.4);
+    background: rgba(255,255,255,0.09);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+}
+
+/* =====================================================
+   3D ORBIT SPHERE VISUAL
+   ===================================================== */
 .master-visual {
     position: absolute;
     right: 55px;
     top: 50%;
-    width: 330px;
-    height: 250px;
     transform: translateY(-50%);
-
+    width: 300px;
+    height: 300px;
+    z-index: 5;
     display: flex;
     align-items: center;
     justify-content: center;
-
-    background:
-        radial-gradient(
-            circle at center,
-            rgba(34,197,94,0.13),
-            transparent 62%
-        );
-
     overflow: visible;
+    perspective: 700px;
 }
 
-/* Soft glow */
-
-.master-visual::before {
-    content: "";
+/* === Outer glow === */
+.orbit-glow {
     position: absolute;
-
-    width: 230px;
-    height: 140px;
-
+    width: 200px;
+    height: 200px;
     border-radius: 50%;
-
-    background: rgba(34,197,94,0.08);
-
-    filter: blur(35px);
-
-    animation: masterGlow 4s ease-in-out infinite;
+    background: radial-gradient(circle, rgba(34,197,94,0.25) 0%, transparent 70%);
+    filter: blur(30px);
+    animation: orbitGlowPulse 3s ease-in-out infinite;
+}
+@keyframes orbitGlowPulse {
+    0%,100% { transform: scale(0.9); opacity: 0.5; }
+    50%      { transform: scale(1.2); opacity: 1; }
 }
 
-
-/* =========================================================
-   MUSIC EQUALIZER
-   ========================================================= */
-
-.master-wave {
+/* === Core sphere === */
+.orbit-sphere {
     position: relative;
-    z-index: 3;
-
-    width: 250px;
-    height: 150px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    gap: 7px;
-}
-
-
-.wave-bar {
-    width: 8px;
-    min-height: 20px;
-
-    border-radius: 999px;
-
-    background: linear-gradient(
-        to top,
-        #16a34a,
-        #4ade80
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%,
+        rgba(74,222,128,0.9) 0%,
+        rgba(34,197,94,0.6) 40%,
+        rgba(22,163,74,0.3) 100%
     );
-
     box-shadow:
-        0 0 12px rgba(74,222,128,0.35);
-
-    animation:
-        equalizer 1.15s ease-in-out infinite;
+        0 0 0 2px rgba(74,222,128,0.3),
+        0 0 30px rgba(34,197,94,0.6),
+        0 0 60px rgba(34,197,94,0.2),
+        inset 0 -10px 20px rgba(0,0,0,0.3);
+    animation: spherePulse 3s ease-in-out infinite;
+    z-index: 10;
+}
+@keyframes spherePulse {
+    0%,100% { box-shadow: 0 0 0 2px rgba(74,222,128,0.3), 0 0 30px rgba(34,197,94,0.6), 0 0 60px rgba(34,197,94,0.2); }
+    50%      { box-shadow: 0 0 0 4px rgba(74,222,128,0.5), 0 0 50px rgba(34,197,94,0.9), 0 0 90px rgba(34,197,94,0.35); }
 }
 
-
-.wave-bar:nth-child(1) {
-    height: 32px;
-    animation-delay: -0.9s;
+/* === Orbit rings (3D planes) === */
+.orbit-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1.5px solid rgba(74,222,128,0.35);
+    transform-style: preserve-3d;
 }
 
-.wave-bar:nth-child(2) {
-    height: 58px;
-    animation-delay: -0.4s;
+/* Ring 1 — horizontal tilt */
+.orbit-ring-1 {
+    width: 180px;
+    height: 180px;
+    transform: rotateX(70deg);
+    animation: ringOrbit1 4s linear infinite;
+    border-color: rgba(74,222,128,0.5);
+}
+@keyframes ringOrbit1 {
+    from { transform: rotateX(70deg) rotateZ(0deg); }
+    to   { transform: rotateX(70deg) rotateZ(360deg); }
 }
 
-.wave-bar:nth-child(3) {
-    height: 88px;
-    animation-delay: -0.7s;
+/* Ring 2 — diagonal tilt */
+.orbit-ring-2 {
+    width: 220px;
+    height: 220px;
+    transform: rotateX(70deg) rotateZ(60deg);
+    animation: ringOrbit2 6s linear infinite;
+    border-color: rgba(74,222,128,0.25);
+}
+@keyframes ringOrbit2 {
+    from { transform: rotateX(70deg) rotateZ(60deg); }
+    to   { transform: rotateX(70deg) rotateZ(420deg); }
 }
 
-.wave-bar:nth-child(4) {
-    height: 115px;
-    animation-delay: -0.2s;
+/* Ring 3 — opposite diagonal */
+.orbit-ring-3 {
+    width: 260px;
+    height: 260px;
+    transform: rotateX(70deg) rotateZ(120deg);
+    animation: ringOrbit3 9s linear infinite reverse;
+    border-color: rgba(34,197,94,0.15);
+}
+@keyframes ringOrbit3 {
+    from { transform: rotateX(70deg) rotateZ(120deg); }
+    to   { transform: rotateX(70deg) rotateZ(480deg); }
 }
 
-.wave-bar:nth-child(5) {
-    height: 72px;
-    animation-delay: -0.8s;
+/* === Orbiting dots on ring 1 === */
+.orbit-dot {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 10px rgba(74,222,128,0.9), 0 0 20px rgba(74,222,128,0.5);
+    top: 50%;
+    left: 50%;
 }
 
-.wave-bar:nth-child(6) {
-    height: 135px;
-    animation-delay: -0.3s;
+.orbit-dot-1 {
+    margin: -4px 0 0 -4px;
+    animation: dotOrbit 4s linear infinite;
+    transform-origin: 0 -90px;
+}
+.orbit-dot-2 {
+    width: 5px;
+    height: 5px;
+    margin: -2.5px 0 0 -2.5px;
+    background: #a7f3d0;
+    animation: dotOrbit 6s linear infinite reverse;
+    transform-origin: 0 -110px;
+    animation-delay: -2s;
+}
+.orbit-dot-3 {
+    width: 6px;
+    height: 6px;
+    margin: -3px 0 0 -3px;
+    animation: dotOrbit 4s linear infinite;
+    transform-origin: 0 -90px;
+    animation-delay: -2s;
+}
+@keyframes dotOrbit {
+    from { transform: rotate(0deg)   translateY(-90px); }
+    to   { transform: rotate(360deg) translateY(-90px); }
 }
 
-.wave-bar:nth-child(7) {
-    height: 95px;
-    animation-delay: -0.6s;
-}
-
-.wave-bar:nth-child(8) {
-    height: 125px;
-    animation-delay: -0.1s;
-}
-
-.wave-bar:nth-child(9) {
-    height: 75px;
-    animation-delay: -0.5s;
-}
-
-.wave-bar:nth-child(10) {
-    height: 52px;
-    animation-delay: -0.9s;
-}
-
-.wave-bar:nth-child(11) {
-    height: 30px;
-    animation-delay: -0.35s;
-}
-
-
-/* =========================================================
-   FLOATING MUSIC NOTES
-   ========================================================= */
-
+/* === Floating music notes === */
 .master-note {
     position: absolute;
-    z-index: 4;
-
     color: #4ade80;
+    font-size: 1.3rem;
+    text-shadow: 0 0 16px rgba(74,222,128,0.9);
+    animation: floatNote 4s ease-in-out infinite;
+    z-index: 6;
+    pointer-events: none;
+}
+.note-1 { top: 10px;  left: 15px;  animation-delay: 0s;   font-size: 1.1rem; }
+.note-2 { top: 30px;  right: 10px; animation-delay: -1.5s; font-size: 0.9rem; }
+.note-3 { bottom: 25px; right: 20px; animation-delay: -3s; font-size: 1.4rem; }
 
-    font-size: 1.35rem;
-
-    text-shadow:
-        0 0 14px rgba(74,222,128,0.65);
-
-    animation:
-        floatingNote 4s ease-in-out infinite;
+@keyframes floatNote {
+    0%,100% { transform: translateY(0)   rotate(-10deg); opacity: 0.3; }
+    50%      { transform: translateY(-18px) rotate(8deg);  opacity: 0.9; }
 }
 
-.note-1 {
-    left: 25px;
-    top: 42px;
+/* =====================================================
+   STATS ROW
+   ===================================================== */
+.master-stats {
+    display: flex;
+    gap: 0;
+    margin-bottom: 64px;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 20px;
+    background: rgba(255,255,255,0.02);
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+    animation: fadeInUp 0.8s ease 0.4s both;
 }
 
-.note-2 {
-    right: 25px;
-    top: 30px;
-
-    animation-delay: -1.7s;
+.stat-item {
+    flex: 1;
+    padding: 28px 24px;
+    text-align: center;
+    position: relative;
+    transition: background 0.3s ease;
 }
 
-.note-3 {
-    right: 45px;
-    bottom: 32px;
-
-    animation-delay: -3s;
+.stat-item:hover {
+    background: rgba(255,255,255,0.04);
 }
 
+.stat-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0; top: 20%; bottom: 20%;
+    width: 1px;
+    background: rgba(255,255,255,0.07);
+}
 
-/* =========================================================
+.stat-number {
+    display: block;
+    font-family: "Montserrat", sans-serif;
+    font-size: 2rem;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    margin-bottom: 6px;
+}
+
+.stat-number .stat-green {
+    background: linear-gradient(135deg, #4ade80, #22c55e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.78rem;
+    color: #6b7a8d;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+/* =====================================================
+   FEATURES SECTION
+   ===================================================== */
+.master-section {
+    margin-bottom: 64px;
+}
+
+.master-section-header {
+    margin-bottom: 28px;
+    animation: fadeInUp 0.7s ease both;
+}
+
+.master-section-header h2 {
+    margin: 0 0 8px;
+    font-family: "Montserrat", sans-serif;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.04em;
+}
+
+.master-section-header p {
+    margin: 0;
+    color: #6b7a8d;
+    font-size: 0.9rem;
+}
+
+/* =====================================================
+   3D FEATURE CARDS
+   ===================================================== */
+.master-cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.master-card {
+    padding: 28px 24px;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 20px;
+    background: rgba(255,255,255,0.025);
+    backdrop-filter: blur(12px);
+    position: relative;
+    overflow: hidden;
+    cursor: default;
+    transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+    transform-style: preserve-3d;
+    animation: fadeInUp 0.7s ease both;
+}
+
+.master-card:nth-child(1) { animation-delay: 0.1s; }
+.master-card:nth-child(2) { animation-delay: 0.2s; }
+.master-card:nth-child(3) { animation-delay: 0.3s; }
+
+.master-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(74,222,128,0.4), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.master-card:hover {
+    border-color: rgba(74,222,128,0.2);
+    background: rgba(255,255,255,0.05);
+    transform: translateY(-8px) scale(1.01);
+    box-shadow:
+        0 30px 60px rgba(0,0,0,0.4),
+        0 0 0 1px rgba(74,222,128,0.1),
+        0 0 30px rgba(34,197,94,0.05) inset;
+}
+
+.master-card:hover::before {
+    opacity: 1;
+}
+
+/* Card shimmer */
+.master-card::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -60%;
+    width: 50%;
+    height: 200%;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.04), transparent);
+    transform: skewX(-20deg);
+    transition: left 0.7s ease;
+}
+
+.master-card:hover::after {
+    left: 120%;
+}
+
+.master-card-icon {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    background: rgba(34,197,94,0.10);
+    border: 1px solid rgba(74,222,128,0.15);
+    font-size: 1.3rem;
+    transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.master-card:hover .master-card-icon {
+    transform: scale(1.1) rotate(-5deg);
+    background: rgba(34,197,94,0.18);
+}
+
+.master-card h3 {
+    margin: 0 0 8px;
+    color: #fff;
+    font-size: 1.02rem;
+    font-weight: 700;
+}
+
+.master-card p {
+    margin: 0;
+    color: #6b7a8d;
+    font-size: 0.84rem;
+    line-height: 1.65;
+}
+
+/* =====================================================
+   PREVIEW CARDS (What's Waiting)
+   ===================================================== */
+.master-preview {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.master-preview-card {
+    min-height: 160px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 20px;
+    background:
+        radial-gradient(circle at 85% 15%, rgba(34,197,94,0.12), transparent 45%),
+        rgba(255,255,255,0.025);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+    animation: fadeInUp 0.7s ease both;
+}
+
+.master-preview-card:nth-child(1) { animation-delay: 0.15s; }
+.master-preview-card:nth-child(2) { animation-delay: 0.25s; }
+.master-preview-card:nth-child(3) { animation-delay: 0.35s; }
+
+.master-preview-card:hover {
+    border-color: rgba(74,222,128,0.2);
+    transform: translateY(-6px);
+    box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+}
+
+.preview-icon {
+    margin-bottom: auto;
+    color: rgba(74,222,128,0.8);
+    font-size: 1.8rem;
+    display: block;
+    margin-bottom: 12px;
+    transition: transform 0.3s ease;
+}
+
+.master-preview-card:hover .preview-icon {
+    transform: scale(1.15) rotate(5deg);
+}
+
+.master-preview-card h3 {
+    margin: 0 0 6px;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.master-preview-card p {
+    margin: 0;
+    color: #6b7a8d;
+    font-size: 0.8rem;
+    line-height: 1.5;
+}
+
+/* =====================================================
+   CTA SECTION
+   ===================================================== */
+.master-cta {
+    position: relative;
+    overflow: hidden;
+    padding: 56px 40px;
+    text-align: center;
+    border: 1px solid rgba(74,222,128,0.15);
+    border-radius: 28px;
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(34,197,94,0.12), transparent 60%),
+        rgba(255,255,255,0.02);
+    backdrop-filter: blur(12px);
+    animation: fadeInUp 0.7s ease 0.3s both;
+}
+
+.master-cta::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 20%; right: 20%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(74,222,128,0.5), transparent);
+}
+
+.master-cta h2 {
+    margin: 0 0 12px;
+    font-family: "Montserrat", sans-serif;
+    font-size: 2rem;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: -0.04em;
+}
+
+.master-cta p {
+    margin: 0 0 28px;
+    color: #6b7a8d;
+    font-size: 0.95rem;
+}
+
+/* =====================================================
    ANIMATIONS
-   ========================================================= */
-
-@keyframes equalizer {
-
-    0%,
-    100% {
-        transform: scaleY(0.55);
-        opacity: 0.55;
-    }
-
-    50% {
-        transform: scaleY(1);
-        opacity: 1;
-    }
+   ===================================================== */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-
-@keyframes masterGlow {
-
-    0%,
-    100% {
-        transform: scale(0.9);
-        opacity: 0.45;
-    }
-
-    50% {
-        transform: scale(1.12);
-        opacity: 0.8;
-    }
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-
-@keyframes floatingNote {
-
-    0%,
-    100% {
-        transform: translateY(8px) rotate(-8deg);
-        opacity: 0.25;
-    }
-
-    50% {
-        transform: translateY(-14px) rotate(8deg);
-        opacity: 0.8;
-    }
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+@media (max-width: 900px) {
+    .master-hero { padding: 55px 42px; }
+    .master-visual { right: 10px; opacity: 0.4; width: 220px; height: 220px; }
+    .vinyl-disc { width: 180px; height: 180px; }
+    .master-cards, .master-preview { grid-template-columns: 1fr 1fr; }
+    .master-stats { flex-wrap: wrap; }
+    .stat-item { flex: 0 0 50%; }
 }
 
-    .master-section {
-        margin-top: 55px;
-    }
+@media (max-width: 700px) {
+    .master-content { width: calc(100% - 28px); }
+    .master-hero { min-height: auto; padding: 44px 28px; border-radius: 22px; }
+    .master-hero h1 { font-size: 2.6rem; }
+    .master-visual { display: none; }
+    .master-actions { flex-direction: column; }
+    .master-btn { width: 100%; }
+    .master-cards, .master-preview { grid-template-columns: 1fr; }
+    .master-stats { flex-direction: column; }
+    .stat-item::after { display: none; }
+}
 
-    .master-section h2 {
-        margin: 0;
-        color: #fff;
-        font-family: "Montserrat", sans-serif;
-        font-size: 1.7rem;
-        font-weight: 800;
-        letter-spacing: -.035em;
-    }
-
-    .master-section-sub {
-        margin: 7px 0 20px;
-        color: #8d98a9;
-        font-size: .9rem;
-    }
-
-    .master-cards {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 16px;
-    }
-
-    .master-card {
-        padding: 22px;
-        border: 1px solid rgba(255,255,255,.07);
-        border-radius: 16px;
-        background: rgba(255,255,255,.025);
-    }
-
-    .master-card-icon {
-        width: 42px;
-        height: 42px;
-        margin-bottom: 14px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 12px;
-        background: rgba(34,197,94,.10);
-        color: #4ade80;
-        font-size: 1.2rem;
-    }
-
-    .master-card h3 {
-        margin: 0 0 7px;
-        color: #fff;
-        font-size: 1rem;
-    }
-
-    .master-card p {
-        margin: 0;
-        color: #8d98a9;
-        font-size: .84rem;
-        line-height: 1.6;
-    }
-
-    .master-preview {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 16px;
-    }
-
-    .master-preview-card {
-        min-height: 150px;
-        padding: 20px;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-        border: 1px solid rgba(255,255,255,.07);
-        border-radius: 16px;
-        background:
-            radial-gradient(circle at 85% 15%, rgba(34,197,94,.12), transparent 38%),
-            #151a22;
-    }
-
-    .master-preview-card .preview-icon {
-        margin-bottom: auto;
-        color: rgba(74,222,128,.75);
-        font-size: 1.5rem;
-    }
-
-    .master-preview-card h3 {
-        margin: 0 0 5px;
-        color: #fff;
-        font-size: .98rem;
-    }
-
-    .master-preview-card p {
-        margin: 0;
-        color: #8d98a9;
-        font-size: .78rem;
-    }
-
-    .master-cta {
-        margin-top: 55px;
-        padding: 32px;
-        text-align: center;
-        border: 1px solid rgba(74,222,128,.12);
-        border-radius: 20px;
-        background: rgba(34,197,94,.045);
-    }
-
-    .master-cta h2 {
-        margin-bottom: 9px;
-    }
-
-    .master-cta p {
-        margin: 0 0 20px;
-        color: #8d98a9;
-    }
-
-    @keyframes masterFloat {
-        0%,100% { transform: translateY(0) scale(1); }
-        50% { transform: translateY(-8px) scale(1.04); }
-    }
-
-    @keyframes masterPulse {
-        0%,100% { opacity: .35; transform: scale(.96); }
-        50% { opacity: .85; transform: scale(1.04); }
-    }
-
-    @keyframes masterDrift {
-        0%,100% { opacity: .15; transform: translateY(8px); }
-        50% { opacity: .75; transform: translateY(-10px); }
-    }
-
-    @media (max-width: 900px) {
-        .master-hero {
-            padding: 55px 42px;
-        }
-
-        .master-visual {
-            right: 10px;
-            opacity: .3;
-        }
-
-        .master-cards,
-        .master-preview {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    @media (max-width: 700px) {
-        .master-page {
-            width: calc(100% - 28px);
-        }
-
-        .master-hero {
-            min-height: auto;
-            padding: 42px 28px;
-            border-radius: 22px;
-        }
-
-        .master-hero h1 {
-            font-size: 2.7rem;
-        }
-
-        .master-visual {
-            display: none;
-        }
-
-        .master-actions {
-            flex-direction: column;
-        }
-
-        .master-btn {
-            width: 100%;
-        }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-        .master-visual::before,
-        .master-visual::after,
-        .master-note,
-        .master-float {
-            animation: none;
-        }
-    }
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+}
 </style>
 {% endblock %}
 
 {% block body %}
+<!-- Animated mesh background -->
+<div class="master-mesh" aria-hidden="true">
+    <div class="mesh-blob mesh-blob-1"></div>
+    <div class="mesh-blob mesh-blob-2"></div>
+    <div class="mesh-blob mesh-blob-3"></div>
+</div>
+
+<!-- Star particle canvas -->
+<canvas id="master-canvas" aria-hidden="true"></canvas>
+
 <div class="master-page">
+    <div class="master-content">
 
-    <section class="master-hero">
-        <div class="master-hero-content">
+        <!-- ====== 3D HERO ====== -->
+        <div class="hero-3d-scene">
+            <section class="master-hero" id="masterHero">
 
-            <div class="master-badge">
-                <span></span>
-                Your music, your way
-            </div>
+                <div class="master-hero-content">
+                    <div class="master-badge">
+                        <span class="badge-dot"></span>
+                        Your music, your way
+                    </div>
 
-            <h1>
-                Music that<br>
-                <span>moves you.</span>
-            </h1>
+                    <h1>
+                        Music that<br>
+                        <span class="text-green">moves you.</span>
+                    </h1>
 
-            <p>
-                Discover songs, explore curated playlists, and build
-                your own personal music collection — all in one
-                beautiful place.
-            </p>
+                    <p>
+                        Discover songs, explore curated playlists, and build
+                        your own personal music collection — all in one
+                        beautiful place.
+                    </p>
 
-            <div class="master-actions">
-                <a href="{% url 'login_user' %}" class="master-btn master-btn-primary">
-                    Login to Listen
-                </a>
+                    <div class="master-actions">
+                        <a href="{% url 'login_user' %}" class="master-btn master-btn-primary">
+                            🎵 Login to Listen
+                        </a>
+                        <a href="{% url 'register_user' %}" class="master-btn master-btn-secondary">
+                            Create Account
+                        </a>
+                    </div>
+                </div>
 
-                <a href="{% url 'register_user' %}" class="master-btn master-btn-secondary">
-                    Create Account
-                </a>
-            </div>
+                <!-- 3D Orbit Sphere Visual -->
+                <div class="master-visual" aria-hidden="true">
 
+                    <div class="master-note note-1">♪</div>
+                    <div class="master-note note-2">♫</div>
+                    <div class="master-note note-3">♩</div>
+
+                    <div class="orbit-glow"></div>
+
+                    <div class="orbit-ring orbit-ring-3"></div>
+                    <div class="orbit-ring orbit-ring-2"></div>
+                    <div class="orbit-ring orbit-ring-1">
+                        <div class="orbit-dot orbit-dot-1"></div>
+                        <div class="orbit-dot orbit-dot-3"></div>
+                    </div>
+
+                    <div class="orbit-sphere"></div>
+
+                    <div class="orbit-dot orbit-dot-2"
+                         style="position:absolute;transform-origin:0 -110px;"></div>
+
+                </div>
+
+            </section>
         </div>
 
-        <div class="master-visual" aria-hidden="true">
+        <!-- ====== STATS ====== -->
+        <div class="master-stats">
+            <div class="stat-item">
+                <span class="stat-number"><span class="stat-green">100+</span></span>
+                <span class="stat-label">Songs Available</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number"><span class="stat-green">∞</span></span>
+                <span class="stat-label">Playlists</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number"><span class="stat-green">Free</span></span>
+                <span class="stat-label">Always</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number"><span class="stat-green">24/7</span></span>
+                <span class="stat-label">Available</span>
+            </div>
+        </div>
 
-    <div class="master-note note-1">♪</div>
-    <div class="master-note note-2">♫</div>
-    <div class="master-note note-3">♪</div>
+        <!-- ====== FEATURES ====== -->
+        <section class="master-section">
+            <div class="master-section-header">
+                <h2>Everything you need for your music.</h2>
+                <p>Sign in to unlock the complete experience.</p>
+            </div>
 
-    <div class="master-wave">
+            <div class="master-cards">
+                <div class="master-card">
+                    <div class="master-card-icon">🎵</div>
+                    <h3>Discover Music</h3>
+                    <p>Explore popular songs, recently added music, and curated playlists crafted just for you.</p>
+                </div>
+                <div class="master-card">
+                    <div class="master-card-icon">❤️</div>
+                    <h3>Your Favorites</h3>
+                    <p>Like songs you love and keep them together in your personal collection forever.</p>
+                </div>
+                <div class="master-card">
+                    <div class="master-card-icon">🎧</div>
+                    <h3>Your Playlists</h3>
+                    <p>Create playlists, organize your music, and enjoy your collection your way.</p>
+                </div>
+            </div>
+        </section>
 
-        <span class="wave-bar"></span>
-        <span class="wave-bar"></span>
-        <span class="wave-bar"></span>
-        <span class="wave-bar"></span>
-        <span class="wave-bar"></span>
-        <span class="wave-bar"></span>
-        <span class="wave-bar"></span>
-        <span class="wave-bar"></span>
-        <span class="wave-bar"></span>
-        <span class="wave-bar"></span>
-        <span class="wave-bar"></span>
+        <!-- ====== PREVIEW ====== -->
+        <section class="master-section">
+            <div class="master-section-header">
+                <h2>What's waiting for you</h2>
+                <p>A quick preview of your music space.</p>
+            </div>
+
+            <div class="master-preview">
+                <div class="master-preview-card">
+                    <span class="preview-icon">♫</span>
+                    <h3>Featured Playlists</h3>
+                    <p>Curated music selected for you.</p>
+                </div>
+                <div class="master-preview-card">
+                    <span class="preview-icon">🔥</span>
+                    <h3>Popular Songs</h3>
+                    <p>Find something you'll want to play on repeat.</p>
+                </div>
+                <div class="master-preview-card">
+                    <span class="preview-icon">💚</span>
+                    <h3>Liked Songs</h3>
+                    <p>Keep your favorite tracks always close.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ====== FINAL CTA ====== -->
+        <section class="master-cta">
+            <h2>Ready to start listening?</h2>
+            <p>Create your account and unlock your personal music experience.</p>
+            <a href="{% url 'register_user' %}" class="master-btn master-btn-primary">
+                🚀 Get Started — It's Free
+            </a>
+        </section>
 
     </div>
-
 </div>
-    </section>
 
+<!-- =====================================================
+     JAVASCRIPT: 3D Hero Tilt + Particle Stars
+     ===================================================== -->
+<script>
+(function () {
+    'use strict';
 
-    <section class="master-section">
-        <h2>Everything you need for your music.</h2>
-        <p class="master-section-sub">
-            Sign in to unlock the complete experience.
-        </p>
+    /* ---------- 3D HERO MOUSE TILT ---------- */
+    const hero = document.getElementById('masterHero');
+    if (hero) {
+        hero.addEventListener('mousemove', function (e) {
+            const rect = hero.getBoundingClientRect();
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+            const dx = (e.clientX - cx) / (rect.width / 2);
+            const dy = (e.clientY - cy) / (rect.height / 2);
+            const rx = -dy * 5;   /* tilt up/down */
+            const ry = dx * 6;    /* tilt left/right */
+            hero.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg) scale(1.008)`;
+        });
 
-        <div class="master-cards">
+        hero.addEventListener('mouseleave', function () {
+            hero.style.transform = 'rotateX(2deg) rotateY(0deg) scale(1)';
+        });
+    }
 
-            <div class="master-card">
-                <div class="master-card-icon">🎵</div>
-                <h3>Discover Music</h3>
-                <p>Explore popular songs, recently added music, and curated playlists.</p>
-            </div>
+    /* ---------- PARTICLE STAR CANVAS ---------- */
+    const canvas = document.getElementById('master-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let W, H, stars = [];
 
-            <div class="master-card">
-                <div class="master-card-icon">❤️</div>
-                <h3>Your Favorites</h3>
-                <p>Like songs you love and keep them together in your personal collection.</p>
-            </div>
+    function resize() {
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+    }
 
-            <div class="master-card">
-                <div class="master-card-icon">🎧</div>
-                <h3>Your Playlists</h3>
-                <p>Create playlists, organize your music, and enjoy your collection your way.</p>
-            </div>
+    function createStars(count) {
+        stars = [];
+        for (let i = 0; i < count; i++) {
+            stars.push({
+                x: Math.random() * W,
+                y: Math.random() * H,
+                r: Math.random() * 1.5 + 0.2,
+                opacity: Math.random() * 0.5 + 0.1,
+                speed: Math.random() * 0.015 + 0.005,
+                phase: Math.random() * Math.PI * 2,
+            });
+        }
+    }
 
-        </div>
-    </section>
+    let raf, t = 0;
+    function draw() {
+        ctx.clearRect(0, 0, W, H);
+        t += 0.008;
+        for (const s of stars) {
+            const op = s.opacity * (0.6 + 0.4 * Math.sin(t * s.speed * 80 + s.phase));
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(255,255,255,${op})`;
+            ctx.fill();
+        }
+        raf = requestAnimationFrame(draw);
+    }
 
+    resize();
+    createStars(120);
+    draw();
 
-    <section class="master-section">
-        <h2>What's waiting for you</h2>
-        <p class="master-section-sub">
-            A quick preview of your music space.
-        </p>
+    window.addEventListener('resize', function () {
+        resize();
+        createStars(120);
+    });
 
-        <div class="master-preview">
+    /* ---------- SCROLL REVEAL ---------- */
+    const revealEls = document.querySelectorAll('.master-card, .master-preview-card, .master-stats, .master-cta');
+    const obs = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = entry.target.style.transform.replace('translateY(30px)', 'translateY(0)');
+                obs.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.12 });
 
-            <div class="master-preview-card">
-                <div class="preview-icon">♫</div>
-                <h3>Featured Playlists</h3>
-                <p>Curated music selected for you.</p>
-            </div>
+    revealEls.forEach(function (el) { obs.observe(el); });
 
-            <div class="master-preview-card">
-                <div class="preview-icon">♪</div>
-                <h3>Popular Songs</h3>
-                <p>Find something you will want to play.</p>
-            </div>
-
-            <div class="master-preview-card">
-                <div class="preview-icon">♡</div>
-                <h3>Liked Songs</h3>
-                <p>Keep your favorite tracks close.</p>
-            </div>
-
-        </div>
-    </section>
-
-
-    <section class="master-cta">
-        <h2>Ready to start listening?</h2>
-        <p>Create your account and unlock your personal music experience.</p>
-
-        <a href="{% url 'register_user' %}" class="master-btn master-btn-primary">
-            Get Started
-        </a>
-    </section>
-
-</div>
+}());
+</script>
 {% endblock %}
