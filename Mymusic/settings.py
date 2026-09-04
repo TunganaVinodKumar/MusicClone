@@ -49,6 +49,7 @@
 #     'django.contrib.auth.middleware.AuthenticationMiddleware',
 #     'django.contrib.messages.middleware.MessageMiddleware',
 #     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 # ]
 
 # ROOT_URLCONF = 'Mymusic.urls'
@@ -203,6 +204,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
 
 
