@@ -1,17 +1,17 @@
 {% extends 'main/base.html' %}
 
 {% block heading %}
-<title>Login Today!</title>
+<title>Login — SoundWave</title>
 
 <style>
 /* =====================================================
-   FULL-PAGE OVERRIDE (same as master_home)
+   FULL-PAGE OVERRIDE
    ===================================================== */
 body { background: #060a10 !important; }
 .main-content { width: 100% !important; padding: 0 !important; margin: 0 !important; }
 
 /* =====================================================
-   ANIMATED BACKGROUND
+   ANIMATED 3D COSMIC BACKGROUND
    ===================================================== */
 #auth-canvas {
     position: fixed;
@@ -33,41 +33,40 @@ body { background: #060a10 !important; }
 .auth-blob {
     position: absolute;
     border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.15;
-    animation: authBlobFloat 10s ease-in-out infinite;
+    filter: blur(90px);
+    opacity: 0.16;
+    animation: authBlobFloat 12s ease-in-out infinite alternate;
 }
 
 .auth-blob-1 {
-    width: 500px; height: 500px;
+    width: 520px; height: 520px;
     background: radial-gradient(circle, #22c55e, transparent 70%);
-    top: -120px; right: -80px;
-    animation-delay: 0s;
+    top: -100px; right: -80px;
 }
 
 .auth-blob-2 {
-    width: 400px; height: 400px;
-    background: radial-gradient(circle, #3b82f6, transparent 70%);
-    bottom: -80px; left: -100px;
-    animation-delay: -5s;
+    width: 440px; height: 440px;
+    background: radial-gradient(circle, #06b6d4, transparent 70%);
+    bottom: -90px; left: -100px;
+    animation-delay: -6s;
 }
 
 .auth-blob-3 {
-    width: 280px; height: 280px;
+    width: 320px; height: 320px;
     background: radial-gradient(circle, #8b5cf6, transparent 70%);
-    top: 50%; left: 50%;
+    top: 45%; left: 45%;
     transform: translate(-50%, -50%);
     animation-delay: -3s;
 }
 
 @keyframes authBlobFloat {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    33%  { transform: translate(20px, -30px) scale(1.05); }
-    66%  { transform: translate(-15px, 15px) scale(0.95); }
+    0%   { transform: translate(0, 0) scale(1); }
+    50%  { transform: translate(25px, -35px) scale(1.08); }
+    100% { transform: translate(-20px, 20px) scale(0.94); }
 }
 
 /* =====================================================
-   PAGE WRAPPER
+   PAGE WRAPPER & 3D STAGE
    ===================================================== */
 .authentication-page {
     position: relative;
@@ -76,31 +75,34 @@ body { background: #060a10 !important; }
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 40px 20px;
+    padding: 50px 20px;
+    perspective: 1200px;
 }
 
 /* =====================================================
-   CARD — GLASSMORPHISM 3D
+   CARD — 3D TILT GLASSMORPHISM
    ===================================================== */
-.authentication-card {
+.authentication-card-wrapper {
     position: relative;
-    width: min(100%, 460px);
-    padding: 38px 36px;
-    border-radius: 28px;
-    border: 1px solid rgba(255,255,255,0.09);
-    background: rgba(13, 17, 25, 0.75);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    box-shadow:
-        0 40px 80px rgba(0,0,0,0.5),
-        0 0 0 1px rgba(255,255,255,0.04) inset;
-    animation: cardSlideIn 0.6s cubic-bezier(0.23, 1, 0.32, 1) both;
-    overflow: hidden;
+    width: min(100%, 470px);
 }
 
-@keyframes cardSlideIn {
-    from { opacity: 0; transform: translateY(40px) scale(0.96); }
-    to   { opacity: 1; transform: translateY(0)    scale(1);    }
+.authentication-card {
+    position: relative;
+    width: 100%;
+    padding: 42px 38px;
+    border-radius: 28px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(13, 18, 28, 0.82);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+    box-shadow:
+        0 40px 90px rgba(0, 0, 0, 0.65),
+        0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+        0 0 40px rgba(34, 197, 94, 0.12);
+    transform-style: preserve-3d;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+    overflow: hidden;
 }
 
 /* Shimmer top border */
@@ -108,16 +110,16 @@ body { background: #060a10 !important; }
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0;
-    height: 1px;
+    height: 2px;
     background: linear-gradient(90deg,
         transparent 0%,
-        rgba(74,222,128,0.6) 30%,
-        rgba(74,222,128,1) 50%,
-        rgba(74,222,128,0.6) 70%,
+        rgba(74, 222, 128, 0.5) 25%,
+        rgba(74, 222, 128, 1) 50%,
+        rgba(6, 182, 212, 0.8) 75%,
         transparent 100%
     );
     background-size: 200% 100%;
-    animation: shimmerBorder 3s linear infinite;
+    animation: shimmerBorder 3.5s linear infinite;
 }
 
 @keyframes shimmerBorder {
@@ -125,15 +127,47 @@ body { background: #060a10 !important; }
     100% { background-position:  200% 0; }
 }
 
-/* Inner glow blob */
-.authentication-card::after {
-    content: '';
+/* Floating 3D Ambient Hologram Badges */
+.auth-floating-badge {
     position: absolute;
-    top: -80px; right: -60px;
-    width: 260px; height: 260px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(34,197,94,0.07), transparent 70%);
+    padding: 9px 16px;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.9);
+    border: 1px solid rgba(74, 222, 128, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: #ffffff;
+    font-size: 0.78rem;
+    font-weight: 750;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
     pointer-events: none;
+    z-index: 10;
+    white-space: nowrap;
+}
+
+.auth-badge-top-left {
+    top: -18px;
+    left: -28px;
+    animation: authFloatA 4.5s ease-in-out infinite alternate;
+}
+
+.auth-badge-bottom-right {
+    bottom: -18px;
+    right: -28px;
+    animation: authFloatB 5s ease-in-out infinite alternate;
+}
+
+@keyframes authFloatA {
+    0%   { transform: translateY(0) rotate(-2deg); }
+    100% { transform: translateY(-12px) rotate(1deg); }
+}
+
+@keyframes authFloatB {
+    0%   { transform: translateY(0) rotate(2deg); }
+    100% { transform: translateY(12px) rotate(-1deg); }
 }
 
 /* =====================================================
@@ -141,190 +175,132 @@ body { background: #060a10 !important; }
    ===================================================== */
 .authentication-header {
     text-align: center;
-    margin-bottom: 28px;
-    animation: fadeInDown 0.5s ease 0.2s both;
-}
-
-@keyframes fadeInDown {
-    from { opacity: 0; transform: translateY(-16px); }
-    to   { opacity: 1; transform: translateY(0); }
+    margin-bottom: 30px;
 }
 
 .authentication-icon {
-    width: 58px;
-    height: 58px;
-    margin: 0 auto 16px;
-    display: grid;
-    place-items: center;
-    border-radius: 18px;
-    background: linear-gradient(135deg, #4ade80, #16a34a);
-    color: #052e16;
-    font-size: 1.5rem;
-    font-weight: 800;
-    box-shadow:
-        0 8px 24px rgba(34,197,94,0.35),
-        0 0 0 4px rgba(74,222,128,0.12);
-    animation: iconPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both,
-               iconGlow 3s ease-in-out 1s infinite;
+    width: 62px;
+    height: 62px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(6, 182, 212, 0.15));
+    border: 1.5px solid rgba(74, 222, 128, 0.5);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    color: #4ade80;
+    margin-bottom: 16px;
+    box-shadow: 0 0 25px rgba(34, 197, 94, 0.35);
+    animation: iconPulse 3s ease-in-out infinite alternate;
 }
 
-@keyframes iconPop {
-    from { opacity: 0; transform: scale(0.5) rotate(-15deg); }
-    to   { opacity: 1; transform: scale(1)   rotate(0deg);   }
-}
-
-@keyframes iconGlow {
-    0%, 100% { box-shadow: 0 8px 24px rgba(34,197,94,0.35), 0 0 0 4px rgba(74,222,128,0.12); }
-    50%       { box-shadow: 0 8px 36px rgba(34,197,94,0.6),  0 0 0 6px rgba(74,222,128,0.22); }
+@keyframes iconPulse {
+    0%   { transform: scale(0.96); box-shadow: 0 0 18px rgba(34, 197, 94, 0.3); }
+    100% { transform: scale(1.05); box-shadow: 0 0 32px rgba(34, 197, 94, 0.6); }
 }
 
 .authentication-header h1 {
-    margin: 0 0 8px;
-    font-family: "Montserrat", sans-serif;
+    font-family: 'Outfit', sans-serif;
     font-size: 1.85rem;
-    font-weight: 900;
-    color: #fff;
-    letter-spacing: -0.04em;
+    font-weight: 850;
+    letter-spacing: -0.03em;
+    color: #ffffff;
+    margin: 0 0 8px;
 }
 
 .authentication-header p {
-    margin: 0;
-    color: #8d9daf;
+    color: var(--text-secondary);
     font-size: 0.92rem;
+    margin: 0;
 }
 
 /* =====================================================
-   ERROR
+   ERROR MESSAGE
    ===================================================== */
 .authentication-error {
-    margin-bottom: 18px;
-    padding: 12px 14px;
-    border: 1px solid rgba(248,113,113,0.35);
-    border-radius: 12px;
-    background: rgba(127,29,29,0.25);
+    margin-bottom: 22px;
+    padding: 13px 18px;
+    border-radius: 14px;
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.35);
     color: #fca5a5;
     font-size: 0.88rem;
-    line-height: 1.5;
-    animation: shakeError 0.4s ease both;
-}
-
-@keyframes shakeError {
-    0%,100% { transform: translateX(0); }
-    20%     { transform: translateX(-6px); }
-    40%     { transform: translateX(6px); }
-    60%     { transform: translateX(-4px); }
-    80%     { transform: translateX(4px); }
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 /* =====================================================
-   FORM
+   FORM CONTROLS
    ===================================================== */
 .authentication-form {
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    box-shadow: none;
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 20px;
 }
 
 .form-group {
     display: flex;
     flex-direction: column;
-    gap: 7px;
-    animation: fadeInUp 0.5s ease both;
-}
-
-.form-group:nth-child(1) { animation-delay: 0.25s; }
-.form-group:nth-child(2) { animation-delay: 0.35s; }
-.form-group:nth-child(3) { animation-delay: 0.45s; }
-
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
+    gap: 8px;
 }
 
 .form-group label {
-    color: #c8d3df;
-    font-size: 0.84rem;
-    font-weight: 600;
-    letter-spacing: 0.01em;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #cbd5e1;
 }
 
 .form-group input {
     width: 100%;
-    min-height: 50px;
-    padding: 13px 16px;
+    padding: 14px 18px;
     border-radius: 14px;
-    border: 1px solid rgba(255,255,255,0.08);
-    background: rgba(255,255,255,0.04);
-    color: #fff;
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #ffffff;
     font-size: 0.95rem;
-    transition: all 0.25s ease;
     outline: none;
-}
-
-.form-group input:hover {
-    border-color: rgba(255,255,255,0.14);
-    background: rgba(255,255,255,0.06);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .form-group input:focus {
-    border-color: rgba(74,222,128,0.5);
-    background: rgba(34,197,94,0.05);
-    box-shadow:
-        0 0 0 3px rgba(34,197,94,0.12),
-        0 4px 16px rgba(0,0,0,0.2);
+    border-color: #22c55e;
+    background: rgba(15, 23, 42, 0.95);
+    box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.2), 0 0 20px rgba(34, 197, 94, 0.15);
     transform: translateY(-1px);
 }
 
-.field-help {
-    color: #6b7a8d;
-    font-size: 0.74rem;
-    line-height: 1.4;
+.form-group input::placeholder {
+    color: #64748b;
 }
 
 /* =====================================================
-   BUTTON
+   SUBMIT BUTTON
    ===================================================== */
 .authentication-button {
     position: relative;
     width: 100%;
-    min-height: 52px;
+    padding: 15px 24px;
     margin-top: 6px;
-    border-radius: 14px;
-    background: linear-gradient(135deg, #22c55e, #16a34a);
-    color: #fff;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #4ade80 0%, #22c55e 50%, #16a34a 100%);
+    color: #052e16 !important;
     font-weight: 800;
-    font-size: 1rem;
-    letter-spacing: 0.01em;
+    font-size: 1.02rem;
+    letter-spacing: 0.02em;
     border: none;
     cursor: pointer;
     overflow: hidden;
-    transition: all 0.25s cubic-bezier(0.23, 1, 0.32, 1);
-    box-shadow: 0 8px 24px rgba(34,197,94,0.3), 0 0 0 1px rgba(74,222,128,0.2) inset;
-    animation: fadeInUp 0.5s ease 0.4s both;
+    box-shadow: 0 8px 28px rgba(34, 197, 94, 0.4);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
-
-/* Button shimmer sweep */
-.authentication-button::after {
-    content: '';
-    position: absolute;
-    top: 0; left: -100%;
-    width: 60%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-    transform: skewX(-20deg);
-    transition: left 0.55s ease;
-}
-
-.authentication-button:hover::after { left: 150%; }
 
 .authentication-button:hover {
-    transform: translateY(-3px) scale(1.01);
-    box-shadow: 0 16px 36px rgba(34,197,94,0.5), 0 0 0 1px rgba(74,222,128,0.3) inset;
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 14px 38px rgba(34, 197, 94, 0.6);
 }
 
 .authentication-button:active {
@@ -336,15 +312,14 @@ body { background: #060a10 !important; }
    ===================================================== */
 .authentication-footer {
     margin: 22px 0 0;
-    color: #7a8899;
+    color: var(--text-secondary);
     text-align: center;
-    font-size: 0.88rem;
-    animation: fadeInUp 0.5s ease 0.5s both;
+    font-size: 0.9rem;
 }
 
 .authentication-footer a {
     color: #4ade80;
-    font-weight: 700;
+    font-weight: 750;
     text-decoration: none;
     transition: color 0.2s ease;
 }
@@ -358,19 +333,16 @@ body { background: #060a10 !important; }
    RESPONSIVE
    ===================================================== */
 @media (max-width: 520px) {
-    .authentication-page { padding: 25px 14px; }
-    .authentication-card { padding: 28px 22px; border-radius: 22px; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .authentication-page { padding: 30px 16px; }
+    .authentication-card { padding: 32px 24px; border-radius: 24px; }
+    .auth-floating-badge { display: none; }
 }
 </style>
 {% endblock %}
 
 {% block body %}
 
-<!-- Background FX -->
+<!-- Background Mesh & Canvas -->
 <div class="auth-mesh" aria-hidden="true">
     <div class="auth-blob auth-blob-1"></div>
     <div class="auth-blob auth-blob-2"></div>
@@ -378,104 +350,160 @@ body { background: #060a10 !important; }
 </div>
 <canvas id="auth-canvas" aria-hidden="true"></canvas>
 
-<div class="authentication-page">
-    <div class="authentication-card">
-
-        <div class="authentication-header">
-            <div class="authentication-icon">♫</div>
-            <h1>Welcome Back</h1>
-            <p>Login to continue listening to your music.</p>
+<div class="authentication-page" id="authPageStage">
+    <div class="authentication-card-wrapper">
+        <!-- Floating 3D Badges -->
+        <div class="auth-floating-badge auth-badge-top-left">
+            <span style="color: #4ade80;">✦</span> Studio Lossless 320k
+        </div>
+        <div class="auth-floating-badge auth-badge-bottom-right">
+            <span style="color: #06b6d4;">⚡</span> Instant Audio Streaming
         </div>
 
-        {% if error %}
-            <div class="authentication-error">
-                ⚠️ {{ error }}
-            </div>
-        {% endif %}
+        <!-- 3D Tilt Card -->
+        <div class="authentication-card" id="authTiltCard">
 
-        <form method="post" class="authentication-form">
-            {% csrf_token %}
-
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input
-                    id="username"
-                    placeholder="Enter your username"
-                    type="text"
-                    name="username"
-                    value="{{ username|default:'' }}"
-                    autocomplete="username"
-                    required
-                >
+            <div class="authentication-header">
+                <div class="authentication-icon">♫</div>
+                <h1>Welcome Back</h1>
+                <p>Login to continue streaming your music library.</p>
             </div>
 
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input
-                    id="password"
-                    placeholder="Enter your password"
-                    type="password"
-                    name="password"
-                    autocomplete="current-password"
-                    required
-                >
-            </div>
+            {% if error %}
+                <div class="authentication-error">
+                    ⚠️ {{ error }}
+                </div>
+            {% endif %}
 
-            <button type="submit" class="authentication-button">
-                Login
-            </button>
-        </form>
+            <form method="post" class="authentication-form">
+                {% csrf_token %}
 
-        <p class="authentication-footer">
-            Don't have an account?
-            <a href="{% url 'register_user' %}">Create one</a>
-        </p>
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input
+                        id="username"
+                        placeholder="Enter your username"
+                        type="text"
+                        name="username"
+                        value="{{ username|default:'' }}"
+                        autocomplete="username"
+                        required
+                    >
+                </div>
 
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input
+                        id="password"
+                        placeholder="Enter your password"
+                        type="password"
+                        name="password"
+                        autocomplete="current-password"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="authentication-button">
+                    Login to SoundWave
+                </button>
+            </form>
+
+            <p class="authentication-footer">
+                Don't have an account?
+                <a href="{% url 'register_user' %}">Create one free</a>
+            </p>
+
+        </div>
     </div>
 </div>
 
+<!-- Interactive 3D Card Tilt & Particle Canvas Script -->
 <script>
 (function () {
+    /* 1. Interactive 3D Card Tilt on Mouse Move */
+    const stage = document.getElementById('authPageStage');
+    const card = document.getElementById('authTiltCard');
+
+    if (stage && card) {
+        stage.addEventListener('mousemove', function(e) {
+            const rect = card.getBoundingClientRect();
+            const cx = (e.clientX - rect.left - rect.width / 2) / (rect.width / 2);
+            const cy = (e.clientY - rect.top - rect.height / 2) / (rect.height / 2);
+
+            card.style.transform = `perspective(1200px) rotateX(${-cy * 9}deg) rotateY(${cx * 10}deg) translateY(-2px)`;
+        });
+
+        stage.addEventListener('mouseleave', function() {
+            card.style.transform = 'perspective(1200px) rotateX(0deg) rotateY(0deg) translateY(0)';
+        });
+    }
+
+    /* 2. Interactive Starfield & Constellation Canvas */
     const canvas = document.getElementById('auth-canvas');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    let W, H, stars = [];
+    let W, H, nodes = [];
 
-    function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+    function resize() {
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+    }
 
-    function createStars(n) {
-        stars = [];
+    function initNodes(n) {
+        nodes = [];
         for (let i = 0; i < n; i++) {
-            stars.push({
+            nodes.push({
                 x: Math.random() * W,
                 y: Math.random() * H,
-                r: Math.random() * 1.4 + 0.2,
-                op: Math.random() * 0.45 + 0.08,
-                sp: Math.random() * 0.015 + 0.004,
-                ph: Math.random() * Math.PI * 2,
+                vx: (Math.random() - 0.5) * 0.4,
+                vy: (Math.random() - 0.5) * 0.4,
+                r: Math.random() * 2 + 0.8,
+                alpha: Math.random() * 0.6 + 0.2
             });
         }
     }
 
-    let t = 0;
     function draw() {
         ctx.clearRect(0, 0, W, H);
-        t += 0.008;
-        for (const s of stars) {
-            const op = s.op * (0.5 + 0.5 * Math.sin(t * s.sp * 80 + s.ph));
+
+        for (let i = 0; i < nodes.length; i++) {
+            for (let j = i + 1; j < nodes.length; j++) {
+                const dx = nodes[i].x - nodes[j].x;
+                const dy = nodes[i].y - nodes[j].y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < 110) {
+                    ctx.strokeStyle = `rgba(74, 222, 128, ${(1 - dist / 110) * 0.15})`;
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(nodes[i].x, nodes[i].y);
+                    ctx.lineTo(nodes[j].x, nodes[j].y);
+                    ctx.stroke();
+                }
+            }
+        }
+
+        for (const s of nodes) {
             ctx.beginPath();
             ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(255,255,255,${op})`;
+            ctx.fillStyle = `rgba(74, 222, 128, ${s.alpha})`;
             ctx.fill();
+
+            s.x += s.vx;
+            s.y += s.vy;
+
+            if (s.x < 0 || s.x > W) s.vx *= -1;
+            if (s.y < 0 || s.y > H) s.vy *= -1;
         }
+
         requestAnimationFrame(draw);
     }
 
     resize();
-    createStars(100);
+    initNodes(70);
     draw();
-    window.addEventListener('resize', () => { resize(); createStars(100); });
-}());
+    window.addEventListener('resize', () => { resize(); initNodes(70); });
+})();
 </script>
 
 {% endblock %}

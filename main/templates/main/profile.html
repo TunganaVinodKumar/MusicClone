@@ -1,478 +1,458 @@
 {% extends 'main/base.html' %}
 
 {% block heading %}
-    <title>Profile - My Music Clone</title>
-{% endblock %}
-
-{% block body %}
+<title>Profile — SoundWave</title>
 
 <style>
     /* =========================================================
-       PROFILE PAGE
-    ========================================================= */
-
-    .profile-page {
-        width: min(850px, 100%);
-        margin: 0 auto;
+       PROFILE PAGE: 3D HOLOGRAPHIC LISTENER PASS
+       ========================================================= */
+    .profile-page-wrapper {
+        perspective: 1200px;
+        width: min(840px, 100%);
+        margin: 10px auto 40px;
     }
 
-    /* Profile Card */
-
-    .profile-card {
-        padding: 45px 35px 35px;
-
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 22px;
-
-        background:
-            linear-gradient(
-                145deg,
-                rgba(21, 25, 34, 0.96),
-                rgba(16, 19, 26, 0.96)
-            );
-
-        box-shadow:
-            0 20px 50px rgba(0, 0, 0, 0.35);
-
-        text-align: center;
-    }
-
-    /* Profile Picture */
-
-    .profile-picture-wrapper {
+    .profile-hologram-card {
         position: relative;
+        padding: 50px 42px 42px;
+        border-radius: 28px;
+        background: linear-gradient(145deg, #131a26 0%, #0b0f16 100%);
+        border: 1px solid rgba(74, 222, 128, 0.25);
+        box-shadow:
+            0 30px 80px rgba(0, 0, 0, 0.7),
+            0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+            0 0 50px rgba(34, 197, 94, 0.12);
+        transform-style: preserve-3d;
+        transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+        text-align: center;
+        overflow: hidden;
+    }
 
-        width: 120px;
-        height: 120px;
+    /* Holographic Top Border Shimmer */
+    .profile-hologram-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent 0%, rgba(74, 222, 128, 0.8) 50%, transparent 100%);
+        background-size: 200% 100%;
+        animation: profileShimmer 4s linear infinite;
+    }
 
-        margin: 0 auto 20px;
+    @keyframes profileShimmer {
+        0%   { background-position: -200% 0; }
+        100% { background-position:  200% 0; }
+    }
+
+    /* Ambient Glow Blob */
+    .profile-hologram-card::after {
+        content: '';
+        position: absolute;
+        top: -60px;
+        right: -60px;
+        width: 260px;
+        height: 260px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(34, 197, 94, 0.1), transparent 70%);
+        pointer-events: none;
+    }
+
+    /* =========================================================
+       AVATAR & PULSING SOUNDWAVE RINGS
+       ========================================================= */
+    .profile-avatar-stage {
+        position: relative;
+        width: 140px;
+        height: 140px;
+        margin: 0 auto 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .avatar-sound-ring {
+        position: absolute;
+        inset: -12px;
+        border-radius: 50%;
+        border: 2px solid rgba(74, 222, 128, 0.4);
+        box-shadow: 0 0 20px rgba(34, 197, 94, 0.25);
+        animation: avatarPulse 2.8s ease-in-out infinite alternate;
+        pointer-events: none;
+    }
+
+    .avatar-sound-ring-outer {
+        position: absolute;
+        inset: -24px;
+        border-radius: 50%;
+        border: 1px dashed rgba(6, 182, 212, 0.35);
+        animation: avatarOrbitSpin 14s linear infinite;
+        pointer-events: none;
+    }
+
+    @keyframes avatarPulse {
+        0%   { transform: scale(0.95); opacity: 0.5; }
+        100% { transform: scale(1.08); opacity: 1; border-color: rgba(74, 222, 128, 0.8); }
+    }
+
+    @keyframes avatarOrbitSpin {
+        from { transform: rotate(0deg); }
+        to   { transform: rotate(360deg); }
     }
 
     .profile-picture,
     .profile-letter {
-        width: 120px;
-        height: 120px;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
+        width: 130px;
+        height: 130px;
         border-radius: 50%;
+        position: relative;
+        z-index: 2;
     }
 
     .profile-picture {
         object-fit: cover;
-
-        border: 3px solid rgba(34, 197, 94, 0.35);
-
-        box-shadow:
-            0 12px 35px rgba(34, 197, 94, 0.18);
+        border: 3px solid rgba(74, 222, 128, 0.6);
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6);
     }
 
     .profile-letter {
-        background:
-            linear-gradient(
-                135deg,
-                #4ade80,
-                #16a34a
-            );
-
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #4ade80 0%, #16a34a 100%);
         color: #052e16;
-
-        font-family: "Montserrat", sans-serif;
-        font-size: 2.7rem;
-        font-weight: 800;
-
-        border: 3px solid rgba(74, 222, 128, 0.25);
-
-        box-shadow:
-            0 12px 35px rgba(34, 197, 94, 0.18);
+        font-family: 'Outfit', sans-serif;
+        font-size: 3.2rem;
+        font-weight: 900;
+        border: 3px solid rgba(74, 222, 128, 0.5);
+        box-shadow: 0 12px 35px rgba(34, 197, 94, 0.3);
     }
 
-    /* Username */
+    /* VIP Badge Tag */
+    .profile-vip-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 16px;
+        border-radius: 999px;
+        background: rgba(34, 197, 94, 0.12);
+        border: 1px solid rgba(34, 197, 94, 0.35);
+        color: var(--accent-light);
+        font-size: 0.78rem;
+        font-weight: 750;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        margin-bottom: 12px;
+    }
+
+    .profile-vip-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #22c55e;
+        box-shadow: 0 0 10px #22c55e;
+        animation: vipBlink 2s infinite;
+    }
+
+    @keyframes vipBlink {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.3; transform: scale(0.8); }
+    }
 
     .profile-username {
-        margin: 0;
-
-        color: #f5f7fb;
-
-        font-family: "Montserrat", sans-serif;
-        font-size: 1.65rem;
-        font-weight: 800;
-
+        font-family: 'Outfit', sans-serif;
+        font-size: 2.2rem;
+        font-weight: 850;
         letter-spacing: -0.03em;
+        color: #ffffff;
+        margin: 0 0 6px;
     }
-
-    /* Subtitle */
 
     .profile-subtitle {
-        margin: 6px 0 0;
-
-        color: #9ca6b5;
-
-        font-size: 0.9rem;
-        font-weight: 500;
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        margin: 0 0 24px;
     }
 
-    /* Picture Controls */
-
+    /* Avatar Upload / Remove Actions */
     .profile-picture-actions {
         display: flex;
         justify-content: center;
         align-items: center;
-
-        gap: 8px;
-
-        margin-top: 20px;
+        gap: 12px;
+        margin-bottom: 38px;
     }
 
     .profile-picture-action {
-        padding: 8px 13px;
-
-        border: 1px solid rgba(255, 255, 255, 0.09);
-        border-radius: 9px;
-
-        background: rgba(255, 255, 255, 0.045);
-
-        color: #a3adbd;
-
-        font-size: 0.78rem;
-        font-weight: 600;
-
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 18px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+        color: #e2e8f0;
+        font-size: 0.85rem;
+        font-weight: 700;
         cursor: pointer;
-
-        transition:
-            background 0.2s ease,
-            border-color 0.2s ease,
-            color 0.2s ease,
-            transform 0.2s ease;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        text-decoration: none;
     }
 
     .profile-picture-action:hover {
-        background: rgba(34, 197, 94, 0.08);
-
-        border-color: rgba(34, 197, 94, 0.28);
-
+        background: rgba(34, 197, 94, 0.15);
+        border-color: rgba(34, 197, 94, 0.4);
         color: #4ade80;
-
-        transform: translateY(-1px);
+        transform: translateY(-2px);
     }
 
-    /* Statistics */
+    .profile-picture-action.btn-danger:hover {
+        background: rgba(239, 68, 68, 0.15);
+        border-color: rgba(239, 68, 68, 0.4);
+        color: #f87171;
+    }
 
-    .profile-stats {
+    /* =========================================================
+       STATISTICS 3D CARDS
+       ========================================================= */
+    .profile-stats-grid {
         display: grid;
-
-        grid-template-columns:
-            repeat(3, 1fr);
-
-        margin-top: 38px;
-
-        padding-top: 30px;
-
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+        padding-top: 32px;
         border-top: 1px solid rgba(255, 255, 255, 0.08);
     }
 
-    .profile-stat {
-        position: relative;
-
+    .profile-stat-box {
+        background: rgba(15, 23, 42, 0.65);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 18px;
+        padding: 22px 16px;
+        transition: all 0.25s ease;
         display: flex;
         flex-direction: column;
         align-items: center;
-
-        gap: 5px;
-
-        padding: 5px 15px;
+        gap: 6px;
     }
 
-    .profile-stat:not(:last-child)::after {
-        content: "";
-
-        position: absolute;
-
-        top: 4px;
-        right: 0;
-
-        width: 1px;
-        height: 55px;
-
-        background: rgba(255, 255, 255, 0.08);
+    .profile-stat-box:hover {
+        transform: translateY(-4px);
+        border-color: rgba(74, 222, 128, 0.35);
+        box-shadow: 0 14px 30px rgba(0, 0, 0, 0.4);
     }
 
     .profile-stat-icon {
-        font-size: 1.15rem;
-
-        line-height: 1;
+        font-size: 1.5rem;
+        margin-bottom: 2px;
     }
 
     .profile-stat-number {
-        color: #f5f7fb;
-
-        font-family: "Montserrat", sans-serif;
-        font-size: 1.35rem;
-        font-weight: 800;
+        font-family: 'Outfit', sans-serif;
+        font-size: 1.8rem;
+        font-weight: 850;
+        color: #ffffff;
     }
 
     .profile-stat-label {
-        color: #8f9bad;
-
-        font-size: 0.76rem;
-        font-weight: 600;
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--text-secondary);
     }
 
+    /* Quick Links Row */
+    .profile-quick-links {
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+        margin-top: 32px;
+    }
 
-    /* =========================================================
-       MOBILE
-    ========================================================= */
+    .profile-link-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid var(--border-subtle);
+        color: #ffffff !important;
+        font-weight: 750;
+        font-size: 0.9rem;
+        text-decoration: none !important;
+        transition: all 0.2s ease;
+    }
 
-    @media (max-width: 600px) {
+    .profile-link-btn:hover {
+        background: rgba(34, 197, 94, 0.15);
+        border-color: rgba(34, 197, 94, 0.4);
+        color: var(--accent-light) !important;
+        transform: translateY(-2px);
+    }
 
-        .profile-card {
-            padding: 35px 20px 25px;
-
-            border-radius: 18px;
-        }
-
-        .profile-picture-wrapper,
-        .profile-picture,
-        .profile-letter {
-            width: 100px;
-            height: 100px;
-        }
-
-        .profile-letter {
-            font-size: 2.2rem;
-        }
-
-        .profile-username {
-            font-size: 1.4rem;
-        }
-
-        .profile-stats {
-            margin-top: 30px;
-            padding-top: 25px;
-        }
-
-        .profile-stat {
-            padding: 5px 8px;
-        }
-
-        .profile-stat-number {
-            font-size: 1.15rem;
-        }
-
-        .profile-stat-label {
-            font-size: 0.7rem;
-        }
+    @media (max-width: 640px) {
+        .profile-hologram-card { padding: 36px 20px 28px; }
+        .profile-stats-grid { grid-template-columns: 1fr; }
+        .profile-quick-links { flex-direction: column; }
     }
 </style>
+{% endblock %}
 
+{% block body %}
 
-<div class="profile-page">
+<div class="profile-page-wrapper" id="profilePageWrapper">
+    <div class="profile-hologram-card" id="profileCard">
 
-    <div class="profile-card">
+        <!-- VIP Status Tag -->
+        <div class="profile-vip-pill">
+            <span class="profile-vip-dot"></span>
+            Verified SoundWave Listener
+        </div>
 
-        <!-- =====================================================
-             PROFILE PICTURE
-        ====================================================== -->
-
-        <div class="profile-picture-wrapper">
+        <!-- 3D Avatar Stage with Soundwave Aura -->
+        <div class="profile-avatar-stage">
+            <div class="avatar-sound-ring"></div>
+            <div class="avatar-sound-ring-outer"></div>
 
             {% if user_profile.profile_picture %}
-
                 <img
                     src="{{ user_profile.profile_picture.url }}"
-                    alt="{{ request.user.username }} profile picture"
+                    alt="{{ request.user.username }} avatar"
                     class="profile-picture"
                 >
-
             {% else %}
-
                 <div class="profile-letter">
                     {{ request.user.username|first|upper }}
                 </div>
-
             {% endif %}
-
         </div>
 
+        <!-- Username & Handle -->
+        <h1 class="profile-username">{{ request.user.username }}</h1>
+        <p class="profile-subtitle">Personal SoundVault Member</p>
 
-        <!-- =====================================================
-             USERNAME
-        ====================================================== -->
-
-        <h1 class="profile-username">
-            {{ request.user.username }}
-        </h1>
-
-        <p class="profile-subtitle">
-            Music Listener
-        </p>
-
-
-        <!-- =====================================================
-             PROFILE PICTURE ACTIONS
-        ====================================================== -->
-
-       <!-- =====================================================
-     PROFILE PICTURE ACTIONS
-====================================================== -->
-
-<div class="profile-picture-actions">
-
-    <!-- Change Picture -->
-    <form
-        method="POST"
-        action="{% url 'change_profile_picture' %}"
-        enctype="multipart/form-data"
-        id="profilePictureForm"
-    >
-        {% csrf_token %}
-
-        <input
-            type="file"
-            name="profile_picture"
-            id="profilePictureInput"
-            accept="image/*"
-            hidden
-        >
-
-        <button
-            type="button"
-            class="profile-picture-action"
-            onclick="document.getElementById('profilePictureInput').click()"
-        >
-            📷 Change Picture
-        </button>
-    </form>
-
-
-    <!-- Remove Picture -->
-    {% if user_profile.profile_picture %}
-
-        <form
-            method="POST"
-            action="{% url 'remove_profile_picture' %}"
-        >
-            {% csrf_token %}
-
-            <button
-                type="submit"
-                class="profile-picture-action"
-                onclick="return confirm('Remove your profile picture?')"
+        <!-- Picture Actions -->
+        <div class="profile-picture-actions">
+            <form
+                method="POST"
+                action="{% url 'change_profile_picture' %}"
+                enctype="multipart/form-data"
+                id="profilePictureForm"
+                style="margin: 0;"
             >
-                🗑️ Remove Picture
-            </button>
-        </form>
+                {% csrf_token %}
+                <input
+                    type="file"
+                    name="profile_picture"
+                    id="profilePictureInput"
+                    accept="image/*"
+                    hidden
+                >
+                <button
+                    type="button"
+                    class="profile-picture-action"
+                    onclick="document.getElementById('profilePictureInput').click()"
+                >
+                    📷 Change Photo
+                </button>
+            </form>
 
-    {% endif %}
+            {% if user_profile.profile_picture %}
+                <form
+                    method="POST"
+                    action="{% url 'remove_profile_picture' %}"
+                    style="margin: 0;"
+                >
+                    {% csrf_token %}
+                    <button
+                        type="submit"
+                        class="profile-picture-action btn-danger"
+                        onclick="return confirm('Remove your profile photo?')"
+                    >
+                        🗑️ Remove Photo
+                    </button>
+                </form>
+            {% endif %}
+        </div>
 
-</div>
-
-
-        <!-- =====================================================
-             MUSIC STATISTICS
-        ====================================================== -->
-
-        <div class="profile-stats">
-
-            <!-- Songs -->
-
-            <div class="profile-stat">
-
-                <span class="profile-stat-icon">
-                    🎵
-                </span>
-
-                <span class="profile-stat-number">
-                    {{ song_count }}
-                </span>
-
-                <span class="profile-stat-label">
-                    Songs
-                </span>
-
+        <!-- Music Statistics Grid -->
+        <div class="profile-stats-grid">
+            <div class="profile-stat-box">
+                <span class="profile-stat-icon">🎵</span>
+                <span class="profile-stat-number">{{ song_count }}</span>
+                <span class="profile-stat-label">Vault Tracks</span>
             </div>
 
-
-            <!-- Liked -->
-
-            <div class="profile-stat">
-
-                <span class="profile-stat-icon">
-                    ❤️
-                </span>
-
-                <span class="profile-stat-number">
-                    {{ liked_count }}
-                </span>
-
-                <span class="profile-stat-label">
-                    Liked
-                </span>
-
+            <div class="profile-stat-box">
+                <span class="profile-stat-icon">❤️</span>
+                <span class="profile-stat-number">{{ liked_count }}</span>
+                <span class="profile-stat-label">Liked Songs</span>
             </div>
 
-
-            <!-- Playlists -->
-
-            <div class="profile-stat">
-
-                <span class="profile-stat-icon">
-                    🎧
-                </span>
-
-                <span class="profile-stat-number">
-                    {{ playlist_count }}
-                </span>
-
-                <span class="profile-stat-label">
-                    Playlists
-                </span>
-
+            <div class="profile-stat-box">
+                <span class="profile-stat-icon">🎧</span>
+                <span class="profile-stat-number">{{ playlist_count }}</span>
+                <span class="profile-stat-label">Playlists</span>
             </div>
+        </div>
 
+        <!-- Quick Navigation -->
+        <div class="profile-quick-links">
+            <a href="{% url 'liked_songs' %}" class="profile-link-btn">
+                ❤️ View Liked Songs
+            </a>
+            <a href="{% url 'all_playlists' %}" class="profile-link-btn">
+                📁 Manage Playlists
+            </a>
         </div>
 
     </div>
-
 </div>
 
 <script>
-    const profilePictureInput =
-        document.getElementById("profilePictureInput");
+(function() {
+    /* 1. 3D Card Tilt on Mouse Move */
+    const stage = document.getElementById('profilePageWrapper');
+    const card = document.getElementById('profileCard');
 
-    const profilePictureForm =
-        document.getElementById("profilePictureForm");
+    if (stage && card) {
+        stage.addEventListener('mousemove', function(e) {
+            const rect = card.getBoundingClientRect();
+            const cx = (e.clientX - rect.left - rect.width / 2) / (rect.width / 2);
+            const cy = (e.clientY - rect.top - rect.height / 2) / (rect.height / 2);
 
-    if (profilePictureInput) {
-
-        profilePictureInput.addEventListener("change", function () {
-
-            if (this.files && this.files.length > 0) {
-
-                const file = this.files[0];
-
-                // Basic image validation
-                if (!file.type.startsWith("image/")) {
-                    alert("Please select an image file.");
-                    this.value = "";
-                    return;
-                }
-
-                // Maximum 5 MB
-                if (file.size > 5 * 1024 * 1024) {
-                    alert("Image must be smaller than 5 MB.");
-                    this.value = "";
-                    return;
-                }
-
-                // Automatically submit
-                profilePictureForm.submit();
-            }
-
+            card.style.transform = `perspective(1200px) rotateX(${-cy * 7}deg) rotateY(${cx * 8}deg) translateY(-2px)`;
         });
 
+        stage.addEventListener('mouseleave', function() {
+            card.style.transform = 'perspective(1200px) rotateX(0deg) rotateY(0deg) translateY(0)';
+        });
     }
+
+    /* 2. Auto-Submit Avatar Upload */
+    const input = document.getElementById('profilePictureInput');
+    const form = document.getElementById('profilePictureForm');
+
+    if (input && form) {
+        input.addEventListener('change', function() {
+            if (this.files && this.files.length > 0) {
+                const file = this.files[0];
+                if (!file.type.startsWith('image/')) {
+                    alert('Please select a valid image file.');
+                    this.value = '';
+                    return;
+                }
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Image must be under 5 MB.');
+                    this.value = '';
+                    return;
+                }
+                form.submit();
+            }
+        });
+    }
+})();
 </script>
+
 {% endblock %}

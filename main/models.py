@@ -36,15 +36,15 @@ class Song(models.Model):
             return ""
 
         patterns = [
-            r"(?:youtube\.com/watch\?v=)([A-Za-z0-9_-]{11})",
+            r"(?:[?&]v=)([A-Za-z0-9_-]{11})",
             r"(?:youtu\.be/)([A-Za-z0-9_-]{11})",
             r"(?:youtube\.com/embed/)([A-Za-z0-9_-]{11})",
             r"(?:youtube\.com/shorts/)([A-Za-z0-9_-]{11})",
+            r"^([A-Za-z0-9_-]{11})$",
         ]
 
         for pattern in patterns:
             match = re.search(pattern, url)
-
             if match:
                 return match.group(1)
 
@@ -64,6 +64,13 @@ class Song(models.Model):
     @property
     def youtube_video_id(self):
         return self.get_youtube_video_id()
+
+    @property
+    def youtube_watch_url(self):
+        video_id = self.get_youtube_video_id()
+        if video_id:
+            return f"https://www.youtube.com/watch?v={video_id}"
+        return self.audio_url or ""
        
 class Playlist(models.Model):
     name = models.CharField(max_length=100)

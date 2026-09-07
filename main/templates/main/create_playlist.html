@@ -1,13 +1,365 @@
 {% extends 'main/base.html' %}
 
 {% block heading %}
-    <title>Create New Playlist!</title>
+<title>Create Playlist — SoundWave</title>
+
+<style>
+/* =====================================================
+   CONTAINER & 3D PERSPECTIVE WRAPPER
+   ===================================================== */
+.create-pl-viewport {
+    position: relative;
+    min-height: calc(100vh - 160px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px 100px;
+    perspective: 1200px;
+    overflow: hidden;
+}
+
+/* Cosmic ambient glows */
+.pl-ambient-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.18;
+    pointer-events: none;
+    z-index: 0;
+}
+.pl-ambient-blob-1 {
+    width: 480px; height: 480px;
+    background: radial-gradient(circle, #22c55e, transparent 70%);
+    top: -80px; right: 10%;
+    animation: plBlobFloat 10s ease-in-out infinite alternate;
+}
+.pl-ambient-blob-2 {
+    width: 420px; height: 420px;
+    background: radial-gradient(circle, #06b6d4, transparent 70%);
+    bottom: -60px; left: 8%;
+    animation: plBlobFloat 12s ease-in-out infinite alternate -5s;
+}
+@keyframes plBlobFloat {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(30px, -30px) scale(1.08); }
+}
+
+/* 3D TILT CARD */
+.pl-tilt-card {
+    position: relative;
+    z-index: 2;
+    width: min(580px, 100%);
+    background: linear-gradient(145deg, rgba(17, 24, 39, 0.88), rgba(9, 13, 22, 0.94));
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 28px;
+    padding: 42px 40px;
+    box-shadow: 
+        0 30px 70px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(255, 255, 255, 0.04),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    transform-style: preserve-3d;
+    transition: transform 0.15s ease-out, box-shadow 0.3s ease;
+}
+.pl-tilt-card:hover {
+    box-shadow: 
+        0 35px 85px rgba(0, 0, 0, 0.7),
+        0 0 50px rgba(34, 197, 94, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Card Glare */
+.pl-card-glare {
+    position: absolute;
+    inset: 0;
+    border-radius: 28px;
+    pointer-events: none;
+    background: radial-gradient(circle 320px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.08), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.pl-tilt-card:hover .pl-card-glare {
+    opacity: 1;
+}
+
+/* Header badge */
+.pl-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+.pl-badge-icon {
+    width: 68px; height: 68px;
+    margin: 0 auto 16px;
+    border-radius: 22px;
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.22), rgba(6, 182, 212, 0.15));
+    border: 1px solid rgba(34, 197, 94, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    box-shadow: 0 12px 30px rgba(34, 197, 94, 0.25);
+    animation: plPulse 3s infinite ease-in-out;
+}
+@keyframes plPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 12px 30px rgba(34, 197, 94, 0.25); }
+    50% { transform: scale(1.05); box-shadow: 0 16px 40px rgba(34, 197, 94, 0.4); }
+}
+
+.pl-title {
+    font-size: 1.85rem;
+    font-weight: 850;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, #ffffff 30%, #a7f3d0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0 0 8px;
+}
+.pl-subtitle {
+    color: #94a3b8;
+    font-size: 0.92rem;
+    margin: 0;
+}
+
+/* Form Styling */
+.pl-form-group {
+    margin-bottom: 24px;
+}
+.pl-label {
+    display: block;
+    color: #e2e8f0;
+    font-size: 0.88rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    letter-spacing: 0.01em;
+}
+.pl-input-wrapper {
+    position: relative;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    transition: all 0.25s ease;
+}
+.pl-input-wrapper:focus-within {
+    border-color: #22c55e;
+    background: rgba(255, 255, 255, 0.07);
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+}
+.pl-input {
+    width: 100%;
+    padding: 15px 18px;
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    font-size: 1rem;
+    outline: none;
+    box-sizing: border-box;
+}
+.pl-input::placeholder {
+    color: #64748b;
+}
+
+/* Cover Image Upload Area */
+.pl-dropzone {
+    border: 2px dashed rgba(255, 255, 255, 0.18);
+    border-radius: 18px;
+    padding: 28px 20px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.02);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+}
+.pl-dropzone:hover {
+    border-color: rgba(34, 197, 94, 0.6);
+    background: rgba(34, 197, 94, 0.04);
+    transform: translateY(-2px);
+}
+.pl-preview-img {
+    max-width: 150px;
+    max-height: 150px;
+    border-radius: 14px;
+    object-fit: cover;
+    margin: 0 auto 14px;
+    display: none;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    border: 2px solid rgba(34, 197, 94, 0.5);
+}
+.pl-drop-icon {
+    font-size: 2.2rem;
+    display: block;
+    margin-bottom: 8px;
+}
+.pl-drop-text {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #f1f5f9;
+}
+.pl-drop-hint {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin-top: 6px;
+}
+
+/* Actions */
+.pl-actions {
+    display: flex;
+    gap: 14px;
+    margin-top: 36px;
+}
+.pl-btn-cancel {
+    flex: 1;
+    padding: 14px 22px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.05);
+    color: #cbd5e1;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+.pl-btn-cancel:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+.pl-btn-submit {
+    flex: 2;
+    padding: 14px 24px;
+    border-radius: 14px;
+    border: none;
+    background: linear-gradient(135deg, #22c55e, #10b981);
+    color: #032311;
+    font-size: 0.98rem;
+    font-weight: 850;
+    cursor: pointer;
+    box-shadow: 0 12px 28px rgba(34, 197, 94, 0.3);
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.pl-btn-submit:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 16px 36px rgba(34, 197, 94, 0.45);
+    background: linear-gradient(135deg, #4ade80, #10b981);
+}
+</style>
 {% endblock %}
 
 {% block body %}
-<form method="post" class="create-playlist-form">
-    {% csrf_token %}
-    <input placeholder="Name of the playlist..." type="text" name="name-playlist" required>
-    <button type="submit">Create</button>
-</form>
+<div class="create-pl-viewport">
+    <div class="pl-ambient-blob pl-ambient-blob-1"></div>
+    <div class="pl-ambient-blob pl-ambient-blob-2"></div>
+
+    <div class="pl-tilt-card" id="plTiltCard">
+        <div class="pl-card-glare" id="plCardGlare"></div>
+
+        <div class="pl-header">
+            <div class="pl-badge-icon">🎧</div>
+            <h1 class="pl-title">Create New Playlist</h1>
+            <p class="pl-subtitle">Curate your sonic universe with custom tracks and artwork</p>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="pl-form-group">
+                <label class="pl-label" for="playlistName">Playlist Name *</label>
+                <div class="pl-input-wrapper">
+                    <input
+                        id="playlistName"
+                        class="pl-input"
+                        type="text"
+                        name="name-playlist"
+                        placeholder="e.g. Midnight Beats, Daily Workout, Ambient Focus"
+                        required
+                        autofocus
+                        maxlength="100"
+                    >
+                </div>
+            </div>
+
+            <div class="pl-form-group">
+                <label class="pl-label">Cover Artwork (Optional)</label>
+                <div class="pl-dropzone" onclick="document.getElementById('coverFileInput').click()" id="plDropzone">
+                    <img id="plPreviewImg" class="pl-preview-img" alt="Cover Preview">
+                    <div id="plDropPrompt">
+                        <span class="pl-drop-icon">🎨</span>
+                        <div class="pl-drop-text">Click or drag image here</div>
+                        <div class="pl-drop-hint">PNG, JPG, or WEBP (Max 5MB)</div>
+                    </div>
+                    <input
+                        type="file"
+                        name="cover_image"
+                        id="coverFileInput"
+                        accept="image/*"
+                        style="display: none;"
+                        onchange="handleCoverFile(this)"
+                    >
+                </div>
+            </div>
+
+            <div class="pl-actions">
+                <a href="{% url 'all_playlists' %}" class="pl-btn-cancel">Cancel</a>
+                <button type="submit" class="pl-btn-submit">
+                    <span>Create Playlist</span>
+                    <span>✨</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// 3D Tilt interaction on card
+const tiltCard = document.getElementById('plTiltCard');
+const cardGlare = document.getElementById('plCardGlare');
+
+if (tiltCard) {
+    tiltCard.addEventListener('mousemove', (e) => {
+        const rect = tiltCard.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        const rotateX = ((y - centerY) / centerY) * -7;
+        const rotateY = ((x - centerX) / centerX) * 7;
+        
+        tiltCard.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        tiltCard.style.setProperty('--mouse-x', `${x}px`);
+        tiltCard.style.setProperty('--mouse-y', `${y}px`);
+    });
+
+    tiltCard.addEventListener('mouseleave', () => {
+        tiltCard.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg)';
+    });
+}
+
+// Cover image preview
+function handleCoverFile(input) {
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        if (file.size > 5 * 1024 * 1024) {
+            alert("Image must be smaller than 5 MB");
+            input.value = "";
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const preview = document.getElementById("plPreviewImg");
+            const prompt = document.getElementById("plDropPrompt");
+            preview.src = e.target.result;
+            preview.style.display = "block";
+            prompt.querySelector(".pl-drop-text").textContent = "Click to change image";
+        };
+        reader.readAsDataURL(file);
+    }
+}
+</script>
 {% endblock %}

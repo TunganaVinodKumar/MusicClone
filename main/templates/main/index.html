@@ -1,2675 +1,1641 @@
 {% extends 'main/base.html' %}
 
 {% block heading %}
-<title>My Music Clone</title>
-
+<title>SoundWave — Discover & Play</title>
 <style>
     /* =========================================================
-       HOME PAGE
+       HERO BANNER: 3D CYBER CASSETTE & HOLOGRAPHIC SOUND DECK
        ========================================================= */
-
-    .home-page {
-        width: 100%;
-        max-width: 1280px;
-        margin: 0 auto;
+    .hero-3d-wrapper {
+        perspective: 1100px;
+        margin-bottom: 44px;
     }
 
-    /* =========================================================
-       HERO SECTION
-       ========================================================= */
-
-    /* =========================================================
-       HERO — 3D + SHIMMER
-       ========================================================= */
-
-    .hero-3d-scene {
-        perspective: 1200px;
-        margin-bottom: 55px;
-    }
-
-    .music-hero {
+    .hero-stage {
         position: relative;
         overflow: hidden;
-        min-height: 390px;
-        margin-bottom: 0;
-        padding: 65px 60px;
+        border-radius: var(--radius-xl);
+        background: radial-gradient(circle at 85% 25%, rgba(34, 197, 94, 0.22), transparent 45%),
+                    radial-gradient(circle at 10% 85%, rgba(59, 130, 246, 0.12), transparent 40%),
+                    linear-gradient(135deg, #101622 0%, #090c13 100%);
+        border: 1px solid var(--border-subtle);
+        padding: 44px 44px;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
         display: flex;
         align-items: center;
-        border: 1px solid rgba(255,255,255,0.08);
-        border-radius: 28px;
-        background:
-            radial-gradient(circle at 85% 20%, rgba(34,197,94,0.20), transparent 32%),
-            radial-gradient(circle at 20% 100%, rgba(59,130,246,0.12), transparent 35%),
-            linear-gradient(145deg, #111820, #0a0f18);
-        box-shadow:
-            0 40px 100px rgba(0,0,0,0.5),
-            0 0 0 1px rgba(255,255,255,0.04) inset;
+        justify-content: space-between;
+        gap: 32px;
         transform-style: preserve-3d;
-        transform: rotateX(2deg);
-        transition: transform 0.6s cubic-bezier(0.23,1,0.32,1);
-        cursor: default;
+        transform: rotateX(1deg);
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    /* Shimmer top border */
-    .music-hero::before {
+    /* Ambient Canvas Ribbon in Hero */
+    #heroWaveCanvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1;
+        opacity: 0.7;
+    }
+
+    /* Shimmering Top Accent Border */
+    .hero-stage::before {
         content: '';
         position: absolute;
         top: 0; left: 0; right: 0;
-        height: 1px;
-        background: linear-gradient(90deg,
-            transparent 0%,
-            rgba(74,222,128,0.6) 30%,
-            rgba(74,222,128,1) 50%,
-            rgba(74,222,128,0.6) 70%,
-            transparent 100%
-        );
+        height: 2px;
+        background: linear-gradient(90deg, transparent 0%, rgba(74, 222, 128, 0.8) 50%, transparent 100%);
         background-size: 200% 100%;
-        animation: heroShimmer 3s linear infinite;
-        z-index: 5;
+        animation: topBorderShimmer 4s linear infinite;
+        z-index: 4;
     }
 
-    @keyframes heroShimmer {
+    @keyframes topBorderShimmer {
         0%   { background-position: -200% 0; }
-        100% { background-position:  200% 0; }
+        100% { background-position: 200% 0; }
     }
 
-    .music-hero-content {
-        position: relative;
+    .hero-text-content {
+        max-width: 580px;
         z-index: 3;
-        max-width: 620px;
         transform: translateZ(25px);
-        animation: heroContentIn 0.7s ease 0.1s both;
     }
 
-    @keyframes heroContentIn {
-        from { opacity: 0; transform: translateZ(25px) translateY(20px); }
-        to   { opacity: 1; transform: translateZ(25px) translateY(0); }
-    }
-
-    .hero-small-text {
+    .hero-status-pill {
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        margin-bottom: 18px;
-        padding: 7px 14px;
-        border: 1px solid rgba(74,222,128,0.25);
+        padding: 6px 14px;
         border-radius: 999px;
-        background: rgba(34,197,94,0.09);
-        backdrop-filter: blur(8px);
-        color: #4ade80;
+        background: rgba(34, 197, 94, 0.12);
+        border: 1px solid rgba(34, 197, 94, 0.35);
+        color: var(--accent-light);
         font-size: 0.78rem;
         font-weight: 700;
         letter-spacing: 0.04em;
         text-transform: uppercase;
+        margin-bottom: 16px;
     }
 
-    .hero-small-text span {
-        width: 7px;
-        height: 7px;
+    .hero-status-dot {
+        width: 8px;
+        height: 8px;
         border-radius: 50%;
-        background: #22c55e;
-        box-shadow: 0 0 0 3px rgba(34,197,94,0.2), 0 0 12px rgba(34,197,94,0.9);
-        animation: heroDotPulse 2s ease-in-out infinite;
+        background: var(--accent);
+        box-shadow: 0 0 10px var(--accent-light);
+        animation: heroPulseDot 2s infinite;
     }
 
-    @keyframes heroDotPulse {
-        0%,100% {
-            box-shadow: 0 0 0 3px rgba(34,197,94,0.2), 0 0 10px rgba(34,197,94,0.7);
-        }
-        50% {
-            box-shadow: 0 0 0 5px rgba(34,197,94,0.1), 0 0 18px rgba(34,197,94,1);
-        }
+    @keyframes heroPulseDot {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.4; transform: scale(0.85); }
     }
 
-    .music-hero h1 {
-        margin: 0 0 18px;
-        color: #ffffff;
-        font-family: "Montserrat", sans-serif;
-        font-size: clamp(2.4rem, 5vw, 4.5rem);
+    .hero-heading {
+        font-family: 'Outfit', sans-serif;
+        font-size: clamp(2.2rem, 4.4vw, 3.4rem);
         font-weight: 800;
-        line-height: 1.02;
-        letter-spacing: -0.055em;
+        line-height: 1.1;
+        letter-spacing: -0.04em;
+        margin-bottom: 12px;
+        color: #ffffff;
     }
 
-    .music-hero h1 .accent {
-        background: linear-gradient(135deg, #4ade80, #22c55e 40%, #16a34a);
+    .hero-heading .accent-gradient {
+        background: linear-gradient(135deg, #4ade80, #22c55e);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-        filter: drop-shadow(0 0 18px rgba(34,197,94,0.4));
     }
 
-    .music-hero-description {
-        max-width: 540px;
-        margin: 0 0 28px;
-        color: #8d9daf;
+    .hero-paragraph {
+        color: var(--text-secondary);
         font-size: 1rem;
-        line-height: 1.7;
+        line-height: 1.6;
+        margin-bottom: 26px;
     }
 
-    .hero-actions {
+    .hero-buttons-row {
         display: flex;
         flex-wrap: wrap;
-        gap: 12px;
+        align-items: center;
+        gap: 14px;
     }
 
-    .hero-button {
-        position: relative;
+    .hero-action-btn {
         display: inline-flex;
         align-items: center;
-        justify-content: center;
-        gap: 6px;
-        min-height: 50px;
-        padding: 0 24px;
-        border-radius: 14px;
-        text-decoration: none !important;
-        font-weight: 700;
+        gap: 8px;
+        padding: 12px 24px;
+        border-radius: 999px;
         font-size: 0.92rem;
-        overflow: hidden;
-        transition: all 0.25s cubic-bezier(0.23,1,0.32,1);
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        text-decoration: none !important;
     }
 
-    /* Shimmer sweep on hover */
-    .hero-button::after {
-        content: '';
-        position: absolute;
-        top: 0; left: -100%;
-        width: 60%; height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
-        transform: skewX(-20deg);
-        transition: left 0.5s ease;
+    .btn-emerald-solid {
+        background: linear-gradient(135deg, var(--accent-light), var(--accent));
+        color: #052e16 !important;
+        box-shadow: 0 4px 20px var(--accent-glow);
     }
 
-    .hero-button:hover::after {
-        left: 150%;
+    .btn-emerald-solid:hover {
+        transform: translateY(-2px) scale(1.03);
+        box-shadow: 0 8px 28px rgba(34, 197, 94, 0.45);
     }
 
-    .hero-button-primary {
-        background: linear-gradient(135deg, #22c55e, #16a34a);
-        color: #fff !important;
-        box-shadow:
-            0 8px 28px rgba(34,197,94,0.35),
-            0 0 0 1px rgba(74,222,128,0.2) inset;
-    }
-
-    .hero-button-primary:hover {
-        color: #fff !important;
-        transform: translateY(-3px) scale(1.02);
-        box-shadow: 0 16px 40px rgba(34,197,94,0.5);
-    }
-
-    .hero-button-secondary {
-        border: 1px solid rgba(255,255,255,0.12);
-        background: rgba(255,255,255,0.05);
+    .btn-glass-sub {
+        background: rgba(255, 255, 255, 0.06);
         color: #ffffff !important;
-        backdrop-filter: blur(8px);
+        border: 1px solid var(--border-subtle);
     }
 
-    .hero-button-secondary:hover {
-        border-color: rgba(74,222,128,0.4);
-        background: rgba(255,255,255,0.09);
-        color: #ffffff !important;
-        transform: translateY(-3px) scale(1.02);
-        box-shadow: 0 8px 28px rgba(0,0,0,0.3);
+    .btn-glass-sub:hover {
+        background: rgba(255, 255, 255, 0.12);
+        transform: translateY(-2px);
     }
 
-    /* =========================================================
-       3D CROWN SPECTRUM — HERO VISUAL
-       ========================================================= */
-
-    .hero-music-decoration {
-        position: absolute;
-        right: 60px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 300px;
-        height: 300px;
+    /* ---------------------------------------------------------
+       HIGH-LEVEL 3D SPATIAL AUDIO EQUALIZER MATRIX
+       --------------------------------------------------------- */
+    .equalizer-3d-stage {
+        width: 340px;
+        height: 240px;
+        perspective: 1100px;
         display: flex;
         align-items: center;
         justify-content: center;
-        z-index: 4;
-        perspective: 600px;
-        overflow: visible;
-    }
-
-    /* Crown container — rotates in 3D */
-    .crown-scene {
         position: relative;
-        width: 180px;
-        height: 180px;
+        z-index: 3;
+        flex-shrink: 0;
+    }
+
+    .equalizer-matrix-container {
+        position: relative;
+        width: 280px;
+        height: 220px;
         transform-style: preserve-3d;
-        animation: crownRotate 12s linear infinite;
+        transform: rotateX(24deg) rotateY(-22deg);
+        transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
-    @keyframes crownRotate {
-        0%   { transform: rotateX(62deg) rotateZ(0deg); }
-        100% { transform: rotateX(62deg) rotateZ(360deg); }
-    }
-
-    /* Each bar is a thin pill placed around the circle */
-    .crown-bar {
+    /* Central Pulsing Audio Energy Core */
+    .spatial-audio-core {
         position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 5px;
-        border-radius: 3px;
-        background: linear-gradient(to top, #16a34a, #4ade80, #86efac);
-        box-shadow:
-            0 0 8px rgba(74,222,128,0.7),
-            0 0 18px rgba(34,197,94,0.35);
-        transform-origin: 50% 100%;
-        animation: crownPulse var(--dur) ease-in-out infinite;
-        animation-delay: var(--delay);
-        margin-left: -2.5px;
-    }
-
-    @keyframes crownPulse {
-        0%,100% {
-            height: 18px;
-            opacity: 0.5;
-        }
-        50% {
-            height: var(--max-h);
-            opacity: 1;
-        }
-    }
-
-    /* Central glowing core */
-    .crown-core {
-        position: absolute;
-        width: 36px;
-        height: 36px;
+        width: 76px;
+        height: 76px;
         border-radius: 50%;
-        background: radial-gradient(circle at 35% 35%, #86efac, #22c55e 50%, #15803d);
+        background: radial-gradient(circle at 35% 35%, #86efac 0%, #22c55e 45%, #0e7490 85%, #052e16 100%);
         box-shadow:
-            0 0 0 3px rgba(74,222,128,0.25),
-            0 0 20px rgba(34,197,94,0.7),
-            0 0 50px rgba(34,197,94,0.3);
-        animation: corePulse 2s ease-in-out infinite;
-        z-index: 10;
+            0 0 35px rgba(74, 222, 128, 0.9),
+            0 0 70px rgba(6, 182, 212, 0.5),
+            0 0 100px rgba(34, 197, 94, 0.3);
+        animation: coreAuraPulse 3s ease-in-out infinite alternate;
+        transform: translateZ(20px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #052e16;
+        font-size: 1.8rem;
+        font-weight: 900;
     }
 
-    @keyframes corePulse {
-        0%,100% {
-            box-shadow:
-                0 0 0 3px rgba(74,222,128,0.2),
-                0 0 20px rgba(34,197,94,0.7);
-            transform: scale(1);
-        }
-        50% {
-            box-shadow:
-                0 0 0 6px rgba(74,222,128,0.12),
-                0 0 40px rgba(34,197,94,1);
-            transform: scale(1.08);
-        }
+    @keyframes coreAuraPulse {
+        0%   { transform: translateZ(20px) scale(0.88); box-shadow: 0 0 25px rgba(74, 222, 128, 0.7); }
+        100% { transform: translateZ(20px) scale(1.15); box-shadow: 0 0 55px rgba(74, 222, 128, 1), 0 0 90px rgba(6, 182, 212, 0.7); }
     }
 
-    /* Outer glow halo */
-    .crown-glow {
+    /* Orbiting Equalizer Wave Ring */
+    .matrix-orbit-ring {
         position: absolute;
-        width: 210px;
-        height: 210px;
+        width: 230px;
+        height: 230px;
         border-radius: 50%;
-        background: radial-gradient(circle, rgba(34,197,94,0.18) 0%, transparent 65%);
-        filter: blur(22px);
-        animation: crownGlowPulse 3s ease-in-out infinite;
-    }
-
-    @keyframes crownGlowPulse {
-        0%,100% {
-            transform: scale(0.88);
-            opacity: 0.5;
-        }
-        50% {
-            transform: scale(1.15);
-            opacity: 1;
-        }
-    }
-
-    /* Floating notes */
-    .hero-floating-note {
-        position: absolute;
-        color: #4ade80;
-        text-shadow: 0 0 14px rgba(74,222,128,0.8);
-        animation: hNoteFloat 4s ease-in-out infinite;
-        z-index: 6;
+        border: 2px dashed rgba(74, 222, 128, 0.4);
+        box-shadow: 0 0 25px rgba(34, 197, 94, 0.2) inset;
+        transform: rotateX(70deg) translateZ(0);
+        animation: matrixOrbitSpin 14s linear infinite;
         pointer-events: none;
     }
 
-    .hero-floating-note.note-1 {
-        top: 6px;
-        left: 10px;
-        font-size: 1.1rem;
-        animation-delay: 0s;
+    @keyframes matrixOrbitSpin {
+        from { transform: rotateX(70deg) rotate(0deg); }
+        to   { transform: rotateX(70deg) rotate(360deg); }
     }
 
-    .hero-floating-note.note-2 {
-        top: 20px;
-        right: 6px;
-        font-size: 0.9rem;
-        animation-delay: -1.6s;
+    /* 3D Equalizer Column Ring */
+    .matrix-eq-pillars {
+        position: absolute;
+        width: 220px;
+        height: 140px;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        transform-style: preserve-3d;
+        transform: translateZ(10px);
+        pointer-events: none;
     }
 
-    .hero-floating-note.note-3 {
-        bottom: 20px;
-        right: 15px;
-        font-size: 1.3rem;
-        animation-delay: -3s;
+    .eq-column {
+        width: 8px;
+        border-radius: 999px;
+        background: linear-gradient(180deg, #4ade80 0%, #22c55e 50%, #06b6d4 100%);
+        box-shadow: 0 0 14px rgba(74, 222, 128, 0.7);
+        animation: pillarJump 1.4s ease-in-out infinite alternate;
     }
 
-    .hero-floating-note.note-4 {
-        bottom: 32px;
-        left: 6px;
-        font-size: 0.85rem;
-        animation-delay: -2s;
+    .eq-col-1  { height: 35px; animation-delay: 0.1s; }
+    .eq-col-2  { height: 75px; animation-delay: 0.3s; }
+    .eq-col-3  { height: 50px; animation-delay: 0.15s; }
+    .eq-col-4  { height: 95px; animation-delay: 0.45s; }
+    .eq-col-5  { height: 60px; animation-delay: 0.25s; }
+    .eq-col-6  { height: 110px; animation-delay: 0.55s; }
+    .eq-col-7  { height: 85px; animation-delay: 0.35s; }
+    .eq-col-8  { height: 105px; animation-delay: 0.5s; }
+    .eq-col-9  { height: 45px; animation-delay: 0.2s; }
+    .eq-col-10 { height: 80px; animation-delay: 0.4s; }
+    .eq-col-11 { height: 60px; animation-delay: 0.28s; }
+    .eq-col-12 { height: 40px; animation-delay: 0.12s; }
+
+    @keyframes pillarJump {
+        0%   { transform: scaleY(0.4); opacity: 0.6; }
+        100% { transform: scaleY(1.2); opacity: 1; filter: drop-shadow(0 0 10px rgba(74, 222, 128, 0.9)); }
     }
 
-    @keyframes hNoteFloat {
-        0%,100% {
-            transform: translateY(0) rotate(-10deg);
-            opacity: 0.3;
-        }
-        50% {
-            transform: translateY(-18px) rotate(8deg);
-            opacity: 0.9;
-        }
+    /* Floating 3D Spatial Audio Chips */
+    .spatial-hologram-chip {
+        position: absolute;
+        padding: 7px 14px;
+        border-radius: 12px;
+        background: rgba(15, 23, 42, 0.88);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(74, 222, 128, 0.35);
+        color: #ffffff;
+        font-size: 0.76rem;
+        font-weight: 750;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6);
+        pointer-events: none;
+        white-space: nowrap;
     }
 
-    @media (prefers-reduced-motion: reduce) {
-        .hero-3d-scene,
-        .music-hero,
-        .music-hero::before,
-        .music-hero-content,
-        .hero-small-text span,
-        .hero-button::after,
-        .crown-scene,
-        .crown-bar,
-        .crown-core,
-        .crown-glow,
-        .hero-floating-note {
-            animation: none !important;
-        }
+    .chip-left {
+        top: -15px;
+        left: -35px;
+        transform: translateZ(50px);
+        animation: chipFloatA 3.8s ease-in-out infinite alternate;
+    }
+
+    .chip-right {
+        bottom: -15px;
+        right: -35px;
+        transform: translateZ(65px);
+        animation: chipFloatB 4.2s ease-in-out infinite alternate;
+    }
+
+    @keyframes chipFloatA {
+        0%   { transform: translateZ(50px) translateY(0); }
+        100% { transform: translateZ(50px) translateY(-10px); }
+    }
+
+    @keyframes chipFloatB {
+        0%   { transform: translateZ(65px) translateY(0); }
+        100% { transform: translateZ(65px) translateY(10px); }
     }
 
     /* =========================================================
-       SECTION HEADER
+       SECTION WRAPPERS & CARDS
        ========================================================= */
-
-    .home-section {
-        margin-bottom: 55px;
+    .section-wrap {
+        margin-bottom: 48px;
     }
 
-    .section-header {
+    .section-head {
         display: flex;
         align-items: flex-end;
         justify-content: space-between;
-        gap: 20px;
+        gap: 16px;
         margin-bottom: 22px;
     }
 
-    .section-heading {
-        margin: 0;
-        color: #ffffff;
-        font-family: "Montserrat", sans-serif;
-        font-size: clamp(1.5rem, 3vw, 2rem);
+    .section-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: 1.55rem;
         font-weight: 800;
-        letter-spacing: -0.04em;
+        letter-spacing: -0.03em;
+        color: #ffffff;
     }
 
-    .section-subheading {
-        margin: 6px 0 0;
-        color: #8d98a9;
-        font-size: 0.9rem;
-    }
-
-    .section-link {
-        flex-shrink: 0;
-        color: #4ade80 !important;
+    .section-subtitle {
+        color: var(--text-muted);
         font-size: 0.88rem;
+        margin-top: 4px;
+    }
+
+    .section-more-link {
+        color: var(--accent-light);
+        font-size: 0.85rem;
         font-weight: 700;
-        text-decoration: none;
+        transition: color 0.15s ease;
+        text-decoration: none !important;
     }
 
-    .section-link:hover {
-        color: #86efac !important;
+    .section-more-link:hover {
+        color: #ffffff;
     }
 
-    /* =========================================================
-       SONG GRID
-       ========================================================= */
-
-    .songs-grid {
+    /* 5-Column Popular Tracks */
+    /* 5-Column Popular Tracks */
+    .tracks-grid {
         display: grid;
         grid-template-columns: repeat(5, minmax(0, 1fr));
         gap: 20px;
     }
 
-    /* =========================================================
-       SONG CARD
-       ========================================================= */
-
-    .song-card {
+    .track-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-lg);
+        padding: 14px;
+        transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        display: flex;
+        flex-direction: column;
         position: relative;
-        min-width: 0;
-        overflow: hidden;
-        border: 1px solid rgba(255,255,255,0.07);
-        border-radius: 18px;
-        background: #141820;
-        transition:
-            transform 0.25s ease,
-            border-color 0.25s ease,
-            background 0.25s ease,
-            box-shadow 0.25s ease;
     }
 
-    .song-card:hover {
-        transform: translateY(-6px);
-        border-color: rgba(74,222,128,0.20);
-        background: #191f29;
-        box-shadow: 0 18px 45px rgba(0,0,0,0.30);
+    .track-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        background: var(--card-hover);
+        border-color: rgba(74, 222, 128, 0.35);
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.55), 0 0 25px rgba(34, 197, 94, 0.12);
     }
 
-    .song-cover-wrapper {
+    .track-card.active-song {
+        border-color: var(--accent);
+        box-shadow: 0 0 26px var(--accent-glow);
+    }
+
+    .track-card-art {
         position: relative;
+        width: 100%;
         aspect-ratio: 1 / 1;
+        border-radius: var(--radius-md);
         overflow: hidden;
-        background: #202630;
+        background: #18202d;
+        margin-bottom: 12px;
     }
 
-    .song-cover {
-        width: 100% !important;
+    .track-card-img {
+        width: 100%;
         height: 100%;
-        display: block;
         object-fit: cover;
         transition: transform 0.35s ease;
     }
 
-    .song-card:hover .song-cover {
-        transform: scale(1.05);
+    .track-card:hover .track-card-img {
+        transform: scale(1.06);
     }
 
-    /* Dark overlay */
-
-    .song-cover-overlay {
-        position: absolute;
-        inset: 0;
-        display: flex;
-        align-items: flex-end;
-        justify-content: flex-end;
-        padding: 14px;
-        background:
-            linear-gradient(
-                to top,
-                rgba(0,0,0,0.60),
-                transparent 45%
-            );
-        opacity: 0;
-        transition: opacity 0.25s ease;
-    }
-
-    .song-card:hover .song-cover-overlay {
-        opacity: 1;
-    }
-
-    /* Play button */
-
-    .song-play-button {
-        width: 46px;
-        height: 46px;
+    .track-card-placeholder {
+        width: 100%;
+        height: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
-        border: 0;
-        border-radius: 50%;
-        background: #22c55e;
-        color: #052e16;
-        font-size: 1.15rem;
-        font-weight: 800;
-        text-decoration: none;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.35);
-        transition:
-            transform 0.2s ease,
-            background 0.2s ease;
+        font-size: 2.8rem;
+        background: linear-gradient(135deg, #1a2233, #0f1520);
+        color: var(--accent);
     }
 
-    .song-play-button:hover {
-        background: #4ade80;
-        color: #052e16;
-        transform: scale(1.08);
-    }
-
-    .song-info {
-        padding: 15px;
-    }
-
-    .song-title {
-        overflow: hidden;
-        margin: 0 0 12px;
+    /* Rank Badge on Popular Songs */
+    .track-rank-badge {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 0.72rem;
+        font-weight: 850;
+        letter-spacing: 0.04em;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        background: rgba(10, 15, 24, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.15);
         color: #ffffff;
-        font-family: "Montserrat", sans-serif;
-        font-size: 0.95rem;
-        font-weight: 700;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        z-index: 4;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
     }
 
-    /* Playlist controls */
+    .rank-top-1 {
+        border-color: rgba(250, 204, 21, 0.7);
+        color: #fde047;
+        box-shadow: 0 0 14px rgba(250, 204, 21, 0.35);
+    }
+    .rank-top-2 {
+        border-color: rgba(226, 232, 240, 0.7);
+        color: #f1f5f9;
+        box-shadow: 0 0 14px rgba(226, 232, 240, 0.3);
+    }
+    .rank-top-3 {
+        border-color: rgba(251, 146, 60, 0.7);
+        color: #fdba74;
+        box-shadow: 0 0 14px rgba(251, 146, 60, 0.3);
+    }
 
-    .song-playlist-form {
+    .card-play-btn {
+        position: absolute;
+        bottom: 12px;
+        right: 12px;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: var(--accent);
+        color: #052e16 !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.15rem;
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.7), 0 0 16px var(--accent-glow);
+        opacity: 0;
+        transform: translateY(8px);
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        z-index: 5;
+        text-decoration: none !important;
+    }
+
+    .track-card:hover .card-play-btn,
+    .track-card.active-song .card-play-btn {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .card-play-btn:hover {
+        transform: scale(1.14);
+        background: var(--accent-light);
+    }
+
+    .active-now-badge {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        padding: 4px 10px;
+        background: rgba(5, 46, 22, 0.9);
+        border: 1px solid var(--accent);
+        border-radius: 999px;
+        color: var(--accent-light);
+        font-size: 0.7rem;
+        font-weight: 750;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        backdrop-filter: blur(6px);
+        z-index: 4;
+        box-shadow: 0 0 14px var(--accent-glow);
+    }
+
+    .active-dot-ping {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 8px var(--accent);
+        animation: heroPulseDot 1.5s infinite;
+    }
+
+    .track-card-info {
         display: flex;
         flex-direction: column;
-        gap: 8px;
-        margin: 0;
-    }
-
-    .song-playlist-select {
-        width: 100%;
-        min-height: 38px;
-        padding: 7px 10px;
-        border: 1px solid rgba(255,255,255,0.08);
-        border-radius: 9px;
-        background: #1b202a;
-        color: #dce2eb;
-        font-size: 0.78rem;
-    }
-
-    .song-playlist-button {
-        width: 100%;
-        min-height: 38px;
-        border: 0;
-        border-radius: 9px;
-        background: #202833;
-        color: #ffffff;
-        font-size: 0.78rem;
-        font-weight: 700;
-        cursor: pointer;
-        transition:
-            background 0.2s ease,
-            color 0.2s ease;
-    }
-
-    .song-playlist-button:hover {
-        background: #22c55e;
-        color: #052e16;
-    }
-
-    .song-playlist-menu {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    z-index: 5;
-}
-
-.song-playlist-menu summary {
-    display: grid;
-    width: 36px;
-    height: 36px;
-    place-items: center;
-    border-radius: 50%;
-    background: rgba(15, 19, 27, 0.82);
-    color: #ffffff;
-    cursor: pointer;
-    font-size: 1.35rem;
-    font-weight: 800;
-    line-height: 1;
-    list-style: none;
-}
-
-.song-playlist-menu summary::-webkit-details-marker {
-    display: none;
-}
-
-.song-playlist-menu summary:hover,
-.song-playlist-menu[open] summary {
-    background: #22c55e;
-    color: #052e16;
-}
-
-.song-playlist-popup {
-    position: absolute;
-    top: 44px;
-    right: 0;
-    width: 190px;
-    padding: 8px;
-    border: 1px solid rgba(255,255,255,0.10);
-    border-radius: 12px;
-    background: #1b202a;
-    box-shadow: 0 16px 35px rgba(0,0,0,0.35);
-}
-
-.song-playlist-popup p {
-    margin: 4px 7px 8px;
-    color: #a3adbd;
-    font-size: 0.75rem;
-    font-weight: 700;
-}
-
-.song-playlist-form {
-    margin: 0;
-}
-
-.song-playlist-item,
-.song-playlist-empty {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    gap: 9px;
-    padding: 9px 10px;
-    border: 0;
-    border-radius: 8px;
-    background: transparent;
-    color: #ffffff;
-    text-align: left;
-    text-decoration: none;
-    cursor: pointer;
-    font-size: 0.82rem;
-}
-
-.song-playlist-item:hover,
-.song-playlist-empty:hover {
-    background: rgba(34,197,94,0.14);
-    color: #4ade80;
-}
-
-    .login-to-playlist {
-        display: block;
-        width: 100%;
-        padding: 9px;
-        border: 1px solid rgba(255,255,255,0.07);
-        border-radius: 9px;
-        color: #8d98a9 !important;
-        font-size: 0.76rem;
-        text-align: center;
-        text-decoration: none;
-    }
-
-    .login-to-playlist:hover {
-        color: #4ade80 !important;
-        border-color: rgba(74,222,128,0.2);
-    }
-
-    /* =========================================================
-       CURRENTLY PLAYING BANNER
-       ========================================================= */
-
-    .now-playing-banner {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        margin-bottom: 35px;
-        padding: 14px 18px;
-        border: 1px solid rgba(34,197,94,0.15);
-        border-radius: 14px;
-        background: rgba(34,197,94,0.06);
-    }
-
-    .now-playing-icon {
-        width: 40px;
-        height: 40px;
-        flex-shrink: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 10px;
-        background: rgba(34,197,94,0.14);
-        color: #4ade80;
-    }
-
-    .now-playing-copy {
+        gap: 3px;
         min-width: 0;
     }
 
-    .now-playing-label {
-        margin: 0 0 2px;
-        color: #4ade80;
-        font-size: 0.7rem;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-    }
-
-    .now-playing-title {
-        overflow: hidden;
-        margin: 0;
+    .track-card-title {
+        font-weight: 750;
+        font-size: 0.95rem;
         color: #ffffff;
-        font-size: 0.9rem;
-        font-weight: 600;
-        text-overflow: ellipsis;
         white-space: nowrap;
-    }
-
-    /* =========================================================
-       RECENTLY ADDED
-       ========================================================= */
-
-    .recent-list {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 12px;
-    }
-
-    .recent-song {
-        position: relative;
-        z-index: 1;
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        min-width: 0;
-        padding: 12px;
-        border: 1px solid rgba(255,255,255,0.06);
-        border-radius: 14px;
-        background: #141820;
-        transition:
-            background 0.2s ease,
-            transform 0.2s ease;
-    }
-
-    .recent-song:hover {
-        background: #1a202a;
-        transform: translateY(-2px);
-    }
-
-    .recent-cover {
-        width: 58px !important;
-        height: 58px;
-        flex-shrink: 0;
-        border-radius: 10px;
-        object-fit: cover;
-    }
-
-    .recent-song-info {
-        min-width: 0;
-        flex: 1;
-    }
-
-    .recent-song-title {
         overflow: hidden;
-        margin: 0 0 5px;
-        color: #ffffff;
-        font-size: 0.9rem;
-        font-weight: 700;
         text-overflow: ellipsis;
+    }
+
+    .track-card-artist {
+        font-size: 0.8rem;
+        color: var(--text-muted);
         white-space: nowrap;
-    }
-
-    .recent-song-label {
-        margin: 0;
-        color: #7f8998;
-        font-size: 0.75rem;
-    }
-
-    .recent-play {
-        width: 36px;
-        height: 36px;
-        flex-shrink: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        background: #202833;
-        color: #4ade80 !important;
-        text-decoration: none;
-        transition:
-            background 0.2s ease,
-            transform 0.2s ease;
-    }
-
-    .recent-play:hover {
-        background: #22c55e;
-        color: #052e16 !important;
-        transform: scale(1.08);
-    }
-
-    /* =========================================================
-   RECENT SONG ACTIONS
-   Play + Three Dot Menu
-   ========================================================= */
-
-.recent-song-actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-
-    flex-shrink: 0;
-}
-
-
-/* =========================================================
-   RECENT PLAY BUTTON
-   ========================================================= */
-
-.recent-play {
-    width: 38px;
-    height: 38px;
-
-    flex-shrink: 0;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 50%;
-
-    background: #202833;
-    color: #4ade80 !important;
-
-    text-decoration: none;
-
-    font-size: 0.9rem;
-    font-weight: 800;
-
-    transition:
-        background 0.2s ease,
-        color 0.2s ease,
-        transform 0.2s ease,
-        border-color 0.2s ease;
-}
-
-
-.recent-play:hover {
-    background: #22c55e;
-    border-color: #22c55e;
-
-    color: #052e16 !important;
-
-    transform: scale(1.06);
-}
-
-
-/* =========================================================
-   RECENT THREE DOT MENU
-   ========================================================= */
-
-.recent-song-menu {
-    position: relative;
-
-    flex-shrink: 0;
-
-    z-index: 100;
-}
-
-/* Keep the whole row above neighbouring rows while its menu is open. */
-.recent-song:has(.recent-song-menu[open]) {
-    z-index: 1000;
-}
-
-
-.recent-song-menu summary {
-    width: 38px;
-    height: 38px;
-
-    display: grid;
-    place-items: center;
-
-    border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 50%;
-
-    background: #202833;
-    color: #ffffff;
-
-    cursor: pointer;
-
-    font-size: 1.2rem;
-    font-weight: 800;
-
-    line-height: 1;
-
-    list-style: none;
-
-    transition:
-        background 0.2s ease,
-        color 0.2s ease,
-        border-color 0.2s ease;
-}
-
-
-.recent-song-menu summary::-webkit-details-marker {
-    display: none;
-}
-
-
-.recent-song-menu summary:hover,
-.recent-song-menu[open] summary {
-    background: #22c55e;
-    border-color: #22c55e;
-
-    color: #052e16;
-}
-
-
-/* =========================================================
-   RECENT MENU POPUP
-   ========================================================= */
-
-.recent-song-menu .song-playlist-popup {
-    position: absolute;
-
-    /* Open upward so the popup does not cover the next song row. */
-    top: auto;
-    bottom: 46px;
-    right: 0;
-
-    z-index: 1001;
-
-    width: 210px;
-    max-width: calc(100vw - 30px);
-
-    padding: 8px;
-
-    border: 1px solid rgba(255,255,255,0.10);
-    border-radius: 13px;
-
-    background: #1b202a;
-
-    box-shadow:
-        0 18px 40px rgba(0,0,0,0.45);
-}
-
-
-/* =========================================================
-   MOBILE
-   ========================================================= */
-
-@media (max-width: 600px) {
-
-    .recent-song-actions {
-        gap: 6px;
-    }
-
-    .recent-play,
-    .recent-song-menu summary {
-        width: 36px;
-        height: 36px;
-    }
-
-    .recent-song-menu .song-playlist-popup {
-        right: 0;
-        width: 200px;
-    }
-
-}
-
-    /* =========================================================
-       PLAYLIST / CREATE SECTION
-       ========================================================= */
-
-    .playlist-promo {
-        position: relative;
         overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .track-card-footer {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 30px;
-        padding: 30px;
-        border: 1px solid rgba(255,255,255,0.07);
-        border-radius: 20px;
-        background:
-            radial-gradient(
-                circle at 90% 20%,
-                rgba(34,197,94,0.15),
-                transparent 30%
-            ),
-            #141820;
+        margin-top: 10px;
+        padding-top: 8px;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
     }
 
-    .playlist-promo-content {
+    .track-action-btns {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-left: auto;
+    }
+
+    .card-heart-btn {
+        color: var(--text-muted);
+        font-size: 1.05rem;
+        padding: 2px 4px;
+        border-radius: 6px;
+        transition: transform 0.15s ease, color 0.15s ease;
+        text-decoration: none !important;
+    }
+
+    .card-heart-btn:hover {
+        transform: scale(1.2);
+        color: #f87171;
+    }
+
+    .card-dropdown {
         position: relative;
-        z-index: 2;
     }
 
-    .playlist-promo h3 {
-        margin: 0 0 8px;
+    .card-dots-btn {
+        color: var(--text-muted);
+        cursor: pointer;
+        font-size: 1.1rem;
+        padding: 2px 6px;
+        border-radius: 4px;
+        user-select: none;
+        list-style: none;
+    }
+
+    .card-dots-btn::-webkit-details-marker {
+        display: none;
+    }
+
+    .card-dots-btn:hover {
         color: #ffffff;
-        font-family: "Montserrat", sans-serif;
-        font-size: 1.25rem;
-        font-weight: 800;
+        background: rgba(255, 255, 255, 0.08);
     }
 
-    .playlist-promo p {
-        max-width: 580px;
-        margin: 0;
-        color: #929dad;
-        font-size: 0.88rem;
-        line-height: 1.6;
+    .card-dropdown-menu {
+        position: absolute;
+        bottom: calc(100% + 8px);
+        right: 0;
+        width: 200px;
+        background: #111622;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: var(--radius-md);
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.7);
+        padding: 6px;
+        z-index: 100;
     }
 
-    .playlist-promo-button {
-        flex-shrink: 0;
-        display: inline-flex;
+    .card-dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        border-radius: 6px;
+        color: var(--text-secondary);
+        font-size: 0.8rem;
+        font-weight: 500;
+        width: 100%;
+        background: transparent;
+        border: 0;
+        text-align: left;
+        cursor: pointer;
+        transition: all 0.15s ease;
+    }
+
+    .card-dropdown-item:hover {
+        background: rgba(34, 197, 94, 0.14);
+        color: var(--accent-light);
+    }
+
+    .card-dropdown-header {
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        font-weight: 700;
+        padding: 4px 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    /* =========================================================
+       FEATURED PLAYLISTS SECTION (EDITORIAL SPOTLIGHT)
+       ========================================================= */
+    .featured-playlists-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 22px;
+    }
+
+    .featured-playlist-card {
+        background: linear-gradient(145deg, #131b28 0%, #0c111a 100%);
+        border: 1px solid rgba(74, 222, 128, 0.3);
+        border-radius: var(--radius-lg);
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        text-decoration: none !important;
+        color: inherit !important;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .featured-playlist-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #4ade80, #06b6d4);
+        opacity: 0.7;
+    }
+
+    .featured-playlist-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        border-color: rgba(74, 222, 128, 0.6);
+        box-shadow: 0 22px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(34, 197, 94, 0.18);
+    }
+
+    .featured-playlist-cover {
+        width: 100%;
+        aspect-ratio: 16 / 10;
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        margin-bottom: 14px;
+        background: linear-gradient(135deg, #064e3b, #0c4a6e);
+        display: flex;
         align-items: center;
         justify-content: center;
-        min-height: 44px;
-        padding: 0 18px;
-        border-radius: 10px;
-        background: #22c55e;
-        color: #052e16 !important;
-        font-size: 0.85rem;
-        font-weight: 800;
-        text-decoration: none;
-        transition:
-            transform 0.2s ease,
-            background 0.2s ease;
+        font-size: 2.8rem;
+        color: var(--accent-light);
+        position: relative;
     }
 
-    .playlist-promo-button:hover {
-        background: #4ade80;
-        color: #052e16 !important;
+    .featured-playlist-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.35s ease;
+    }
+
+    .featured-playlist-card:hover .featured-playlist-cover img {
+        transform: scale(1.06);
+    }
+
+    .featured-pill-tag {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: rgba(5, 46, 22, 0.88);
+        border: 1px solid rgba(74, 222, 128, 0.6);
+        color: #86efac;
+        font-size: 0.7rem;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        backdrop-filter: blur(6px);
+    }
+
+    .featured-playlist-name {
+        font-family: 'Outfit', sans-serif;
+        font-weight: 800;
+        font-size: 1.15rem;
+        color: #ffffff;
+        margin-bottom: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .featured-playlist-desc {
+        font-size: 0.82rem;
+        color: var(--text-secondary);
+        margin-bottom: 12px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .featured-playlist-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: auto;
+        padding-top: 10px;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .featured-track-count {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: var(--accent-light);
+    }
+
+    .btn-open-featured {
+        font-size: 0.82rem;
+        font-weight: 750;
+        color: #ffffff;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: color 0.15s ease;
+    }
+
+    .featured-playlist-card:hover .btn-open-featured {
+        color: var(--accent-light);
+    }
+
+    /* =========================================================
+       LIKED SONGS SPOTLIGHT BANNER
+       ========================================================= */
+    .liked-spotlight-banner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        padding: 26px 32px;
+        border-radius: var(--radius-xl);
+        background: radial-gradient(circle at 10% 30%, rgba(239, 68, 68, 0.22), transparent 50%),
+                    linear-gradient(135deg, #19101a 0%, #0e121b 100%);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        box-shadow: 0 18px 45px rgba(0, 0, 0, 0.45);
+        margin-bottom: 48px;
+    }
+
+    .liked-spotlight-left {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .liked-spotlight-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 20px;
+        background: linear-gradient(135deg, #ef4444, #991b1b);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.2rem;
+        color: #ffffff;
+        box-shadow: 0 10px 25px rgba(239, 68, 68, 0.45);
+        flex-shrink: 0;
+    }
+
+    .liked-spotlight-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: 1.45rem;
+        font-weight: 850;
+        letter-spacing: -0.02em;
+        color: #ffffff;
+        margin: 0 0 4px;
+    }
+
+    .liked-spotlight-sub {
+        font-size: 0.88rem;
+        color: var(--text-secondary);
+        margin: 0;
+    }
+
+    .liked-spotlight-actions {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .btn-liked-play-all {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 26px;
+        border-radius: 999px;
+        background: #ef4444;
+        color: #ffffff !important;
+        font-weight: 750;
+        font-size: 0.92rem;
+        box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+        transition: all 0.2s ease;
+        text-decoration: none !important;
+    }
+
+    .btn-liked-play-all:hover {
+        transform: translateY(-2px) scale(1.03);
+        background: #dc2626;
+        box-shadow: 0 10px 26px rgba(239, 68, 68, 0.55);
+    }
+
+    .btn-liked-browse {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 22px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.07);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: #ffffff !important;
+        font-weight: 700;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        text-decoration: none !important;
+    }
+
+    .btn-liked-browse:hover {
+        background: rgba(255, 255, 255, 0.14);
         transform: translateY(-2px);
     }
 
     /* =========================================================
-       EMPTY STATE
+       USER PLAYLISTS SECTION
        ========================================================= */
-
-    .empty-library {
-        padding: 55px 20px;
-        border: 1px dashed rgba(255,255,255,0.12);
-        border-radius: 18px;
-        background: rgba(255,255,255,0.02);
-        text-align: center;
+    .user-playlists-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
     }
 
-    .empty-library-icon {
+    .user-playlist-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-lg);
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        text-decoration: none !important;
+        color: inherit !important;
+    }
+
+    .user-playlist-card:hover {
+        transform: translateY(-6px);
+        background: var(--card-hover);
+        border-color: rgba(255, 255, 255, 0.18);
+        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+    }
+
+    .user-playlist-cover {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        border-radius: var(--radius-md);
+        overflow: hidden;
         margin-bottom: 12px;
-        color: #4ade80;
+        background: linear-gradient(135deg, #14532d, #064e3b);
+        display: flex;
+        align-items: center;
+        justify-content: center;
         font-size: 2.5rem;
+        color: var(--accent-light);
     }
 
-    .empty-library h3 {
-        margin: 0 0 8px;
+    .user-playlist-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .user-playlist-name {
+        font-weight: 750;
+        font-size: 0.95rem;
         color: #ffffff;
-        font-family: "Montserrat", sans-serif;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-bottom: 3px;
     }
 
-    .empty-library p {
-        margin: 0;
-        color: #8d98a9;
+    .user-playlist-meta {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+    }
+
+    .create-playlist-card {
+        border: 2px dashed rgba(74, 222, 128, 0.3);
+        background: rgba(34, 197, 94, 0.03);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 24px 16px;
+        min-height: 220px;
+        border-radius: var(--radius-lg);
+        text-decoration: none !important;
+        transition: all 0.25s ease;
+    }
+
+    .create-playlist-card:hover {
+        border-color: var(--accent);
+        background: rgba(34, 197, 94, 0.08);
+        transform: translateY(-5px);
+    }
+
+    .create-plus-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        background: rgba(34, 197, 94, 0.15);
+        border: 1px solid var(--accent);
+        color: var(--accent-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        margin-bottom: 12px;
+        transition: all 0.2s ease;
+    }
+
+    .create-playlist-card:hover .create-plus-icon {
+        background: var(--accent);
+        color: #052e16;
+        transform: scale(1.1);
     }
 
     /* =========================================================
-       HIDDEN YOUTUBE PLAYER
+       RECENTLY ADDED STUDIO TRACKLIST
        ========================================================= */
-
-    .hidden-player {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        left: -99999px;
-        top: -99999px;
-        opacity: 0;
-        pointer-events: none;
+    .tracklist-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-lg);
+        overflow: visible;
     }
 
-    /* =========================================================
-       RESPONSIVE
-       ========================================================= */
+    .tracklist-row {
+        display: flex;
+        align-items: center;
+        padding: 12px 18px;
+        gap: 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        transition: all 0.15s ease;
+        text-decoration: none !important;
+        color: inherit !important;
+    }
 
-    @media (max-width: 1100px) {
-        .songs-grid {
+    .tracklist-row:last-child {
+        border-bottom: none;
+    }
+
+    .tracklist-row:hover {
+        background: rgba(255, 255, 255, 0.06);
+        transform: translateX(4px);
+    }
+
+    .tracklist-row.active {
+        background: rgba(34, 197, 94, 0.1);
+        border-left: 3px solid var(--accent);
+    }
+
+    .tracklist-num {
+        width: 28px;
+        text-align: center;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    .tracklist-thumb {
+        width: 44px;
+        height: 44px;
+        border-radius: var(--radius-sm);
+        object-fit: cover;
+        background: #18202d;
+        flex-shrink: 0;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .tracklist-main {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .tracklist-song-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #ffffff;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-decoration: none;
+        display: block;
+        transition: color 0.15s ease;
+    }
+
+    .tracklist-song-title:hover {
+        color: var(--accent-light);
+    }
+
+    .tracklist-song-artist {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .tracklist-actions-right {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-shrink: 0;
+    }
+
+    .tracklist-duration {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        width: 50px;
+        text-align: right;
+        font-weight: 600;
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+        .tracks-grid {
             grid-template-columns: repeat(4, minmax(0, 1fr));
-        }
-
-        .hero-music-decoration {
-            right: 55px;
-            width: 180px;
-            height: 180px;
-        }
-
-        .hero-note {
-            font-size: 4rem;
         }
     }
 
     @media (max-width: 900px) {
-        .music-hero {
-            padding: 50px 40px;
+        .hero-stage {
+            padding: 36px 28px;
+            flex-direction: column;
+            align-items: flex-start;
         }
-
-        .hero-music-decoration {
-            opacity: 0.35;
-            right: 25px;
+        .cassette-3d-stage {
+            align-self: center;
+            margin-top: 10px;
         }
-
-        .songs-grid {
+        .tracks-grid {
             grid-template-columns: repeat(3, minmax(0, 1fr));
         }
     }
 
-    @media (max-width: 700px) {
-        .music-hero {
-            min-height: auto;
-            padding: 42px 28px;
-            border-radius: 22px;
-        }
-
-        .music-hero-content {
-            max-width: 100%;
-        }
-
-        .music-hero h1 {
-            font-size: 2.5rem;
-        }
-
-        .hero-music-decoration {
-            display: none;
-        }
-
-        .songs-grid {
+    @media (max-width: 600px) {
+        .tracks-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 14px;
+            gap: 12px;
         }
-
-        .recent-list {
-            grid-template-columns: 1fr;
+        .playlists-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
         }
-
-        .playlist-promo {
-            align-items: flex-start;
-            flex-direction: column;
-            padding: 24px;
-        }
-
-        .playlist-promo-button {
-            width: 100%;
+        .track-card {
+            padding: 10px;
         }
     }
-
-    @media (max-width: 480px) {
-        .music-hero {
-            margin-bottom: 38px;
-            padding: 34px 22px;
-        }
-
-        .music-hero h1 {
-            font-size: 2.15rem;
-        }
-
-        .music-hero-description {
-            font-size: 0.9rem;
-        }
-
-        .hero-actions {
-            flex-direction: column;
-        }
-
-        .hero-button {
-            width: 100%;
-        }
-
-        .songs-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 10px;
-        }
-
-        .song-info {
-            padding: 11px;
-        }
-
-        .song-title {
-            font-size: 0.82rem;
-        }
-
-        .song-playlist-select,
-        .song-playlist-button {
-            font-size: 0.7rem;
-        }
-
-        .section-header {
-            align-items: flex-start;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .now-playing-banner {
-            padding: 12px;
-        }
-    }
-    .playlist-message {
-    margin: 0 0 22px;
-    padding: 13px 16px;
-    border: 1px solid rgba(74,222,128,0.25);
-    border-radius: 12px;
-    background: rgba(34,197,94,0.10);
-    color: #bbf7d0;
-    font-size: 0.9rem;
-    font-weight: 600;
-}
-
-/* =========================================================
-   SEARCH RESULTS
-========================================================= */
-
-.search-results-section {
-    margin-bottom: 55px;
-}
-
-.search-results-heading {
-    margin: 0;
-    color: #ffffff;
-    font-family: "Montserrat", sans-serif;
-    font-size: clamp(1.5rem, 3vw, 2rem);
-    font-weight: 800;
-    letter-spacing: -0.04em;
-}
-
-.search-results-heading span {
-    color: #4ade80;
-}
-
-.search-results-subheading {
-    margin: 7px 0 22px;
-    color: #8d98a9;
-    font-size: 0.9rem;
-}
-
-.search-no-results {
-    padding: 55px 20px;
-    border: 1px dashed rgba(255,255,255,0.12);
-    border-radius: 18px;
-    background: rgba(255,255,255,0.02);
-    text-align: center;
-}
-
-.search-no-results-icon {
-    margin-bottom: 12px;
-    color: #4ade80;
-    font-size: 2.5rem;
-}
-
-.search-no-results h3 {
-    margin: 0 0 8px;
-    color: #ffffff;
-    font-family: "Montserrat", sans-serif;
-}
-
-.search-no-results p {
-    margin: 0;
-    color: #8d98a9;
-}
-
-/* =========================================================
-   LIKE BUTTON
-========================================================= */
-
-/* =========================================================
-   SONG ACTION MENU
-   Three dots -> Like + Add to playlist
-========================================================= */
-
-.song-action-item {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    gap: 10px;
-    padding: 10px 11px;
-    border: 0;
-    border-radius: 8px;
-    background: transparent;
-    color: #ffffff;
-    text-align: left;
-    text-decoration: none;
-    cursor: pointer;
-    font-size: 0.82rem;
-    font-weight: 600;
-}
-
-.song-action-item:hover {
-    background: rgba(34,197,94,0.14);
-    color: #4ade80;
-}
-
-.song-action-item.active {
-    color: #4ade80;
-    background: rgba(34,197,94,0.10);
-}
-
-.song-action-item span {
-    width: 18px;
-    text-align: center;
-    font-size: 1rem;
-}
-
-.song-action-divider {
-    height: 1px;
-    margin: 7px 4px;
-    background: rgba(255,255,255,0.08);
-}
-
-.song-action-heading {
-    margin: 5px 7px 7px;
-    color: #8d98a9;
-    font-size: 0.72rem;
-    font-weight: 700;
-}
-
-
-/* =========================================================
-   FEATURED PLAYLISTS
-   ========================================================= */
-
-.featured-playlists-grid {
-    display: grid;
-    grid-template-columns: repeat(
-        auto-fill,
-        minmax(220px, 260px)
-    );
-    gap: 20px;
-    align-items: start;
-}
-
-
-/* Playlist Card */
-
-.featured-playlist-card {
-    display: block;
-    width: 100%;
-    max-width: 260px;
-
-    text-decoration: none;
-    color: inherit;
-
-    background: #151a22;
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    border-radius: 16px;
-
-    overflow: hidden;
-
-    transition:
-        transform 0.2s ease,
-        border-color 0.2s ease,
-        box-shadow 0.2s ease;
-}
-
-
-.featured-playlist-card:hover {
-    transform: translateY(-4px);
-
-    border-color: rgba(255, 255, 255, 0.14);
-
-    box-shadow:
-        0 12px 30px rgba(0, 0, 0, 0.25);
-}
-
-
-/* Cover */
-
-.featured-playlist-cover {
-    position: relative;
-
-    width: 100%;
-    aspect-ratio: 1 / 1;
-
-    overflow: hidden;
-
-    background: #202631;
-}
-
-
-.featured-playlist-cover img {
-    display: block;
-
-    width: 100%;
-    height: 100%;
-
-    object-fit: cover;
-
-    transition: transform 0.3s ease;
-}
-
-
-.featured-playlist-card:hover
-.featured-playlist-cover img {
-    transform: scale(1.04);
-}
-
-
-/* Dark overlay */
-
-.featured-playlist-overlay {
-    position: absolute;
-
-    inset: 0;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: rgba(0, 0, 0, 0.28);
-
-    color: #ffffff;
-
-    font-size: 1.8rem;
-
-    opacity: 0;
-
-    transition: opacity 0.2s ease;
-}
-
-
-.featured-playlist-card:hover
-.featured-playlist-overlay {
-    opacity: 1;
-}
-
-
-/* Placeholder */
-
-.featured-playlist-placeholder {
-    width: 100%;
-    height: 100%;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background:
-        linear-gradient(
-            135deg,
-            #1d2430,
-            #11151c
-        );
-
-    color: #8d98a9;
-
-    font-size: 3rem;
-}
-
-
-/* Playlist information */
-
-.featured-playlist-info {
-    padding: 14px 15px 16px;
-}
-
-
-.featured-playlist-info h3 {
-    margin: 0;
-
-    color: #ffffff;
-
-    font-size: 0.98rem;
-    font-weight: 700;
-
-    line-height: 1.35;
-
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-
-.featured-playlist-info p {
-    margin: 6px 0 0;
-
-    color: #8d98a9;
-
-    font-size: 0.78rem;
-
-    line-height: 1.3;
-}
-
-/* =========================================
-   RECENTLY ADDED - ACTION BUTTON ALIGNMENT
-   ========================================= */
-
-.recent-song-actions {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: flex-end !important;
-    gap: 8px !important;
-    height: 44px !important;
-    flex-shrink: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-.recent-song-actions > * {
-    position: static !important;
-    top: auto !important;
-    bottom: auto !important;
-    transform: none !important;
-    margin: 0 !important;
-}
-
-.recent-song-actions .recent-play-btn,
-.recent-song-actions .recent-menu-btn {
-    width: 30px !important;
-    height: 30px !important;
-    min-width: 30px !important;
-    min-height: 30px !important;
-
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-
-    margin: 0 !important;
-    padding: 0 !important;
-    line-height: 1 !important;
-    vertical-align: middle !important;
-}
-
-
-/* Three-dot popup positioning must remain independent */
-.recent-song-menu {
-    position: relative !important;
-}
-
-.recent-song-menu .song-playlist-popup {
-    position: absolute !important;
-    right: 0 !important;
-    bottom: 50px !important;
-    top: auto !important;
-    z-index: 1001 !important;
-}
-/* =========================================
-   FINAL RECENTLY ADDED ACTION BUTTON FIX
-   ========================================= */
-
-.recent-song-actions {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 16px !important;
-    flex-shrink: 0 !important;
-    height: 100% !important;
-}
-
-/* Force BOTH action buttons to the same size */
-.recent-song-actions > .recent-song-menu > summary {
-    width: 34px !important;
-    height: 34px !important;
-    min-width: 34px !important;
-    min-height: 34px !important;
-    max-width: 34px !important;
-    max-height: 34px !important;
-
-    padding: 0 !important;
-    margin: 0 !important;
-
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-
-    flex-shrink: 0 !important;
-    box-sizing: border-box !important;
-
-    line-height: 1 !important;
-}
-
-/* Keep the icons themselves proportional */
-.recent-song-actions > .recent-song-menu > summary svg {
-    width: 16px !important;
-    height: 16px !important;
-    max-width: 16px !important;
-    max-height: 16px !important;
-}
-
-/* Three dots icon */
-.recent-song-actions > .recent-song-menu > summary span,
-.recent-song-actions > .recent-song-menu > summary i {
-    line-height: 1 !important;
-}
 </style>
 {% endblock %}
 
-
 {% block body %}
+<div style="max-width: 1320px; margin: 0 auto;">
 
-<div class="home-page">
-
-    <!-- =====================================================
-         CURRENTLY PLAYING
-         ===================================================== -->
-
+    <!-- Django Messages -->
     {% if messages %}
-    {% for message in messages %}
-        <div class="playlist-message">
-            {{ message }}
-        </div>
-    {% endfor %}
-{% endif %}
-
-
-    {% if play_song %}
-        <div class="now-playing-banner">
-
-            <div class="now-playing-icon">
-                ♪
-            </div>
-
-            <div class="now-playing-copy">
-
-                <p class="now-playing-label">
-                    Now Playing
-                </p>
-
-                <p class="now-playing-title">
-                    {{ play_song.title }}
-                </p>
-
-            </div>
-
-        </div>
-    {% endif %}
-
-
-    <!-- =====================================================
-         HERO SECTION
-         ===================================================== -->
-
-    <div class="hero-3d-scene">
-    <section class="music-hero" id="homeHero">
-
-        <div class="music-hero-content">
-
-            <div class="hero-small-text">
-                <span></span>
-                Your music, your way
-            </div>
-
-            <h1>
-                Music that
-                <span class="accent">moves</span>
-                you.
-            </h1>
-
-            <p class="music-hero-description">
-                Discover your favorite songs, build playlists,
-                and enjoy your personal music collection in one
-                beautiful place.
-            </p>
-
-            <div class="hero-actions">
-
-                <a
-                    href="#popular-songs"
-                    class="hero-button hero-button-primary"
-                >
-                    🎧 Explore Songs
-                </a>
-
-                {% if user.is_authenticated %}
-
-                    <a
-                        href="{% url 'create_playlist' %}"
-                        class="hero-button hero-button-secondary"
-                    >
-                        ＋ Create Playlist
-                    </a>
-
-                {% else %}
-
-                    <a
-                        href="{% url 'register_user' %}"
-                        class="hero-button hero-button-secondary"
-                    >
-                        Get Started
-                    </a>
-
-                {% endif %}
-
-            </div>
-
-        </div>
-
-
-        <!-- 3D Crown Spectrum Visual -->
-        <div class="hero-music-decoration" aria-hidden="true">
-
-            <span class="hero-floating-note note-1">♪</span>
-            <span class="hero-floating-note note-2">♫</span>
-            <span class="hero-floating-note note-3">♩</span>
-            <span class="hero-floating-note note-4">♬</span>
-
-            <div class="crown-glow"></div>
-
-            <!-- 24 bars arranged in a circle -->
-            <div class="crown-scene" id="crownScene"></div>
-
-            <div class="crown-core"></div>
-
-        </div>
-
-    </section>
-    </div><!-- /.hero-3d-scene -->
-
-    {% if search_query %}
-
-<section class="home-section search-results-section">
-
-    <div class="section-header">
-
-        <div>
-            <h2 class="search-results-heading">
-                Search results for
-                <span>"{{ search_query }}"</span>
-            </h2>
-
-            <p class="search-results-subheading">
-                Songs matching your search
-            </p>
-        </div>
-
-    </div>
-
-
-    {% if search_results %}
-
-        <div class="songs-grid">
-
-            {% for song in search_results %}
-
-                <article class="song-card">
-
-                    <!-- Cover -->
-                    <div class="song-cover-wrapper">
-
-                        <img
-                            class="song-cover"
-                            src="{{ song.cover_image.url }}"
-                            alt="{{ song.title }}"
-                            loading="lazy"
-                        >
-
-                        <div class="song-cover-overlay">
-
-                            <a
-                                href="?q={{ search_query|urlencode }}&play={{ song.id }}"
-                                class="song-play-button"
-                                aria-label="Play {{ song.title }}"
-                            >
-                                ▶
-                            </a>
-
-                        </div>
-
-                        <div class="song-cover-overlay">
-    <a
-        href="?q={{ search_query|urlencode }}&play={{ song.id }}"
-        class="song-play-button"
-        aria-label="Play {{ song.title }}"
-    >
-        ▶
-    </a>
-</div>
-
-<!-- SONG ACTION MENU -->
-<details class="song-playlist-menu">
-
-    <summary
-        aria-label="More options for {{ song.title }}"
-        title="More options"
-    >
-        ⋮
-    </summary>
-
-    <div class="song-playlist-popup">
-
-        {% if user.is_authenticated %}
-
-            <form
-                method="post"
-                action="{% url 'toggle_like' song.id %}"
-                class="song-playlist-form"
-            >
-                {% csrf_token %}
-
-                <button
-                    type="submit"
-                    class="song-action-item {% if user in song.liked_by.all %}active{% endif %}"
-                >
-                    <span>
-                        {% if user in song.liked_by.all %}
-                            ♥
-                        {% else %}
-                            ♡
-                        {% endif %}
-                    </span>
-
-                    {% if user in song.liked_by.all %}
-                        Liked
-                    {% else %}
-                        Like
-                    {% endif %}
-                </button>
-            </form>
-
-            <div class="song-action-divider"></div>
-
-            <p class="song-action-heading">
-                Add to playlist
-            </p>
-
-            {% for playlist in playlists %}
-
-                <form
-                    method="post"
-                    class="song-playlist-form"
-                >
-                    {% csrf_token %}
-
-                    <input
-                        type="hidden"
-                        name="song_id"
-                        value="{{ song.id }}"
-                    >
-
-                    <input
-                        type="hidden"
-                        name="playlist_id"
-                        value="{{ playlist.id }}"
-                    >
-
-                    <button
-                        type="submit"
-                        class="song-action-item"
-                    >
-                        <span>＋</span>
-                        {{ playlist.name }}
-                    </button>
-                </form>
-
-            {% empty %}
-
-                <a
-                    href="{% url 'create_playlist' %}"
-                    class="song-action-item"
-                >
-                    <span>＋</span>
-                    Create playlist
-                </a>
-
-            {% endfor %}
-
-        {% else %}
-
-            <a
-                href="{% url 'login_user' %}"
-                class="song-action-item"
-            >
-                <span>♡</span>
-                Like
-            </a>
-
-            <a
-                href="{% url 'login_user' %}"
-                class="song-action-item"
-            >
-                <span>＋</span>
-                Add to playlist
-            </a>
-
-        {% endif %}
-
-    </div>
-
-</details>
-
-                    </div>
-
-
-                    <!-- Song information -->
-                    <div class="song-info">
-
-                        <h3
-                            class="song-title"
-                            title="{{ song.title }}"
-                        >
-                            {{ song.title }}
-                        </h3>
-
-                        <p
-                            style="
-                                margin: -7px 0 0;
-                                color: #8d98a9;
-                                font-size: 0.78rem;
-                                white-space: nowrap;
-                                overflow: hidden;
-                                text-overflow: ellipsis;
-                            "
-                            title="{{ song.artist }}"
-                        >
-                            {{ song.artist }}
-                        </p>
-
-                    </div>
-
-                </article>
-
-            {% endfor %}
-
-        </div>
-
-    {% else %}
-
-        <div class="search-no-results">
-
-            <div class="search-no-results-icon">
-                🔍
-            </div>
-
-            <h3>
-                No songs found
-            </h3>
-
-            <p>
-                Try searching for a different song or artist.
-            </p>
-
-        </div>
-
-    {% endif %}
-
-</section>
-
-{% endif %}
-
-{% if not search_query %}
-
-
-<!-- =====================================================
-     FEATURED PLAYLISTS
-     ===================================================== -->
-{% if featured_playlists %}
-
-    <section class="home-section" id="featured-playlists">
-
-        <div class="section-header">
-
-            <div>
-                <h2 class="section-heading">
-                    Featured Playlists
-                </h2>
-
-                <p class="section-subheading">
-                    Curated playlists picked for you.
-                </p>
-            </div>
-
-        </div>
-
-
-        <div class="featured-playlists-grid">
-
-            {% for playlist in featured_playlists %}
-
-    <a
-        href="{% url 'view_playlist' playlist.id %}"
-        class="featured-playlist-card"
-    >
-
-        <div class="featured-playlist-cover">
-
-            {% if playlist.cover_image %}
-                <img
-                    src="{{ playlist.cover_image.url }}"
-                    alt="{{ playlist.name }}"
-                >
-            {% else %}
-                <div class="featured-playlist-placeholder">
-                    ♪
+        <div style="margin-bottom: 24px; display: flex; flex-direction: column; gap: 8px;">
+            {% for message in messages %}
+                <div style="padding: 12px 18px; border-radius: var(--radius-md); background: rgba(34, 197, 94, 0.12); border: 1px solid rgba(34, 197, 94, 0.3); color: #bbf7d0; font-size: 0.88rem; font-weight: 600;">
+                    {{ message }}
                 </div>
-            {% endif %}
-
-            <div class="featured-playlist-overlay">
-                ▶
-            </div>
-
-        </div>
-
-
-                    <div class="featured-playlist-info">
-
-                        <h3>
-                            {{ playlist.name }}
-                        </h3>
-
-                        <p>
-                            {{ playlist.song.count }} songs
-                        </p>
-
-                    </div>
-
-                </a>
-
             {% endfor %}
-
         </div>
+    {% endif %}
 
-    </section>
+    <!-- =========================================================
+         1. HERO SECTION (WITH 3D CYBER CASSETTE AUDIO DECK)
+         ========================================================= -->
+    <div class="hero-3d-wrapper">
+        <section class="hero-stage" id="authHeroStage">
+            <!-- Dynamic 3D Sine Wave Ribbon Canvas -->
+            <canvas id="heroWaveCanvas"></canvas>
 
-{% endif %}
+            <div class="hero-text-content">
+                <div class="hero-status-pill">
+                    <span class="hero-status-dot"></span>
+                    SoundWave Master Stream
+                </div>
 
+                <h1 class="hero-heading">
+                    Welcome Back, <br>
+                    <span class="accent-gradient">{{ request.user.username }}.</span>
+                </h1>
 
-    <!-- =====================================================
-         POPULAR SONGS
-         ===================================================== -->
-
-    <section
-        class="home-section"
-        id="popular-songs"
-    >
-
-        <div class="section-header">
-
-            <div>
-
-                <h2 class="section-heading">
-                    Popular Songs
-                </h2>
-
-                <p class="section-subheading">
-                    Listen to something you love.
+                <p class="hero-paragraph">
+                    Your collection is ready. Dive straight back into your personal mixes, stream high-fidelity hits, and discover fresh sounds.
                 </p>
 
+                <div class="hero-buttons-row">
+                    {% if popular_songs %}
+                        <a href="?play={{ popular_songs.0.id }}" class="hero-action-btn btn-emerald-solid">
+                            ▶ Play Top Track
+                        </a>
+                        <a href="?play={{ popular_songs.0.id }}&shuffle=true" class="hero-action-btn btn-glass-sub">
+                            🔀 Shuffle Library
+                        </a>
+                    {% elif songs %}
+                        <a href="?play={{ songs.0.id }}" class="hero-action-btn btn-emerald-solid">
+                            ▶ Play Top Track
+                        </a>
+                    {% endif %}
+
+                    <a href="{% url 'create_playlist' %}" class="hero-action-btn btn-glass-sub">
+                        ＋ New Playlist
+                    </a>
+                </div>
             </div>
 
-            <span class="section-link">
-                Your Library
-            </span>
+            <!-- Distinct 3D Spatial Audio Equalizer Matrix -->
+            <div class="equalizer-3d-stage">
+                <div class="equalizer-matrix-container" id="equalizerMatrix">
+                    <!-- Rotating Orbit Ring -->
+                    <div class="matrix-orbit-ring"></div>
 
-        </div>
+                    <!-- 3D Equalizer Column Ring -->
+                    <div class="matrix-eq-pillars">
+                        <div class="eq-column eq-col-1"></div>
+                        <div class="eq-column eq-col-2"></div>
+                        <div class="eq-column eq-col-3"></div>
+                        <div class="eq-column eq-col-4"></div>
+                        <div class="eq-column eq-col-5"></div>
+                        <div class="eq-column eq-col-6"></div>
+                        <div class="eq-column eq-col-7"></div>
+                        <div class="eq-column eq-col-8"></div>
+                        <div class="eq-column eq-col-9"></div>
+                        <div class="eq-column eq-col-10"></div>
+                        <div class="eq-column eq-col-11"></div>
+                        <div class="eq-column eq-col-12"></div>
+                    </div>
 
+                    <!-- Levitating Central Audio Core -->
+                    <div class="spatial-audio-core">
+                        <span>♫</span>
+                    </div>
 
-        {% if popular_songs %}
+                    <!-- Floating 3D Hologram Chips -->
+                    <div class="spatial-hologram-chip chip-left">
+                        <span style="color: #4ade80;">✦</span> Spatial Audio 3D
+                    </div>
+                    <div class="spatial-hologram-chip chip-right">
+                        <span style="color: #06b6d4;">⚡</span> 24-Bit / 96kHz Lossless
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
 
-            <div class="songs-grid">
+    <!-- =========================================================
+         2. SEARCH RESULTS (IF QUERY ACTIVE)
+         ========================================================= -->
+    {% if search_query %}
+        <section class="section-wrap">
+            <div class="section-head">
+                <div>
+                    <h2 class="section-title">Search Results for "{{ search_query }}"</h2>
+                    <p class="section-subtitle">{{ search_results.count }} song{{ search_results.count|pluralize }} found</p>
+                </div>
+                <a href="{% url 'index' %}" class="section-more-link">✕ Clear Search</a>
+            </div>
 
-                {% for song in popular_songs %}
+            {% if search_results %}
+                <div class="tracks-grid">
+                    {% for song in search_results %}
+                        <article class="track-card {% if play_song and play_song.id == song.id %}active-song{% endif %}">
+                            <div class="track-card-art">
+                                {% if song.cover_image %}
+                                    <img src="{{ song.cover_image.url }}" class="track-card-img" alt="{{ song.title }}" loading="lazy">
+                                {% else %}
+                                    <div class="track-card-placeholder">🎵</div>
+                                {% endif %}
 
-                    <article class="song-card">
+                                {% if play_song and play_song.id == song.id %}
+                                    <div class="active-now-badge">
+                                        <span class="active-dot-ping"></span>
+                                        Playing
+                                    </div>
+                                {% endif %}
 
-                        <!-- Cover -->
-
-                        <div class="song-cover-wrapper">
-
-                            <img
-                                class="song-cover"
-                                src="{{ song.cover_image.url }}"
-                                alt="{{ song.title }}"
-                                loading="lazy"
-                            >
-
-                            <div class="song-cover-overlay">
-
-                                <a
-                                    href="?play={{ song.id }}"
-                                    class="song-play-button"
-                                    aria-label="Play {{ song.title }}"
-                                >
-                                    ▶
+                                <a href="?q={{ search_query|urlencode }}&play={{ song.id }}" class="card-play-btn" title="Play {{ song.title }}">
+                                    {% if play_song and play_song.id == song.id %}⏸{% else %}▶{% endif %}
                                 </a>
-
                             </div>
 
-                        </div>
+                            <div class="track-card-info">
+                                <span class="track-card-title" title="{{ song.title }}">{{ song.title }}</span>
+                                <span class="track-card-artist" title="{{ song.artist }}">{{ song.artist }}</span>
+                            </div>
 
+                            <div class="track-card-footer">
+                                <span style="font-size: 0.78rem; color: var(--text-muted);">{{ song.duration|default:"3:30" }}</span>
+                                <div class="track-action-btns">
+                                    <a href="{% url 'toggle_like' song.id %}" class="card-heart-btn {% if request.user in song.liked_by.all %}active{% endif %}" title="Like song">
+                                        {% if request.user in song.liked_by.all %}❤️{% else %}🤍{% endif %}
+                                    </a>
 
-                        <!-- Song information -->
-
-                        <div class="song-info">
-
-                            <h3
-                                class="song-title"
-                                title="{{ song.title }}"
-                            >
-                                {{ song.title }}
-                            </h3>
-
-<!-- =====================================================
-     SONG ACTION MENU
-     Like + Add to playlist
-     ===================================================== -->
-
-<details class="song-playlist-menu">
-
-    <summary
-        aria-label="More options for {{ song.title }}"
-        title="More options"
-    >
-        ⋮
-    </summary>
-
-    <div class="song-playlist-popup">
-
-        {% if user.is_authenticated %}
-
-            <!-- LIKE -->
-            <form
-                method="post"
-                action="{% url 'toggle_like' song.id %}"
-                class="song-playlist-form"
-            >
-                {% csrf_token %}
-
-                <button
-                    type="submit"
-                    class="song-action-item {% if user in song.liked_by.all %}active{% endif %}"
-                    aria-label="{% if user in song.liked_by.all %}Unlike{% else %}Like{% endif %} {{ song.title }}"
-                >
-                    <span>
-                        {% if user in song.liked_by.all %}
-                            ♥
-                        {% else %}
-                            ♡
-                        {% endif %}
-                    </span>
-
-                    {% if user in song.liked_by.all %}
-                        Liked
-                    {% else %}
-                        Like
-                    {% endif %}
-                </button>
-            </form>
-
-            <div class="song-action-divider"></div>
-
-            <!-- PLAYLISTS -->
-            <p class="song-action-heading">
-                Add to playlist
-            </p>
-
-{% for playlist in playlists %}
-
-    {% if song in playlist.song.all %}
-
-        <!-- ALREADY IN PLAYLIST -->
-        <div
-            class="song-action-item active added"
-            title="Already in {{ playlist.name }}"
-        >
-            <span>✓</span>
-            {{ playlist.name }}
-        </div>
-
-    {% else %}
-
-        <!-- ADD TO PLAYLIST -->
-        <form
-            method="post"
-            class="song-playlist-form"
-        >
-            {% csrf_token %}
-
-            <input
-                type="hidden"
-                name="song_id"
-                value="{{ song.id }}"
-            >
-
-            <input
-                type="hidden"
-                name="playlist_id"
-                value="{{ playlist.id }}"
-            >
-
-            <button
-                type="submit"
-                class="song-action-item"
-            >
-                <span>＋</span>
-                {{ playlist.name }}
-            </button>
-        </form>
-
+                                    <details class="card-dropdown">
+                                        <summary class="card-dots-btn" title="Options">⋮</summary>
+                                        <div class="card-dropdown-menu">
+                                            <div class="card-dropdown-header">Add to Playlist</div>
+                                            {% for pl in playlists %}
+                                                {% if song in pl.song.all %}
+                                                    <div class="card-dropdown-item added" title="Already in {{ pl.name }}">
+                                                        <span class="card-dropdown-icon">✓</span>
+                                                        <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ pl.name }}</span>
+                                                        <span class="card-dropdown-badge">Added</span>
+                                                    </div>
+                                                {% else %}
+                                                    <form method="POST" action="{% url 'index' %}" style="margin: 0;">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="song_id" value="{{ song.id }}">
+                                                        <input type="hidden" name="playlist_id" value="{{ pl.id }}">
+                                                        <button type="submit" class="card-dropdown-item">
+                                                            <span class="card-dropdown-icon">＋</span>
+                                                            <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ pl.name }}</span>
+                                                        </button>
+                                                    </form>
+                                                {% endif %}
+                                            {% empty %}
+                                                <a href="{% url 'create_playlist' %}" class="card-dropdown-item">
+                                                    <span class="card-dropdown-icon">＋</span>
+                                                    <span>Create Playlist</span>
+                                                </a>
+                                            {% endfor %}
+                                        </div>
+                                    </details>
+                                </div>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 48px 20px; background: var(--card-bg); border-radius: var(--radius-lg); border: 1px dashed var(--border-subtle);">
+                    <div style="font-size: 2.5rem; margin-bottom: 10px;">🔍</div>
+                    <h3 style="color: #fff; margin-bottom: 6px;">No tracks found</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Try searching for another song title or artist name.</p>
+                </div>
+            {% endif %}
+        </section>
     {% endif %}
 
-{% empty %}
-
-    <a
-        href="{% url 'create_playlist' %}"
-        class="song-action-item"
-    >
-        <span>＋</span>
-        Create playlist
-    </a>
-
-{% endfor %}
-
-        {% else %}
-
-            <!-- NOT LOGGED IN -->
-            <a
-                href="{% url 'login_user' %}"
-                class="song-action-item"
-            >
-                <span>♡</span>
-                Like
-            </a>
-
-            <a
-                href="{% url 'login_user' %}"
-                class="song-action-item"
-            >
-                <span>＋</span>
-                Add to playlist
-            </a>
-
-        {% endif %}
-
-    </div>
-
-</details>
-                            
-
-                        </div>
-
-                    </article>
-
-                {% endfor %}
-
+    <!-- =========================================================
+         3. POPULAR TRACKS (5 COLUMNS)
+         ========================================================= -->
+    <section class="section-wrap" id="popular-tracks">
+        <div class="section-head">
+            <div>
+                <h2 class="section-title">Popular Tracks</h2>
+                <p class="section-subtitle">Trending and most streamed songs in your library</p>
             </div>
-
-        {% else %}
-
-            <div class="empty-library">
-
-                <div class="empty-library-icon">
-                    ♪
-                </div>
-
-                <h3>
-                    Your music library is empty
-                </h3>
-
-                <p>
-                    Add some songs to start building your music collection.
-                </p>
-
-            </div>
-
-        {% endif %}
-
-    </section>
-
-
-    <!-- =====================================================
-         RECENTLY ADDED
-         ===================================================== -->
-
-    {% if songs %}
-
-        <section class="home-section">
-
-            <div class="section-header">
-
-                <div>
-
-                    <h2 class="section-heading">
-                        Recently Added
-                    </h2>
-
-                    <p class="section-subheading">
-                        More music waiting for you.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="recent-list">
-
-                {% for song in recent_songs %}
-
-                    <div class="recent-song">
-
-                        <!-- SONG COVER -->
-
-                        <img
-                            class="recent-cover"
-                            src="{{ song.cover_image.url }}"
-                            alt="{{ song.title }}"
-                            loading="lazy"
-                        >
-
-
-                        <!-- SONG INFORMATION -->
-
-                        <div class="recent-song-info">
-
-                            <p
-                                class="recent-song-title"
-                                title="{{ song.title }}"
-                            >
-                                {{ song.title }}
-                            </p>
-
-                            <p class="recent-song-label">
-                                Available in your library
-                            </p>
-
-                        </div>
-
-
-                        <!-- =================================================
-                             RECENT SONG ACTIONS
-                             Play + Three Dot Menu
-                             ================================================= -->
-
-                        <div class="recent-song-actions">
-
-
-                            <!-- PLAY BUTTON -->
-
-                            <a
-                                href="?play={{ song.id }}"
-                                class="recent-play"
-                                aria-label="Play {{ song.title }}"
-                                title="Play {{ song.title }}"
-                            >
-                                ▶
-                            </a>
-
-
-                            <!-- THREE DOT MENU -->
-
-                            <details class="song-playlist-menu recent-song-menu">
-
-                                <summary
-                                    aria-label="More options for {{ song.title }}"
-                                    title="More options"
-                                >
-                                    ⋮
-                                </summary>
-
-
-                                <div class="song-playlist-popup">
-
-                                    {% if user.is_authenticated %}
-
-                                        <!-- LIKE -->
-
-                                        <form
-                                            method="post"
-                                            action="{% url 'toggle_like' song.id %}"
-                                            class="song-playlist-form"
-                                        >
-
-                                            {% csrf_token %}
-
-                                            <button
-                                                type="submit"
-                                                class="song-action-item {% if user in song.liked_by.all %}active{% endif %}"
-                                            >
-
-                                                <span>
-                                                    {% if user in song.liked_by.all %}
-                                                        ♥
-                                                    {% else %}
-                                                        ♡
-                                                    {% endif %}
-                                                </span>
-
-                                                {% if user in song.liked_by.all %}
-                                                    Liked
-                                                {% else %}
-                                                    Like
-                                                {% endif %}
-
-                                            </button>
-
-                                        </form>
-
-
-                                        <div class="song-action-divider"></div>
-
-
-                                        <!-- PLAYLISTS -->
-
-                                        <p class="song-action-heading">
-                                            Add to playlist
-                                        </p>
-
-
-                                        {% for playlist in playlists %}
-
-                                            {% if song in playlist.song.all %}
-
-                                                <!-- ALREADY IN PLAYLIST -->
-
-                                                <div
-                                                    class="song-action-item active added"
-                                                    title="Already in {{ playlist.name }}"
-                                                >
-
-                                                    <span>✓</span>
-
-                                                    {{ playlist.name }}
-
-                                                </div>
-
-                                            {% else %}
-
-                                                <!-- ADD TO PLAYLIST -->
-
-                                                <form
-                                                    method="post"
-                                                    class="song-playlist-form"
-                                                >
-
-                                                    {% csrf_token %}
-
-                                                    <input
-                                                        type="hidden"
-                                                        name="song_id"
-                                                        value="{{ song.id }}"
-                                                    >
-
-                                                    <input
-                                                        type="hidden"
-                                                        name="playlist_id"
-                                                        value="{{ playlist.id }}"
-                                                    >
-
-                                                    <button
-                                                        type="submit"
-                                                        class="song-action-item"
-                                                    >
-
-                                                        <span>＋</span>
-
-                                                        {{ playlist.name }}
-
-                                                    </button>
-
-                                                </form>
-
-                                            {% endif %}
-
-                                        {% empty %}
-
-                                            <a
-                                                href="{% url 'create_playlist' %}"
-                                                class="song-action-item"
-                                            >
-
-                                                <span>＋</span>
-
-                                                Create playlist
-
-                                            </a>
-
-                                        {% endfor %}
-
-
-                                    {% else %}
-
-                                        <!-- NOT LOGGED IN -->
-
-                                        <a
-                                            href="{% url 'login_user' %}"
-                                            class="song-action-item"
-                                        >
-                                            <span>♡</span>
-                                            Like
-                                        </a>
-
-                                        <a
-                                            href="{% url 'login_user' %}"
-                                            class="song-action-item"
-                                        >
-                                            <span>＋</span>
-                                            Add to playlist
-                                        </a>
-
-                                    {% endif %}
-
-                                </div>
-
-                            </details>
-
-                        </div>
-
+            {% if popular_songs %}
+                <a href="?play={{ popular_songs.0.id }}" class="section-more-link">▶ Play All</a>
+            {% endif %}
+        </div>
+
+        <div class="tracks-grid">
+            {% for song in popular_songs %}
+                <article class="track-card {% if play_song and play_song.id == song.id %}active-song{% endif %}">
+                    <!-- Rank Badge -->
+                    {% if forloop.counter <= 3 %}
+                        <div class="track-rank-badge rank-top-{{ forloop.counter }}">#{{ forloop.counter }}</div>
+                    {% else %}
+                        <div class="track-rank-badge">#{{ forloop.counter }}</div>
+                    {% endif %}
+
+                    <div class="track-card-art">
+                        {% if song.cover_image %}
+                            <img src="{{ song.cover_image.url }}" class="track-card-img" alt="{{ song.title }}" loading="lazy">
+                        {% else %}
+                            <div class="track-card-placeholder">🎵</div>
+                        {% endif %}
+
+                        {% if play_song and play_song.id == song.id %}
+                            <div class="active-now-badge">
+                                <span class="active-dot-ping"></span>
+                                Playing
+                            </div>
+                        {% endif %}
+
+                        <a href="?play={{ song.id }}" class="card-play-btn" title="Play {{ song.title }}">
+                            {% if play_song and play_song.id == song.id %}⏸{% else %}▶{% endif %}
+                        </a>
                     </div>
 
-                {% endfor %}
+                    <div class="track-card-info">
+                        <span class="track-card-title" title="{{ song.title }}">{{ song.title }}</span>
+                        <span class="track-card-artist" title="{{ song.artist }}">{{ song.artist }}</span>
+                    </div>
 
-            </div>
+                    <div class="track-card-footer">
+                        <span style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600;">{{ song.duration|default:"3:30" }}</span>
+                        <div class="track-action-btns">
+                            <a href="{% url 'toggle_like' song.id %}" class="card-heart-btn {% if request.user in song.liked_by.all %}active{% endif %}" title="Like song">
+                                {% if request.user in song.liked_by.all %}❤️{% else %}🤍{% endif %}
+                            </a>
 
-        </section>
-
-    {% endif %}
-
-
-    <!-- =====================================================
-         CREATE PLAYLIST
-         ===================================================== -->
-
-    <section class="home-section">
-
-        <div class="playlist-promo">
-
-            <div class="playlist-promo-content">
-
-                <h3>
-                    Build your own soundtrack
-                </h3>
-
-                <p>
-                    Create playlists for every mood, moment, and memory.
-                    Keep your favorite songs together and listen whenever
-                    you want.
-                </p>
-
-            </div>
-
-
-            {% if user.is_authenticated %}
-
-                <a
-                    href="{% url 'create_playlist' %}"
-                    class="playlist-promo-button"
-                >
-                    ＋ Create Playlist
-                </a>
-
-            {% else %}
-
-                <a
-                    href="{% url 'login_user' %}"
-                    class="playlist-promo-button"
-                >
-                    Login to Create
-                </a>
-
-            {% endif %}
-
+                            <details class="card-dropdown">
+                                <summary class="card-dots-btn" title="Options">⋮</summary>
+                                <div class="card-dropdown-menu">
+                                    <div class="card-dropdown-header">Add to Playlist</div>
+                                    {% for pl in playlists %}
+                                        {% if song in pl.song.all %}
+                                            <div class="card-dropdown-item added" title="Already in {{ pl.name }}">
+                                                <span class="card-dropdown-icon">✓</span>
+                                                <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ pl.name }}</span>
+                                                <span class="card-dropdown-badge">Added</span>
+                                            </div>
+                                        {% else %}
+                                            <form method="POST" action="{% url 'index' %}" style="margin: 0;">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="song_id" value="{{ song.id }}">
+                                                <input type="hidden" name="playlist_id" value="{{ pl.id }}">
+                                                <button type="submit" class="card-dropdown-item">
+                                                    <span class="card-dropdown-icon">＋</span>
+                                                    <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ pl.name }}</span>
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                    {% empty %}
+                                        <a href="{% url 'create_playlist' %}" class="card-dropdown-item">
+                                            <span class="card-dropdown-icon">＋</span>
+                                            <span>Create Playlist</span>
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                            </details>
+                        </div>
+                    </div>
+                </article>
+            {% empty %}
+                <div style="grid-column: 1 / -1; text-align: center; padding: 48px 20px; background: var(--card-bg); border-radius: var(--radius-lg); border: 1px dashed var(--border-subtle);">
+                    <div style="font-size: 2.5rem; margin-bottom: 10px;">🎶</div>
+                    <h3 style="color: #fff; margin-bottom: 6px;">No songs in catalog yet</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Add your favorite music tracks via the Django Admin panel.</p>
+                </div>
+            {% endfor %}
         </div>
-
     </section>
 
+    <!-- =========================================================
+         4. FEATURED PLAYLISTS SECTION (EDITORIAL CURATIONS)
+         ========================================================= -->
+    {% if featured_playlists %}
+        <section class="section-wrap" id="featured-playlists">
+            <div class="section-head">
+                <div>
+                    <h2 class="section-title">⭐ Featured Playlists</h2>
+                    <p class="section-subtitle">SoundWave editorial curations and signature mixes</p>
+                </div>
+            </div>
+
+            <div class="featured-playlists-grid">
+                {% for playlist in featured_playlists %}
+                    <a href="{% url 'view_playlist' playlist.id %}" class="featured-playlist-card">
+                        <div class="featured-playlist-cover">
+                            <span class="featured-pill-tag">Editorial Pick</span>
+                            {% if playlist.cover_image %}
+                                <img src="{{ playlist.cover_image.url }}" alt="{{ playlist.name }}" loading="lazy">
+                            {% else %}
+                                🎵
+                            {% endif %}
+                        </div>
+                        <div class="featured-playlist-name">{{ playlist.name }}</div>
+                        <div class="featured-playlist-desc">Curated studio tracks tailored for uninterrupted listening flow.</div>
+                        <div class="featured-playlist-footer">
+                            <span class="featured-track-count">{{ playlist.song.count }} track{{ playlist.song.count|pluralize }}</span>
+                            <span class="btn-open-featured">▶ Stream Mix</span>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        </section>
     {% endif %}
 
+    <!-- =========================================================
+         5. LIKED SONGS SPOTLIGHT BANNER
+         ========================================================= -->
+    <div class="liked-spotlight-banner">
+        <div class="liked-spotlight-left">
+            <div class="liked-spotlight-icon">❤️</div>
+            <div>
+                <h3 class="liked-spotlight-title">Your Liked Songs Collection</h3>
+                <p class="liked-spotlight-sub">Your favorite tracks are saved here automatically. Listen anytime with seamless playback.</p>
+            </div>
+        </div>
+        <div class="liked-spotlight-actions">
+            <a href="{% url 'liked_songs' %}" class="btn-liked-play-all">
+                ▶ Open Liked Songs
+            </a>
+            <a href="{% url 'all_playlists' %}" class="btn-liked-browse">
+                View All Playlists
+            </a>
+        </div>
+    </div>
 
-    <!-- =====================================================
-         HIDDEN YOUTUBE PLAYER
-         IMPORTANT:
-         Keep this because your current playback logic uses it.
-         ===================================================== -->
+    <!-- =========================================================
+         6. YOUR PERSONAL PLAYLISTS
+         ========================================================= -->
+    <section class="section-wrap" id="user-playlists">
+        <div class="section-head">
+            <div>
+                <h2 class="section-title">📁 Your Playlists</h2>
+                <p class="section-subtitle">Custom playlists you designed, organized, and curated</p>
+            </div>
+            <a href="{% url 'create_playlist' %}" class="section-more-link">＋ New Playlist</a>
+        </div>
 
-    {% if play_song %}
+        <div class="user-playlists-grid">
+            <!-- Create Playlist Card -->
+            <a href="{% url 'create_playlist' %}" class="create-playlist-card">
+                <div class="create-plus-icon">＋</div>
+                <div style="font-weight: 750; color: #fff; font-size: 0.95rem;">New Playlist</div>
+                <div style="color: var(--text-muted); font-size: 0.78rem; margin-top: 4px;">Craft your custom mix</div>
+            </a>
 
-        <iframe
-    class="hidden-player"
-    src="{{ play_song.youtube_url_modify }}&origin={{ player_origin }}{% if upcoming_songs %}&playlist={{ play_song.youtube_video_id }},{% for queued_song in upcoming_songs %}{{ queued_song.youtube_video_id }}{% if not forloop.last %},{% endif %}{% endfor %}{% endif %}"
-    allow="autoplay; encrypted-media"
-    referrerpolicy="strict-origin-when-cross-origin"
-    allowfullscreen
-    title="Music player"
-></iframe>
+            {% for playlist in playlists %}
+                {% if not playlist.is_featured %}
+                    <a href="{% url 'view_playlist' playlist.id %}" class="user-playlist-card">
+                        <div class="user-playlist-cover">
+                            {% if playlist.cover_image %}
+                                <img src="{{ playlist.cover_image.url }}" alt="{{ playlist.name }}" loading="lazy">
+                            {% else %}
+                                🎧
+                            {% endif %}
+                        </div>
+                        <div class="user-playlist-name">{{ playlist.name }}</div>
+                        <div class="user-playlist-meta">{{ playlist.song.count }} track{{ playlist.song.count|pluralize }}</div>
+                    </a>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </section>
 
-    {% endif %}
-    
+    <!-- =========================================================
+         7. RECENTLY ADDED TRACKS
+         ========================================================= -->
+    <section class="section-wrap">
+        <div class="section-head">
+            <div>
+                <h2 class="section-title">⚡ Recently Added</h2>
+                <p class="section-subtitle">Fresh additions to your music catalog</p>
+            </div>
+        </div>
+
+        <div class="tracklist-card">
+            {% for song in recent_songs %}
+                <div class="tracklist-row {% if play_song and play_song.id == song.id %}active{% endif %}">
+                    <a href="?play={{ song.id }}" class="tracklist-num" title="Play {{ song.title }}" style="text-decoration: none;">
+                        {% if play_song and play_song.id == song.id %}
+                            <span style="color: var(--accent);">▶</span>
+                        {% else %}
+                            {{ forloop.counter }}
+                        {% endif %}
+                    </a>
+
+                    <a href="?play={{ song.id }}" title="Play {{ song.title }}" style="text-decoration: none; display: flex;">
+                        {% if song.cover_image %}
+                            <img src="{{ song.cover_image.url }}" class="tracklist-thumb" alt="Thumb" loading="lazy">
+                        {% else %}
+                            <div class="tracklist-thumb" style="display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:var(--accent);">🎵</div>
+                        {% endif %}
+                    </a>
+
+                    <div class="tracklist-main">
+                        <a href="?play={{ song.id }}" class="tracklist-song-title" title="Play {{ song.title }}">{{ song.title }}</a>
+                        <div class="tracklist-song-artist">{{ song.artist }}</div>
+                    </div>
+
+                    <div class="tracklist-actions-right">
+                        <span class="tracklist-duration">
+                            {{ song.duration|default:"3:30" }}
+                        </span>
+
+                        <a href="{% url 'toggle_like' song.id %}" class="card-heart-btn {% if request.user in song.liked_by.all %}active{% endif %}" title="Like song">
+                            {% if request.user in song.liked_by.all %}❤️{% else %}🤍{% endif %}
+                        </a>
+
+                        <details class="card-dropdown">
+                            <summary class="card-dots-btn" title="Add to Playlist">⋮</summary>
+                            <div class="card-dropdown-menu">
+                                <div class="card-dropdown-header">Add to Playlist</div>
+                                {% for pl in playlists %}
+                                    {% if song in pl.song.all %}
+                                        <div class="card-dropdown-item added" title="Already in {{ pl.name }}">
+                                            <span class="card-dropdown-icon">✓</span>
+                                            <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ pl.name }}</span>
+                                            <span class="card-dropdown-badge">Added</span>
+                                        </div>
+                                    {% else %}
+                                        <form method="POST" action="{% url 'index' %}" style="margin: 0;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="song_id" value="{{ song.id }}">
+                                            <input type="hidden" name="playlist_id" value="{{ pl.id }}">
+                                            <button type="submit" class="card-dropdown-item">
+                                                <span class="card-dropdown-icon">＋</span>
+                                                <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ pl.name }}</span>
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                {% empty %}
+                                    <a href="{% url 'create_playlist' %}" class="card-dropdown-item">
+                                        <span class="card-dropdown-icon">＋</span>
+                                        <span>Create Playlist</span>
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            {% empty %}
+                <div style="padding: 28px; text-align: center; color: var(--text-muted); font-size: 0.9rem;">
+                    No recent tracks available.
+                </div>
+            {% endfor %}
+        </div>
+    </section>
 
 </div>
 
-
+<!-- 3D Equalizer Matrix Parallax & Audio Wave Ribbon Canvas Script -->
 <script>
-/* === 3D Mouse Tilt on Hero === */
-(function () {
-    const hero = document.getElementById('homeHero');
-    if (!hero) return;
+(function() {
+    /* 1. 3D Mouse Parallax on Equalizer Matrix */
+    const stage = document.getElementById('authHeroStage');
+    const matrix = document.getElementById('equalizerMatrix');
 
-    hero.addEventListener('mousemove', function (e) {
-        const rect = hero.getBoundingClientRect();
-        const cx = rect.left + rect.width / 2;
-        const cy = rect.top + rect.height / 2;
-        const dx = (e.clientX - cx) / (rect.width / 2);
-        const dy = (e.clientY - cy) / (rect.height / 2);
+    if (stage && matrix) {
+        stage.addEventListener('mousemove', function(e) {
+            const rect = stage.getBoundingClientRect();
+            const cx = (e.clientX - rect.left - rect.width / 2) / (rect.width / 2);
+            const cy = (e.clientY - rect.top - rect.height / 2) / (rect.height / 2);
 
-        hero.style.transform =
-            `rotateX(${2 - dy * 4}deg) rotateY(${dx * 6}deg)`;
-    });
+            matrix.style.transform = `rotateX(${24 - cy * 22}deg) rotateY(${-22 + cx * 26}deg) scale(1.06)`;
+        });
 
-    hero.addEventListener('mouseleave', function () {
-        hero.style.transform = 'rotateX(2deg) rotateY(0deg)';
-    });
-}());
-
-/* === Crown Spectrum Bar Builder === */
-(function () {
-    const scene = document.getElementById('crownScene');
-    if (!scene) return;
-
-    const COUNT = 24;
-    const RADIUS = 80;
-
-    const maxHeights = [
-        30,48,62,75,88,72,55,42,35,28,40,58,
-        80,95,78,62,48,36,52,70,85,68,45,32
-    ];
-
-    const durations = [
-        1.1,0.9,1.3,0.8,1.0,1.2,0.95,1.15,0.85,1.05,1.25,0.9,
-        1.0,0.8,1.1,1.3,0.95,1.0,1.2,0.85,1.05,0.9,1.15,1.0
-    ];
-
-    for (let i = 0; i < COUNT; i++) {
-        const angle = (360 / COUNT) * i;
-        const bar = document.createElement('div');
-        bar.className = 'crown-bar';
-
-        const rad = (angle - 90) * (Math.PI / 180);
-        const x = Math.cos(rad) * RADIUS;
-        const y = Math.sin(rad) * RADIUS;
-
-        bar.style.cssText = `
-            --max-h: ${maxHeights[i]}px;
-            --dur: ${durations[i]}s;
-            --delay: ${-(i * (1.3 / COUNT)).toFixed(3)}s;
-            transform: translate(${x}px, ${y}px) rotate(${angle}deg);
-            transform-origin: 50% 100%;
-            height: 18px;
-            margin: -9px 0 0 -2.5px;
-        `;
-
-        scene.appendChild(bar);
+        stage.addEventListener('mouseleave', function() {
+            matrix.style.transform = 'rotateX(24deg) rotateY(-22deg) scale(1)';
+        });
     }
-}());
-</script>
 
+    /* 2. Interactive Audio Wave Ribbon Canvas */
+    const canvas = document.getElementById('heroWaveCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let w, h, step = 0;
+
+    function resize() {
+        w = canvas.width = canvas.parentElement.offsetWidth || window.innerWidth;
+        h = canvas.height = canvas.parentElement.offsetHeight || 300;
+    }
+
+    function renderWave() {
+        ctx.clearRect(0, 0, w, h);
+        step += 0.025;
+
+        // Wave Layer 1
+        ctx.beginPath();
+        ctx.strokeStyle = 'rgba(74, 222, 128, 0.25)';
+        ctx.lineWidth = 2;
+        for (let x = 0; x < w; x += 10) {
+            const y = h * 0.7 + Math.sin(x * 0.008 + step) * 28 + Math.cos(x * 0.004 - step) * 16;
+            if (x === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        // Wave Layer 2 (Harmonic)
+        ctx.beginPath();
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.18)';
+        ctx.lineWidth = 1.5;
+        for (let x = 0; x < w; x += 10) {
+            const y = h * 0.72 + Math.sin(x * 0.012 - step * 1.2) * 20 + Math.sin(x * 0.006 + step) * 12;
+            if (x === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        requestAnimationFrame(renderWave);
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+    renderWave();
+})();
+</script>
 {% endblock %}

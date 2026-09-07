@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>500 — Acoustic Distortion | SoundWave</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;850&family=Space+Grotesk:wght@500;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #060a10;
+            color: #f1f5f9;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+        .ambient-glow {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.22;
+            pointer-events: none;
+        }
+        .ambient-1 {
+            background: radial-gradient(circle, #ef4444, transparent 70%);
+            top: -100px;
+            right: -100px;
+        }
+        .ambient-2 {
+            background: radial-gradient(circle, #f97316, transparent 70%);
+            bottom: -100px;
+            left: -100px;
+        }
+        .card-500 {
+            position: relative;
+            z-index: 2;
+            max-width: 520px;
+            width: 90%;
+            background: linear-gradient(145deg, rgba(24, 17, 17, 0.9), rgba(15, 10, 10, 0.95));
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 28px;
+            padding: 48px 36px;
+            text-align: center;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(20px);
+        }
+        .code-500 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 6.5rem;
+            font-weight: 900;
+            line-height: 1;
+            letter-spacing: -0.05em;
+            background: linear-gradient(135deg, #ef4444 20%, #f97316 80%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+        }
+        .title-500 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            color: #ffffff;
+        }
+        .desc-500 {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 32px;
+        }
+        .btn-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 28px;
+            background: linear-gradient(135deg, #22c55e, #10b981);
+            color: #032311;
+            font-weight: 800;
+            font-size: 0.98rem;
+            text-decoration: none;
+            border-radius: 14px;
+            box-shadow: 0 12px 30px rgba(34, 197, 94, 0.3);
+            transition: all 0.25s ease;
+        }
+        .btn-home:hover {
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 16px 40px rgba(34, 197, 94, 0.45);
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient-glow ambient-1"></div>
+    <div class="ambient-glow ambient-2"></div>
+    <div class="card-500">
+        <div style="font-size: 3rem; margin-bottom: 10px;">⚠️</div>
+        <div class="code-500">500</div>
+        <h1 class="title-500">Acoustic Signal Distortion</h1>
+        <p class="desc-500">An unexpected audio disturbance occurred in the studio server. The studio engineering team has been notified.</p>
+        <a href="/" class="btn-home">
+            <span>Return to Studio</span>
+            <span>⚡</span>
+        </a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,106 @@
+================================================================================
+                    MY MUSIC CLONE - HOW TO RUN LOCALLY
+================================================================================
+
+This project is a Django music streaming application configured to run both
+locally (using SQLite & local media) and in production on Render (using PostgreSQL
+and Cloudinary).
+
+--------------------------------------------------------------------------------
+OPTION 1: ONE-CLICK LAUNCH (FASTEST & EASIEST)
+--------------------------------------------------------------------------------
+
+Simply DOUBLE-CLICK the file:
+    run.bat
+
+What it does automatically:
+1. Detects and uses your virtual environment: music_project_env
+2. Applies any pending database migrations: python manage.py migrate
+3. Runs a system configuration check: python manage.py check
+4. Starts the local development server at: http://127.0.0.1:8000/
+5. Automatically opens your default web browser to http://127.0.0.1:8000/
+
+
+--------------------------------------------------------------------------------
+OPTION 2: RUN MANUALLY FROM TERMINAL (POWERSHELL OR CMD)
+--------------------------------------------------------------------------------
+
+1. Open PowerShell or Command Prompt in this folder:
+   v:\Projects\MUSIC\MusicClone-master
+
+2. Activate the virtual environment:
+   .\music_project_env\Scripts\activate
+
+3. (Optional) Run migrations:
+   python manage.py migrate
+
+4. Start the development server:
+   python manage.py runserver
+
+5. Open your browser and navigate to:
+   http://127.0.0.1:8000/
+
+
+--------------------------------------------------------------------------------
+HOW LOCAL VS CLOUD/RENDER WORKS IN THIS CODEBASE
+--------------------------------------------------------------------------------
+
+- LOCAL ENVIRONMENT:
+  - Database: db.sqlite3 (local SQLite file)
+  - Images & Covers: media/ folder
+  - Static Files: staticfiles/ via WhiteNoise
+
+- RENDER PRODUCTION ENVIRONMENT:
+  - Database: PostgreSQL (automatically active when DATABASE_URL is set)
+  - Images & Covers: Cloudinary (automatically active when CLOUDINARY_* is set)
+  - Static Files: WhiteNoise compressed & cached static files
+
+
+--------------------------------------------------------------------------------
+HELPFUL COMMANDS
+--------------------------------------------------------------------------------
+
+- Create a Superuser / Admin account locally:
+    .\music_project_env\Scripts\python.exe manage.py createsuperuser
+  Then log into Django Admin at: http://127.0.0.1:8000/admin/
+
+- Run automated test suite:
+    .\music_project_env\Scripts\python.exe manage.py test
+
+- Push local media images to Cloudinary (one-time sync):
+    python upload_media.py
+
+- Stop the running server:
+    Press CTRL + C in the terminal window.
+
+
+--------------------------------------------------------------------------------
+HOW TO DEPLOY TO RENDER (ONE-TIME / NEW COMMITS)
+--------------------------------------------------------------------------------
+
+1. Push your updated code to GitHub:
+     git add .
+     git commit -m "Upgrade UI to Studio 3D theme, feature verification passed"
+     git push origin master
+
+2. In your Render Dashboard (https://dashboard.render.com/):
+   - Select your Web Service: "MusicClone" (or create a new Web Service)
+   - Ensure the following settings:
+       * Root Directory: Leave empty
+       * Environment: Python 3
+       * Build Command: ./build.sh  (or: pip install -r requirements.txt && python manage.py collectstatic --no-input && python manage.py migrate)
+       * Start Command: gunicorn Mymusic.wsgi:application
+
+3. Environment Variables on Render:
+   - PYTHON_VERSION: 3.11.9
+   - DJANGO_DEBUG: False
+   - DJANGO_SECRET_KEY: <Your strong random secret key>
+   - DJANGO_ALLOWED_HOSTS: musicclone-3qqv.onrender.com,localhost,127.0.0.1
+   - DATABASE_URL: <Internal Database URL from your Render PostgreSQL instance>
+   - CLOUDINARY_CLOUD_NAME: <Your Cloudinary Cloud Name>
+   - CLOUDINARY_API_KEY: <Your Cloudinary API Key>
+   - CLOUDINARY_API_SECRET: <Your Cloudinary API Secret>
+
+4. Click "Manual Deploy" -> "Deploy latest commit".
+   Render will run build.sh, collect static files, apply migrations, and start Gunicorn!
+================================================================================

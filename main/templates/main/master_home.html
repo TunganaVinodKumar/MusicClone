@@ -1,1055 +1,943 @@
 {% extends 'main/base.html' %}
 
 {% block heading %}
-<title>My Music Clone</title>
-
+<title>SoundWave — Stream, Discover & Curate Unlimited Music</title>
 <style>
-/* =====================================================
-   FONTS & RESET
-   ===================================================== */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Montserrat:wght@700;800;900&display=swap');
-
-/* =====================================================
-   FULL PAGE TRANSPARENCY — override base.html backgrounds
-   ===================================================== */
-body {
-    background: #060a10 !important;  /* single flat dark — canvas/mesh sit on top */
-}
-
-/* Remove the main-content container's width/padding constraints
-   so it doesn't create a visible box around the landing page */
-.main-content {
-    width: 100% !important;
-    padding: 0 !important;
-    margin: 0 !important;
-}
-
-/* =====================================================
-   PAGE WRAPPER
-   ===================================================== */
-.master-page {
-    width: 100%;
-    min-height: 100vh;
-    overflow-x: hidden;
-    position: relative;
-    background: transparent;
-}
-
-/* =====================================================
-   PARTICLE CANVAS BACKGROUND
-   ===================================================== */
-#master-canvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-    pointer-events: none;
-}
-
-/* =====================================================
-   ANIMATED MESH GRADIENT BACKGROUND
-   ===================================================== */
-.master-mesh {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    z-index: 0;
-    pointer-events: none;
-    overflow: hidden;
-}
-
-.mesh-blob {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.18;
-    animation: blobFloat 12s ease-in-out infinite;
-}
-
-.mesh-blob-1 {
-    width: 600px; height: 600px;
-    background: radial-gradient(circle, #22c55e, transparent 70%);
-    top: -150px; right: -100px;
-    animation-delay: 0s;
-}
-
-.mesh-blob-2 {
-    width: 500px; height: 500px;
-    background: radial-gradient(circle, #3b82f6, transparent 70%);
-    bottom: -100px; left: -150px;
-    animation-delay: -4s;
-}
-
-.mesh-blob-3 {
-    width: 350px; height: 350px;
-    background: radial-gradient(circle, #8b5cf6, transparent 70%);
-    top: 40%; left: 40%;
-    animation-delay: -8s;
-}
-
-@keyframes blobFloat {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    33% { transform: translate(30px, -40px) scale(1.05); }
-    66% { transform: translate(-20px, 20px) scale(0.95); }
-}
-
-/* =====================================================
-   CONTENT LAYER
-   ===================================================== */
-.master-content {
-    position: relative;
-    z-index: 2;
-    width: min(1240px, calc(100% - 40px));
-    margin: 0 auto;
-    padding: 50px 0 100px;
-}
-
-/* =====================================================
-   3D HERO SECTION
-   ===================================================== */
-.hero-3d-scene {
-    perspective: 1200px;
-    margin-bottom: 80px;
-}
-
-.master-hero {
-    position: relative;
-    overflow: hidden;
-    min-height: 500px;
-    padding: 72px 68px;
-    display: flex;
-    align-items: center;
-    border-radius: 32px;
-    border: 1px solid rgba(255,255,255,0.08);
-    background:
-        radial-gradient(circle at 80% 20%, rgba(34,197,94,0.18) 0%, transparent 40%),
-        radial-gradient(circle at 10% 80%, rgba(59,130,246,0.12) 0%, transparent 38%),
-        linear-gradient(145deg, #111820 0%, #0a0f18 100%);
-    box-shadow:
-        0 40px 100px rgba(0,0,0,0.5),
-        0 0 0 1px rgba(255,255,255,0.04) inset,
-        0 1px 0 rgba(255,255,255,0.12) inset;
-    transform-style: preserve-3d;
-    transform: rotateX(2deg);
-    transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-    cursor: default;
-}
-
-.master-hero:hover {
-    transform: rotateX(0deg) rotateY(0deg) scale(1.008);
-}
-
-/* Shimmering top border */
-.master-hero::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg,
-        transparent 0%,
-        rgba(74,222,128,0.6) 30%,
-        rgba(74,222,128,1) 50%,
-        rgba(74,222,128,0.6) 70%,
-        transparent 100%
-    );
-    background-size: 200% 100%;
-    animation: shimmerLine 3s linear infinite;
-}
-
-@keyframes shimmerLine {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
-}
-
-/* Inner light reflection */
-.master-hero::after {
-    content: '';
-    position: absolute;
-    top: -60px; left: -60px;
-    width: 300px; height: 300px;
-    background: radial-gradient(circle, rgba(74,222,128,0.06), transparent 70%);
-    border-radius: 50%;
-    pointer-events: none;
-}
-
-/* =====================================================
-   HERO CONTENT
-   ===================================================== */
-.master-hero-content {
-    position: relative;
-    z-index: 3;
-    max-width: 580px;
-    transform: translateZ(30px);
-}
-
-.master-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 24px;
-    padding: 8px 16px;
-    border: 1px solid rgba(74,222,128,0.25);
-    border-radius: 999px;
-    background: rgba(34,197,94,0.08);
-    backdrop-filter: blur(10px);
-    color: #4ade80;
-    font-size: .75rem;
-    font-weight: 700;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-    animation: fadeInDown 0.7s ease both;
-}
-
-.master-badge .badge-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: #22c55e;
-    box-shadow: 0 0 0 3px rgba(34,197,94,0.2), 0 0 14px rgba(34,197,94,0.8);
-    animation: pulseDot 2s ease-in-out infinite;
-}
-
-@keyframes pulseDot {
-    0%, 100% { box-shadow: 0 0 0 3px rgba(34,197,94,0.2), 0 0 10px rgba(34,197,94,0.6); }
-    50% { box-shadow: 0 0 0 6px rgba(34,197,94,0.1), 0 0 20px rgba(34,197,94,1); }
-}
-
-.master-hero h1 {
-    margin: 0 0 20px;
-    font-family: "Montserrat", sans-serif;
-    font-size: clamp(2.8rem, 5.5vw, 4.8rem);
-    font-weight: 900;
-    line-height: 1.0;
-    letter-spacing: -.055em;
-    color: #fff;
-    animation: fadeInUp 0.7s ease 0.15s both;
-}
-
-.master-hero h1 .text-green {
-    background: linear-gradient(135deg, #4ade80, #22c55e 40%, #16a34a);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    filter: drop-shadow(0 0 20px rgba(34,197,94,0.4));
-}
-
-.master-hero p {
-    max-width: 480px;
-    margin: 0 0 32px;
-    color: #8d9daf;
-    font-size: 1.05rem;
-    line-height: 1.75;
-    animation: fadeInUp 0.7s ease 0.25s both;
-}
-
-.master-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    animation: fadeInUp 0.7s ease 0.35s both;
-}
-
-.master-btn {
-    min-height: 50px;
-    padding: 0 26px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    border-radius: 14px;
-    text-decoration: none !important;
-    font-weight: 700;
-    font-size: 0.92rem;
-    letter-spacing: 0.01em;
-    transition: all 0.25s cubic-bezier(0.23, 1, 0.32, 1);
-    position: relative;
-    overflow: hidden;
-}
-
-.master-btn::after {
-    content: '';
-    position: absolute;
-    top: 0; left: -100%;
-    width: 60%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
-    transform: skewX(-20deg);
-    transition: left 0.5s ease;
-}
-
-.master-btn:hover::after {
-    left: 150%;
-}
-
-.master-btn-primary {
-    background: linear-gradient(135deg, #22c55e, #16a34a);
-    color: #fff !important;
-    box-shadow: 0 8px 30px rgba(34,197,94,0.35), 0 0 0 1px rgba(74,222,128,0.2) inset;
-}
-
-.master-btn-primary:hover {
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 16px 40px rgba(34,197,94,0.5), 0 0 0 1px rgba(74,222,128,0.3) inset;
-}
-
-.master-btn-secondary {
-    border: 1px solid rgba(255,255,255,0.12);
-    background: rgba(255,255,255,0.05);
-    color: #fff !important;
-    backdrop-filter: blur(10px);
-}
-
-.master-btn-secondary:hover {
-    border-color: rgba(74,222,128,0.4);
-    background: rgba(255,255,255,0.09);
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-}
-
-/* =====================================================
-   3D ORBIT SPHERE VISUAL
-   ===================================================== */
-.master-visual {
-    position: absolute;
-    right: 55px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 300px;
-    height: 300px;
-    z-index: 5;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: visible;
-    perspective: 700px;
-}
-
-/* === Outer glow === */
-.orbit-glow {
-    position: absolute;
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(34,197,94,0.25) 0%, transparent 70%);
-    filter: blur(30px);
-    animation: orbitGlowPulse 3s ease-in-out infinite;
-}
-@keyframes orbitGlowPulse {
-    0%,100% { transform: scale(0.9); opacity: 0.5; }
-    50%      { transform: scale(1.2); opacity: 1; }
-}
-
-/* === Core sphere === */
-.orbit-sphere {
-    position: relative;
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 35%,
-        rgba(74,222,128,0.9) 0%,
-        rgba(34,197,94,0.6) 40%,
-        rgba(22,163,74,0.3) 100%
-    );
-    box-shadow:
-        0 0 0 2px rgba(74,222,128,0.3),
-        0 0 30px rgba(34,197,94,0.6),
-        0 0 60px rgba(34,197,94,0.2),
-        inset 0 -10px 20px rgba(0,0,0,0.3);
-    animation: spherePulse 3s ease-in-out infinite;
-    z-index: 10;
-}
-@keyframes spherePulse {
-    0%,100% { box-shadow: 0 0 0 2px rgba(74,222,128,0.3), 0 0 30px rgba(34,197,94,0.6), 0 0 60px rgba(34,197,94,0.2); }
-    50%      { box-shadow: 0 0 0 4px rgba(74,222,128,0.5), 0 0 50px rgba(34,197,94,0.9), 0 0 90px rgba(34,197,94,0.35); }
-}
-
-/* === Orbit rings (3D planes) === */
-.orbit-ring {
-    position: absolute;
-    border-radius: 50%;
-    border: 1.5px solid rgba(74,222,128,0.35);
-    transform-style: preserve-3d;
-}
-
-/* Ring 1 — horizontal tilt */
-.orbit-ring-1 {
-    width: 180px;
-    height: 180px;
-    transform: rotateX(70deg);
-    animation: ringOrbit1 4s linear infinite;
-    border-color: rgba(74,222,128,0.5);
-}
-@keyframes ringOrbit1 {
-    from { transform: rotateX(70deg) rotateZ(0deg); }
-    to   { transform: rotateX(70deg) rotateZ(360deg); }
-}
-
-/* Ring 2 — diagonal tilt */
-.orbit-ring-2 {
-    width: 220px;
-    height: 220px;
-    transform: rotateX(70deg) rotateZ(60deg);
-    animation: ringOrbit2 6s linear infinite;
-    border-color: rgba(74,222,128,0.25);
-}
-@keyframes ringOrbit2 {
-    from { transform: rotateX(70deg) rotateZ(60deg); }
-    to   { transform: rotateX(70deg) rotateZ(420deg); }
-}
-
-/* Ring 3 — opposite diagonal */
-.orbit-ring-3 {
-    width: 260px;
-    height: 260px;
-    transform: rotateX(70deg) rotateZ(120deg);
-    animation: ringOrbit3 9s linear infinite reverse;
-    border-color: rgba(34,197,94,0.15);
-}
-@keyframes ringOrbit3 {
-    from { transform: rotateX(70deg) rotateZ(120deg); }
-    to   { transform: rotateX(70deg) rotateZ(480deg); }
-}
-
-/* === Orbiting dots on ring 1 === */
-.orbit-dot {
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #4ade80;
-    box-shadow: 0 0 10px rgba(74,222,128,0.9), 0 0 20px rgba(74,222,128,0.5);
-    top: 50%;
-    left: 50%;
-}
-
-.orbit-dot-1 {
-    margin: -4px 0 0 -4px;
-    animation: dotOrbit 4s linear infinite;
-    transform-origin: 0 -90px;
-}
-.orbit-dot-2 {
-    width: 5px;
-    height: 5px;
-    margin: -2.5px 0 0 -2.5px;
-    background: #a7f3d0;
-    animation: dotOrbit 6s linear infinite reverse;
-    transform-origin: 0 -110px;
-    animation-delay: -2s;
-}
-.orbit-dot-3 {
-    width: 6px;
-    height: 6px;
-    margin: -3px 0 0 -3px;
-    animation: dotOrbit 4s linear infinite;
-    transform-origin: 0 -90px;
-    animation-delay: -2s;
-}
-@keyframes dotOrbit {
-    from { transform: rotate(0deg)   translateY(-90px); }
-    to   { transform: rotate(360deg) translateY(-90px); }
-}
-
-/* === Floating music notes === */
-.master-note {
-    position: absolute;
-    color: #4ade80;
-    font-size: 1.3rem;
-    text-shadow: 0 0 16px rgba(74,222,128,0.9);
-    animation: floatNote 4s ease-in-out infinite;
-    z-index: 6;
-    pointer-events: none;
-}
-.note-1 { top: 10px;  left: 15px;  animation-delay: 0s;   font-size: 1.1rem; }
-.note-2 { top: 30px;  right: 10px; animation-delay: -1.5s; font-size: 0.9rem; }
-.note-3 { bottom: 25px; right: 20px; animation-delay: -3s; font-size: 1.4rem; }
-
-@keyframes floatNote {
-    0%,100% { transform: translateY(0)   rotate(-10deg); opacity: 0.3; }
-    50%      { transform: translateY(-18px) rotate(8deg);  opacity: 0.9; }
-}
-
-/* =====================================================
-   STATS ROW
-   ===================================================== */
-.master-stats {
-    display: flex;
-    gap: 0;
-    margin-bottom: 64px;
-    border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 20px;
-    background: rgba(255,255,255,0.02);
-    backdrop-filter: blur(10px);
-    overflow: hidden;
-    animation: fadeInUp 0.8s ease 0.4s both;
-}
-
-.stat-item {
-    flex: 1;
-    padding: 28px 24px;
-    text-align: center;
-    position: relative;
-    transition: background 0.3s ease;
-}
-
-.stat-item:hover {
-    background: rgba(255,255,255,0.04);
-}
-
-.stat-item:not(:last-child)::after {
-    content: '';
-    position: absolute;
-    right: 0; top: 20%; bottom: 20%;
-    width: 1px;
-    background: rgba(255,255,255,0.07);
-}
-
-.stat-number {
-    display: block;
-    font-family: "Montserrat", sans-serif;
-    font-size: 2rem;
-    font-weight: 900;
-    color: #fff;
-    letter-spacing: -0.04em;
-    line-height: 1;
-    margin-bottom: 6px;
-}
-
-.stat-number .stat-green {
-    background: linear-gradient(135deg, #4ade80, #22c55e);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.stat-label {
-    display: block;
-    font-size: 0.78rem;
-    color: #6b7a8d;
-    font-weight: 500;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-}
-
-/* =====================================================
-   FEATURES SECTION
-   ===================================================== */
-.master-section {
-    margin-bottom: 64px;
-}
-
-.master-section-header {
-    margin-bottom: 28px;
-    animation: fadeInUp 0.7s ease both;
-}
-
-.master-section-header h2 {
-    margin: 0 0 8px;
-    font-family: "Montserrat", sans-serif;
-    font-size: 1.8rem;
-    font-weight: 800;
-    color: #fff;
-    letter-spacing: -0.04em;
-}
-
-.master-section-header p {
-    margin: 0;
-    color: #6b7a8d;
-    font-size: 0.9rem;
-}
-
-/* =====================================================
-   3D FEATURE CARDS
-   ===================================================== */
-.master-cards {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px;
-}
-
-.master-card {
-    padding: 28px 24px;
-    border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 20px;
-    background: rgba(255,255,255,0.025);
-    backdrop-filter: blur(12px);
-    position: relative;
-    overflow: hidden;
-    cursor: default;
-    transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
-    transform-style: preserve-3d;
-    animation: fadeInUp 0.7s ease both;
-}
-
-.master-card:nth-child(1) { animation-delay: 0.1s; }
-.master-card:nth-child(2) { animation-delay: 0.2s; }
-.master-card:nth-child(3) { animation-delay: 0.3s; }
-
-.master-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(74,222,128,0.4), transparent);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.master-card:hover {
-    border-color: rgba(74,222,128,0.2);
-    background: rgba(255,255,255,0.05);
-    transform: translateY(-8px) scale(1.01);
-    box-shadow:
-        0 30px 60px rgba(0,0,0,0.4),
-        0 0 0 1px rgba(74,222,128,0.1),
-        0 0 30px rgba(34,197,94,0.05) inset;
-}
-
-.master-card:hover::before {
-    opacity: 1;
-}
-
-/* Card shimmer */
-.master-card::after {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -60%;
-    width: 50%;
-    height: 200%;
-    background: linear-gradient(to right, transparent, rgba(255,255,255,0.04), transparent);
-    transform: skewX(-20deg);
-    transition: left 0.7s ease;
-}
-
-.master-card:hover::after {
-    left: 120%;
-}
-
-.master-card-icon {
-    width: 48px;
-    height: 48px;
-    margin-bottom: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 14px;
-    background: rgba(34,197,94,0.10);
-    border: 1px solid rgba(74,222,128,0.15);
-    font-size: 1.3rem;
-    transition: transform 0.3s ease, background 0.3s ease;
-}
-
-.master-card:hover .master-card-icon {
-    transform: scale(1.1) rotate(-5deg);
-    background: rgba(34,197,94,0.18);
-}
-
-.master-card h3 {
-    margin: 0 0 8px;
-    color: #fff;
-    font-size: 1.02rem;
-    font-weight: 700;
-}
-
-.master-card p {
-    margin: 0;
-    color: #6b7a8d;
-    font-size: 0.84rem;
-    line-height: 1.65;
-}
-
-/* =====================================================
-   PREVIEW CARDS (What's Waiting)
-   ===================================================== */
-.master-preview {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px;
-}
-
-.master-preview-card {
-    min-height: 160px;
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 20px;
-    background:
-        radial-gradient(circle at 85% 15%, rgba(34,197,94,0.12), transparent 45%),
-        rgba(255,255,255,0.025);
-    backdrop-filter: blur(10px);
-    position: relative;
-    overflow: hidden;
-    transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
-    animation: fadeInUp 0.7s ease both;
-}
-
-.master-preview-card:nth-child(1) { animation-delay: 0.15s; }
-.master-preview-card:nth-child(2) { animation-delay: 0.25s; }
-.master-preview-card:nth-child(3) { animation-delay: 0.35s; }
-
-.master-preview-card:hover {
-    border-color: rgba(74,222,128,0.2);
-    transform: translateY(-6px);
-    box-shadow: 0 25px 50px rgba(0,0,0,0.4);
-}
-
-.preview-icon {
-    margin-bottom: auto;
-    color: rgba(74,222,128,0.8);
-    font-size: 1.8rem;
-    display: block;
-    margin-bottom: 12px;
-    transition: transform 0.3s ease;
-}
-
-.master-preview-card:hover .preview-icon {
-    transform: scale(1.15) rotate(5deg);
-}
-
-.master-preview-card h3 {
-    margin: 0 0 6px;
-    color: #fff;
-    font-size: 1rem;
-    font-weight: 700;
-}
-
-.master-preview-card p {
-    margin: 0;
-    color: #6b7a8d;
-    font-size: 0.8rem;
-    line-height: 1.5;
-}
-
-/* =====================================================
-   CTA SECTION
-   ===================================================== */
-.master-cta {
-    position: relative;
-    overflow: hidden;
-    padding: 56px 40px;
-    text-align: center;
-    border: 1px solid rgba(74,222,128,0.15);
-    border-radius: 28px;
-    background:
-        radial-gradient(ellipse at 50% 0%, rgba(34,197,94,0.12), transparent 60%),
-        rgba(255,255,255,0.02);
-    backdrop-filter: blur(12px);
-    animation: fadeInUp 0.7s ease 0.3s both;
-}
-
-.master-cta::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 20%; right: 20%;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(74,222,128,0.5), transparent);
-}
-
-.master-cta h2 {
-    margin: 0 0 12px;
-    font-family: "Montserrat", sans-serif;
-    font-size: 2rem;
-    font-weight: 900;
-    color: #fff;
-    letter-spacing: -0.04em;
-}
-
-.master-cta p {
-    margin: 0 0 28px;
-    color: #6b7a8d;
-    font-size: 0.95rem;
-}
-
-/* =====================================================
-   ANIMATIONS
-   ===================================================== */
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeInDown {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* =====================================================
-   RESPONSIVE
-   ===================================================== */
-@media (max-width: 900px) {
-    .master-hero { padding: 55px 42px; }
-    .master-visual { right: 10px; opacity: 0.4; width: 220px; height: 220px; }
-    .vinyl-disc { width: 180px; height: 180px; }
-    .master-cards, .master-preview { grid-template-columns: 1fr 1fr; }
-    .master-stats { flex-wrap: wrap; }
-    .stat-item { flex: 0 0 50%; }
-}
-
-@media (max-width: 700px) {
-    .master-content { width: calc(100% - 28px); }
-    .master-hero { min-height: auto; padding: 44px 28px; border-radius: 22px; }
-    .master-hero h1 { font-size: 2.6rem; }
-    .master-visual { display: none; }
-    .master-actions { flex-direction: column; }
-    .master-btn { width: 100%; }
-    .master-cards, .master-preview { grid-template-columns: 1fr; }
-    .master-stats { flex-direction: column; }
-    .stat-item::after { display: none; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { animation: none !important; transition: none !important; }
-}
+    /* =========================================================
+       MASTER LANDING PAGE (UNAUTHENTICATED)
+       ========================================================= */
+    .master-landing-page {
+        position: relative;
+        width: 100%;
+        overflow-x: hidden;
+        background: #070a10;
+        color: #ffffff;
+    }
+
+    /* Ambient Background Canvas */
+    #heroTurntableCanvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    /* =========================================================
+       HERO SECTION — 3D HOLOGRAPHIC VINYL TURNTABLE EXPERIENCE
+       ========================================================= */
+    .landing-hero-section {
+        position: relative;
+        min-height: 94vh;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 60px 60px 80px;
+        max-width: 1400px;
+        margin: 0 auto;
+        gap: 60px;
+        z-index: 2;
+    }
+
+    .landing-hero-copy {
+        flex: 1.15;
+        max-width: 650px;
+        z-index: 3;
+    }
+
+    .landing-pill-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 20px;
+        border-radius: 999px;
+        background: rgba(34, 197, 94, 0.12);
+        border: 1px solid rgba(34, 197, 94, 0.4);
+        color: var(--accent-light);
+        font-size: 0.82rem;
+        font-weight: 750;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        margin-bottom: 24px;
+        box-shadow: 0 0 24px rgba(34, 197, 94, 0.18);
+    }
+
+    .landing-pill-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 12px var(--accent);
+        animation: pillBlink 1.8s infinite;
+    }
+
+    @keyframes pillBlink {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.3; transform: scale(0.8); }
+    }
+
+    .landing-hero-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: clamp(2.8rem, 5.2vw, 4.5rem);
+        font-weight: 900;
+        line-height: 1.06;
+        letter-spacing: -0.04em;
+        color: #ffffff;
+        margin-bottom: 22px;
+    }
+
+    .landing-hero-title .gradient-span {
+        background: linear-gradient(135deg, #4ade80 0%, #22c55e 50%, #06b6d4 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        filter: drop-shadow(0 0 32px rgba(34, 197, 94, 0.4));
+    }
+
+    .landing-hero-desc {
+        color: var(--text-secondary);
+        font-size: 1.12rem;
+        line-height: 1.7;
+        margin-bottom: 38px;
+    }
+
+    .landing-hero-ctas {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 18px;
+    }
+
+    .landing-btn-main {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 16px 36px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, var(--accent-light), var(--accent));
+        color: #052e16 !important;
+        font-weight: 800;
+        font-size: 1.02rem;
+        text-decoration: none !important;
+        box-shadow: 0 8px 32px var(--accent-glow);
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .landing-btn-main:hover {
+        transform: translateY(-3px) scale(1.04);
+        box-shadow: 0 16px 44px rgba(34, 197, 94, 0.55);
+    }
+
+    .landing-btn-sub {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 16px 32px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid var(--border-subtle);
+        color: #ffffff !important;
+        font-weight: 700;
+        font-size: 1rem;
+        text-decoration: none !important;
+        transition: all 0.2s ease;
+    }
+
+    .landing-btn-sub:hover {
+        background: rgba(255, 255, 255, 0.12);
+        border-color: rgba(255, 255, 255, 0.25);
+        transform: translateY(-2px);
+    }
+
+    /* ---------------------------------------------------------
+       HIGH-LEVEL 3D HOLOGRAPHIC TURNTABLE ANIMATION ENGINE
+       --------------------------------------------------------- */
+    .turntable-3d-stage {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        perspective: 1200px;
+        position: relative;
+        min-height: 540px;
+        z-index: 2;
+    }
+
+    .turntable-plinth {
+        position: relative;
+        width: 380px;
+        height: 380px;
+        transform-style: preserve-3d;
+        transform: rotateX(56deg) rotateZ(-26deg);
+        transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Outer glowing acoustic pedestal */
+    .turntable-base-chassis {
+        position: absolute;
+        inset: -20px;
+        border-radius: 36px;
+        background: linear-gradient(145deg, #141b27, #0b0f17);
+        border: 2px solid rgba(74, 222, 128, 0.28);
+        box-shadow:
+            0 40px 80px rgba(0, 0, 0, 0.8),
+            0 0 50px rgba(34, 197, 94, 0.2) inset,
+            0 0 35px rgba(6, 182, 212, 0.15);
+        transform: translateZ(-25px);
+    }
+
+    /* Sound ripple wave rings emitting from turntable */
+    .audio-ripple-ring {
+        position: absolute;
+        inset: -30px;
+        border-radius: 50%;
+        border: 2px solid rgba(74, 222, 128, 0.4);
+        box-shadow: 0 0 25px rgba(74, 222, 128, 0.3);
+        animation: rippleExpand 4s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+        pointer-events: none;
+        transform: translateZ(5px);
+    }
+
+    .audio-ripple-ring:nth-child(2) {
+        animation-delay: 1.3s;
+    }
+    .audio-ripple-ring:nth-child(3) {
+        animation-delay: 2.6s;
+    }
+
+    @keyframes rippleExpand {
+        0% {
+            transform: translateZ(5px) scale(0.7);
+            opacity: 0.9;
+        }
+        100% {
+            transform: translateZ(40px) scale(1.55);
+            opacity: 0;
+        }
+    }
+
+    /* Rotating Holographic Vinyl Disc */
+    .vinyl-disc {
+        position: absolute;
+        inset: 20px;
+        border-radius: 50%;
+        background:
+            radial-gradient(circle at center, #000 0%, #080c10 24%, #182230 25%, #080c10 27%, #151d28 40%, #080c10 42%, #182230 55%, #080c10 57%, #1a2332 70%, #06090e 100%);
+        box-shadow:
+            0 0 35px rgba(0, 0, 0, 0.9),
+            0 0 30px rgba(74, 222, 128, 0.22);
+        animation: vinylSpin 7s linear infinite;
+        transform-style: preserve-3d;
+        transform: translateZ(15px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Glossy Vinyl Sheen Reflection */
+    .vinyl-disc::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: conic-gradient(
+            from 45deg,
+            transparent 0deg,
+            rgba(255, 255, 255, 0.15) 30deg,
+            transparent 60deg,
+            transparent 180deg,
+            rgba(74, 222, 128, 0.2) 210deg,
+            transparent 240deg
+        );
+        pointer-events: none;
+    }
+
+    @keyframes vinylSpin {
+        from { transform: translateZ(15px) rotate(0deg); }
+        to   { transform: translateZ(15px) rotate(360deg); }
+    }
+
+    /* Disc Center Label */
+    .vinyl-center-label {
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        background: radial-gradient(circle, #22c55e 0%, #15803d 70%, #052e16 100%);
+        border: 4px solid #070a10;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 20px rgba(34, 197, 94, 0.8);
+        position: relative;
+    }
+
+    .vinyl-center-hole {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: #070a10;
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        margin-top: 4px;
+    }
+
+    .vinyl-label-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: 0.65rem;
+        font-weight: 900;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: #052e16;
+    }
+
+    /* 3D Holographic Laser Tonearm */
+    .tonearm-assembly {
+        position: absolute;
+        top: 20px;
+        right: -10px;
+        width: 70px;
+        height: 220px;
+        transform-style: preserve-3d;
+        transform: translateZ(35px) rotate(-18deg);
+        transform-origin: top right;
+        animation: tonearmSway 6s ease-in-out infinite alternate;
+        pointer-events: none;
+    }
+
+    @keyframes tonearmSway {
+        0%   { transform: translateZ(35px) rotate(-16deg); }
+        100% { transform: translateZ(35px) rotate(-22deg); }
+    }
+
+    .tonearm-pivot {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #334155, #0f172a);
+        border: 2px solid rgba(74, 222, 128, 0.6);
+        box-shadow: 0 0 15px rgba(34, 197, 94, 0.4);
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
+
+    .tonearm-bar {
+        position: absolute;
+        top: 36px;
+        right: 18px;
+        width: 5px;
+        height: 155px;
+        background: linear-gradient(180deg, #94a3b8, #475569);
+        border-radius: 3px;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    }
+
+    .tonearm-headshell {
+        position: absolute;
+        bottom: 0;
+        right: 12px;
+        width: 18px;
+        height: 32px;
+        background: #22c55e;
+        border-radius: 4px;
+        box-shadow: 0 0 16px rgba(34, 197, 94, 0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .needle-glow-point {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #ffffff;
+        box-shadow: 0 0 12px #ffffff, 0 0 20px #22c55e;
+        animation: needlePulse 1s infinite alternate;
+    }
+
+    @keyframes needlePulse {
+        from { transform: scale(0.8); opacity: 0.8; }
+        to   { transform: scale(1.4); opacity: 1; }
+    }
+
+    /* Floating Orbiting 3D Glass Badges */
+    .turntable-glass-badge {
+        position: absolute;
+        padding: 12px 20px;
+        border-radius: 16px;
+        background: rgba(14, 20, 30, 0.88);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(74, 222, 128, 0.3);
+        color: #ffffff;
+        font-size: 0.88rem;
+        font-weight: 750;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6);
+        pointer-events: none;
+        white-space: nowrap;
+        z-index: 5;
+    }
+
+    .t-badge-1 {
+        top: -30px;
+        left: -30px;
+        transform: translateZ(90px);
+        animation: badgeBobA 4.2s ease-in-out infinite alternate;
+    }
+
+    .t-badge-2 {
+        bottom: 20px;
+        right: -50px;
+        transform: translateZ(105px);
+        animation: badgeBobB 4.8s ease-in-out infinite alternate;
+    }
+
+    .t-badge-3 {
+        bottom: -35px;
+        left: 30px;
+        transform: translateZ(85px);
+        animation: badgeBobC 3.8s ease-in-out infinite alternate;
+    }
+
+    @keyframes badgeBobA {
+        0%   { transform: translateZ(90px) translateY(0); }
+        100% { transform: translateZ(90px) translateY(-14px); }
+    }
+    @keyframes badgeBobB {
+        0%   { transform: translateZ(105px) translateY(0); }
+        100% { transform: translateZ(105px) translateY(16px); }
+    }
+    @keyframes badgeBobC {
+        0%   { transform: translateZ(85px) translateX(0); }
+        100% { transform: translateZ(85px) translateX(12px); }
+    }
+
+    /* =========================================================
+       FEATURES SHOWCASE GRID
+       ========================================================= */
+    .landing-section {
+        padding: 90px 40px;
+        max-width: 1320px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 2;
+    }
+
+    .section-headline {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+
+    .section-headline h2 {
+        font-family: 'Outfit', sans-serif;
+        font-size: clamp(2.2rem, 4vw, 3.1rem);
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        margin-bottom: 12px;
+        color: #ffffff;
+    }
+
+    .section-headline p {
+        color: var(--text-secondary);
+        font-size: 1.05rem;
+        max-width: 620px;
+        margin: 0 auto;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 28px;
+    }
+
+    .feature-card {
+        background: #101622;
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-xl);
+        padding: 38px 32px;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-8px);
+        border-color: rgba(34, 197, 94, 0.4);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(34, 197, 94, 0.12);
+    }
+
+    .feature-icon-box {
+        width: 60px;
+        height: 60px;
+        border-radius: 18px;
+        background: rgba(34, 197, 94, 0.12);
+        border: 1px solid rgba(34, 197, 94, 0.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        margin-bottom: 22px;
+        color: var(--accent-light);
+    }
+
+    .feature-card h3 {
+        font-family: 'Outfit', sans-serif;
+        font-size: 1.35rem;
+        font-weight: 750;
+        margin-bottom: 12px;
+        color: #ffffff;
+    }
+
+    .feature-card p {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        line-height: 1.65;
+        margin: 0;
+    }
+
+    /* =========================================================
+       PREVIEW TEASER CARD (LOCKED AUDIO VAULT)
+       ========================================================= */
+    .preview-stage-wrap {
+        background: linear-gradient(145deg, #101622, #0a0d14);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-xl);
+        padding: 54px 44px;
+        display: flex;
+        align-items: center;
+        gap: 44px;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    .preview-mock-ui {
+        flex: 1;
+        background: #0b0f17;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 18px;
+        padding: 26px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .preview-locked-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(8, 12, 20, 0.88);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 32px;
+        z-index: 10;
+    }
+
+    .locked-icon-badge {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: rgba(34, 197, 94, 0.15);
+        border: 1.5px solid var(--accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.9rem;
+        margin-bottom: 14px;
+        box-shadow: 0 0 25px rgba(34, 197, 94, 0.3);
+    }
+
+    /* Mock Rows */
+    .mock-track-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .mock-thumb {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: #1e293b;
+    }
+
+    .mock-lines {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .mock-line-title {
+        width: 60%;
+        height: 10px;
+        border-radius: 5px;
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .mock-line-sub {
+        width: 35%;
+        height: 8px;
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    /* =========================================================
+       FINAL CTA BANNER
+       ========================================================= */
+    .landing-cta-box {
+        text-align: center;
+        background: radial-gradient(circle at 50% 50%, rgba(34, 197, 94, 0.2), transparent 70%),
+                    linear-gradient(135deg, #101724, #080c14);
+        border: 1px solid rgba(34, 197, 94, 0.3);
+        border-radius: var(--radius-xl);
+        padding: 75px 40px;
+        margin-bottom: 80px;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    .landing-cta-box h2 {
+        font-family: 'Outfit', sans-serif;
+        font-size: clamp(2.4rem, 4.5vw, 3.5rem);
+        font-weight: 900;
+        letter-spacing: -0.03em;
+        margin-bottom: 16px;
+        color: #ffffff;
+    }
+
+    .landing-cta-box p {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        max-width: 560px;
+        margin: 0 auto 34px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .landing-hero-section {
+            flex-direction: column;
+            padding: 50px 24px;
+            text-align: center;
+        }
+        .landing-hero-copy {
+            max-width: 100%;
+        }
+        .landing-hero-ctas {
+            justify-content: center;
+        }
+        .features-grid {
+            grid-template-columns: 1fr;
+        }
+        .preview-stage-wrap {
+            flex-direction: column;
+        }
+    }
 </style>
 {% endblock %}
 
 {% block body %}
-<!-- Animated mesh background -->
-<div class="master-mesh" aria-hidden="true">
-    <div class="mesh-blob mesh-blob-1"></div>
-    <div class="mesh-blob mesh-blob-2"></div>
-    <div class="mesh-blob mesh-blob-3"></div>
-</div>
+<div class="master-landing-page">
 
-<!-- Star particle canvas -->
-<canvas id="master-canvas" aria-hidden="true"></canvas>
+    <!-- Interactive Background Particle Canvas -->
+    <canvas id="heroTurntableCanvas"></canvas>
 
-<div class="master-page">
-    <div class="master-content">
+    <!-- =========================================================
+         1. HERO SECTION WITH 3D HOLOGRAPHIC VINYL TURNTABLE
+         ========================================================= -->
+    <section class="landing-hero-section">
+        <div class="landing-hero-copy">
+            <div class="landing-pill-tag">
+                <span class="landing-pill-dot"></span>
+                Ultra-Fidelity Sound Experience
+            </div>
 
-        <!-- ====== 3D HERO ====== -->
-        <div class="hero-3d-scene">
-            <section class="master-hero" id="masterHero">
+            <h1 class="landing-hero-title">
+                Your Music World. <br>
+                <span class="gradient-span">Pure, Fast & Unlimited.</span>
+            </h1>
 
-                <div class="master-hero-content">
-                    <div class="master-badge">
-                        <span class="badge-dot"></span>
-                        Your music, your way
+            <p class="landing-hero-desc">
+                Stream handpicked studio releases, create personal playlists with custom covers, and experience seamless listening without reloads. Create a free account to unlock full audio playback.
+            </p>
+
+            <div class="landing-hero-ctas">
+                <a href="{% url 'register_user' %}" class="landing-btn-main">
+                    🚀 Create Free Account
+                </a>
+                <a href="{% url 'login_user' %}" class="landing-btn-sub">
+                    🔑 Log In
+                </a>
+            </div>
+        </div>
+
+        <!-- High-Level 3D Holographic Turntable Stage -->
+        <div class="turntable-3d-stage" id="landingTurntableStage">
+            <div class="turntable-plinth" id="turntableScene">
+                <!-- Outer Chassis Base -->
+                <div class="turntable-base-chassis"></div>
+
+                <!-- Acoustic Sonic Ripple Waves -->
+                <div class="audio-ripple-ring"></div>
+                <div class="audio-ripple-ring"></div>
+                <div class="audio-ripple-ring"></div>
+
+                <!-- 3D Spinning Holographic Vinyl Record -->
+                <div class="vinyl-disc">
+                    <div class="vinyl-center-label">
+                        <span class="vinyl-label-title">SOUNDWAVE</span>
+                        <div class="vinyl-center-hole"></div>
                     </div>
+                </div>
 
-                    <h1>
-                        Music that<br>
-                        <span class="text-green">moves you.</span>
-                    </h1>
+                <!-- 3D Laser Tonearm Assembly -->
+                <div class="tonearm-assembly">
+                    <div class="tonearm-pivot"></div>
+                    <div class="tonearm-bar"></div>
+                    <div class="tonearm-headshell">
+                        <div class="needle-glow-point"></div>
+                    </div>
+                </div>
 
-                    <p>
-                        Discover songs, explore curated playlists, and build
-                        your own personal music collection — all in one
-                        beautiful place.
+                <!-- Floating Orbit Badges -->
+                <div class="turntable-glass-badge t-badge-1">
+                    <span style="color: #4ade80;">✦</span> Studio Lossless 320k
+                </div>
+                <div class="turntable-glass-badge t-badge-2">
+                    <span style="color: #06b6d4;">⚡</span> Instant Zero-Buffer
+                </div>
+                <div class="turntable-glass-badge t-badge-3">
+                    <span style="color: #a855f7;">📁</span> Unlimited Playlists
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================================
+         2. FEATURES SHOWCASE
+         ========================================================= -->
+    <section class="landing-section" id="features">
+        <div class="section-headline">
+            <h2>Crafted for Pure Music Lovers</h2>
+            <p>Every feature engineered to provide the cleanest, fastest, most immersive listening environment.</p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon-box">🎛️</div>
+                <h3>Studio Sound Delivery</h3>
+                <p>Listen to high-fidelity audio streams with complete seekable progress bars, volume slider, loop repeat, and shuffle controls.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon-box">📁</div>
+                <h3>Custom Playlist Architecture</h3>
+                <p>Create, organize, and manage personalized music collections with custom uploaded artwork tailored to every mood or vibe.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon-box">❤️</div>
+                <h3>Instant Liked Songs Vault</h3>
+                <p>Heart your favorite tracks in a single tap without any page refresh. Your curated favorites are always ready to play.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon-box">🔍</div>
+                <h3>Live Instant Search</h3>
+                <p>Discover tracks and artists in real-time with our fast search filter designed for instantaneous results.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon-box">🛡️</div>
+                <h3>Intelligent Error Auto-Skip</h3>
+                <p>Never get stopped by channel restrictions. SoundWave automatically detects playback issues and skips smoothly to the next track.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon-box">🔒</div>
+                <h3>Private & Personalized</h3>
+                <p>Enjoy customized user profiles, customizable avatars, and secure session management crafted exclusively for you.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================================
+         3. LOCKED CATALOG PREVIEW (NO SONGS PLAYABLE BEFORE LOGIN)
+         ========================================================= -->
+    <section class="landing-section" id="showcase">
+        <div class="section-headline">
+            <h2>Unlock the Complete Sound Catalog</h2>
+            <p>Members enjoy full, uninterrupted access to stream, organize, and play every track.</p>
+        </div>
+
+        <div class="preview-stage-wrap">
+            <div style="flex: 1;">
+                <div class="landing-pill-tag" style="margin-bottom: 14px;">Member-Only Streaming</div>
+                <h3 style="font-family: 'Outfit', sans-serif; font-size: 2rem; font-weight: 800; margin-bottom: 14px; color: #fff;">Register to Listen Immediately</h3>
+                <p style="color: var(--text-secondary); line-height: 1.65; font-size: 1rem; margin-bottom: 24px;">
+                    Our library is reserved for registered listeners. Create your account in under 30 seconds to stream all songs without ads or restrictions.
+                </p>
+                <div style="display: flex; gap: 14px;">
+                    <a href="{% url 'register_user' %}" class="landing-btn-main" style="padding: 13px 28px; font-size: 0.94rem;">
+                        Get Free Access →
+                    </a>
+                </div>
+            </div>
+
+            <!-- Mocked UI with Locked Glass Overlay -->
+            <div class="preview-mock-ui">
+                <div class="mock-track-row">
+                    <div class="mock-thumb"></div>
+                    <div class="mock-lines">
+                        <div class="mock-line-title"></div>
+                        <div class="mock-line-sub"></div>
+                    </div>
+                </div>
+                <div class="mock-track-row">
+                    <div class="mock-thumb"></div>
+                    <div class="mock-lines">
+                        <div class="mock-line-title" style="width: 75%;"></div>
+                        <div class="mock-line-sub"></div>
+                    </div>
+                </div>
+                <div class="mock-track-row">
+                    <div class="mock-thumb"></div>
+                    <div class="mock-lines">
+                        <div class="mock-line-title" style="width: 50%;"></div>
+                        <div class="mock-line-sub"></div>
+                    </div>
+                </div>
+
+                <div class="preview-locked-overlay">
+                    <div class="locked-icon-badge">🔒</div>
+                    <h4 style="font-size: 1.28rem; font-weight: 800; color: #fff; margin-bottom: 6px;">Music Catalog Locked</h4>
+                    <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 18px; max-width: 320px;">
+                        Sign in or register an account to view songs, stream audio, and create your playlists.
                     </p>
-
-                    <div class="master-actions">
-                        <a href="{% url 'login_user' %}" class="master-btn master-btn-primary">
-                            🎵 Login to Listen
-                        </a>
-                        <a href="{% url 'register_user' %}" class="master-btn master-btn-secondary">
-                            Create Account
-                        </a>
-                    </div>
+                    <a href="{% url 'register_user' %}" class="landing-btn-main" style="padding: 10px 24px; font-size: 0.88rem;">
+                        Sign Up to Listen
+                    </a>
                 </div>
-
-                <!-- 3D Orbit Sphere Visual -->
-                <div class="master-visual" aria-hidden="true">
-
-                    <div class="master-note note-1">♪</div>
-                    <div class="master-note note-2">♫</div>
-                    <div class="master-note note-3">♩</div>
-
-                    <div class="orbit-glow"></div>
-
-                    <div class="orbit-ring orbit-ring-3"></div>
-                    <div class="orbit-ring orbit-ring-2"></div>
-                    <div class="orbit-ring orbit-ring-1">
-                        <div class="orbit-dot orbit-dot-1"></div>
-                        <div class="orbit-dot orbit-dot-3"></div>
-                    </div>
-
-                    <div class="orbit-sphere"></div>
-
-                    <div class="orbit-dot orbit-dot-2"
-                         style="position:absolute;transform-origin:0 -110px;"></div>
-
-                </div>
-
-            </section>
-        </div>
-
-        <!-- ====== STATS ====== -->
-        <div class="master-stats">
-            <div class="stat-item">
-                <span class="stat-number"><span class="stat-green">100+</span></span>
-                <span class="stat-label">Songs Available</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-number"><span class="stat-green">∞</span></span>
-                <span class="stat-label">Playlists</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-number"><span class="stat-green">Free</span></span>
-                <span class="stat-label">Always</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-number"><span class="stat-green">24/7</span></span>
-                <span class="stat-label">Available</span>
             </div>
         </div>
+    </section>
 
-        <!-- ====== FEATURES ====== -->
-        <section class="master-section">
-            <div class="master-section-header">
-                <h2>Everything you need for your music.</h2>
-                <p>Sign in to unlock the complete experience.</p>
+    <!-- =========================================================
+         4. FINAL CALL TO ACTION
+         ========================================================= -->
+    <section class="landing-section" id="cta">
+        <div class="landing-cta-box">
+            <h2>Ready to Elevate Your Listening?</h2>
+            <p>Join SoundWave today and unlock your personalized music sanctuary.</p>
+            <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
+                <a href="{% url 'register_user' %}" class="landing-btn-main">
+                    🚀 Create Free Account
+                </a>
+                <a href="{% url 'login_user' %}" class="landing-btn-sub">
+                    Sign In
+                </a>
             </div>
+        </div>
+    </section>
 
-            <div class="master-cards">
-                <div class="master-card">
-                    <div class="master-card-icon">🎵</div>
-                    <h3>Discover Music</h3>
-                    <p>Explore popular songs, recently added music, and curated playlists crafted just for you.</p>
-                </div>
-                <div class="master-card">
-                    <div class="master-card-icon">❤️</div>
-                    <h3>Your Favorites</h3>
-                    <p>Like songs you love and keep them together in your personal collection forever.</p>
-                </div>
-                <div class="master-card">
-                    <div class="master-card-icon">🎧</div>
-                    <h3>Your Playlists</h3>
-                    <p>Create playlists, organize your music, and enjoy your collection your way.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- ====== PREVIEW ====== -->
-        <section class="master-section">
-            <div class="master-section-header">
-                <h2>What's waiting for you</h2>
-                <p>A quick preview of your music space.</p>
-            </div>
-
-            <div class="master-preview">
-                <div class="master-preview-card">
-                    <span class="preview-icon">♫</span>
-                    <h3>Featured Playlists</h3>
-                    <p>Curated music selected for you.</p>
-                </div>
-                <div class="master-preview-card">
-                    <span class="preview-icon">🔥</span>
-                    <h3>Popular Songs</h3>
-                    <p>Find something you'll want to play on repeat.</p>
-                </div>
-                <div class="master-preview-card">
-                    <span class="preview-icon">💚</span>
-                    <h3>Liked Songs</h3>
-                    <p>Keep your favorite tracks always close.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- ====== FINAL CTA ====== -->
-        <section class="master-cta">
-            <h2>Ready to start listening?</h2>
-            <p>Create your account and unlock your personal music experience.</p>
-            <a href="{% url 'register_user' %}" class="master-btn master-btn-primary">
-                🚀 Get Started — It's Free
-            </a>
-        </section>
-
-    </div>
 </div>
 
-<!-- =====================================================
-     JAVASCRIPT: 3D Hero Tilt + Particle Stars
-     ===================================================== -->
+<!-- Interactive 3D Turntable Mouse Tilt & Ambient Canvas Script -->
 <script>
-(function () {
-    'use strict';
+(function() {
+    /* 1. Interactive 3D Turntable Mouse Tracking */
+    const stage = document.getElementById('landingTurntableStage');
+    const scene = document.getElementById('turntableScene');
 
-    /* ---------- 3D HERO MOUSE TILT ---------- */
-    const hero = document.getElementById('masterHero');
-    if (hero) {
-        hero.addEventListener('mousemove', function (e) {
-            const rect = hero.getBoundingClientRect();
-            const cx = rect.left + rect.width / 2;
-            const cy = rect.top + rect.height / 2;
-            const dx = (e.clientX - cx) / (rect.width / 2);
-            const dy = (e.clientY - cy) / (rect.height / 2);
-            const rx = -dy * 5;   /* tilt up/down */
-            const ry = dx * 6;    /* tilt left/right */
-            hero.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg) scale(1.008)`;
+    if (stage && scene) {
+        stage.addEventListener('mousemove', function(e) {
+            const rect = stage.getBoundingClientRect();
+            const x = (e.clientX - rect.left - rect.width / 2) / (rect.width / 2);
+            const y = (e.clientY - rect.top - rect.height / 2) / (rect.height / 2);
+
+            scene.style.transform = `rotateX(${56 - y * 20}deg) rotateZ(${-26 + x * 22}deg) scale(1.06)`;
         });
 
-        hero.addEventListener('mouseleave', function () {
-            hero.style.transform = 'rotateX(2deg) rotateY(0deg) scale(1)';
+        stage.addEventListener('mouseleave', function() {
+            scene.style.transform = 'rotateX(56deg) rotateZ(-26deg) scale(1)';
         });
     }
 
-    /* ---------- PARTICLE STAR CANVAS ---------- */
-    const canvas = document.getElementById('master-canvas');
+    /* 2. Ambient Soundfield Particles Canvas */
+    const canvas = document.getElementById('heroTurntableCanvas');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    let W, H, stars = [];
+    let w, h, particles = [];
 
     function resize() {
-        W = canvas.width = window.innerWidth;
-        H = canvas.height = window.innerHeight;
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = canvas.parentElement.offsetHeight || window.innerHeight;
     }
 
-    function createStars(count) {
-        stars = [];
+    function initParticles(count) {
+        particles = [];
         for (let i = 0; i < count; i++) {
-            stars.push({
-                x: Math.random() * W,
-                y: Math.random() * H,
-                r: Math.random() * 1.5 + 0.2,
-                opacity: Math.random() * 0.5 + 0.1,
-                speed: Math.random() * 0.015 + 0.005,
-                phase: Math.random() * Math.PI * 2,
+            particles.push({
+                x: Math.random() * w,
+                y: Math.random() * h,
+                vx: (Math.random() - 0.5) * 0.5,
+                vy: (Math.random() - 0.5) * 0.5,
+                r: Math.random() * 2 + 1,
+                alpha: Math.random() * 0.6 + 0.2
             });
         }
     }
 
-    let raf, t = 0;
     function draw() {
-        ctx.clearRect(0, 0, W, H);
-        t += 0.008;
-        for (const s of stars) {
-            const op = s.opacity * (0.6 + 0.4 * Math.sin(t * s.speed * 80 + s.phase));
-            ctx.beginPath();
-            ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(255,255,255,${op})`;
-            ctx.fill();
+        ctx.clearRect(0, 0, w, h);
+
+        // Draw connections
+        for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+                const dx = particles[i].x - particles[j].x;
+                const dy = particles[i].y - particles[j].y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < 120) {
+                    const lineAlpha = (1 - dist / 120) * 0.18;
+                    ctx.strokeStyle = `rgba(74, 222, 128, ${lineAlpha})`;
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    ctx.stroke();
+                }
+            }
         }
-        raf = requestAnimationFrame(draw);
+
+        // Draw nodes
+        for (let p of particles) {
+            ctx.fillStyle = `rgba(74, 222, 128, ${p.alpha})`;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fill();
+
+            p.x += p.vx;
+            p.y += p.vy;
+
+            if (p.x < 0 || p.x > w) p.vx *= -1;
+            if (p.y < 0 || p.y > h) p.vy *= -1;
+        }
+
+        requestAnimationFrame(draw);
     }
 
+    window.addEventListener('resize', () => { resize(); initParticles(60); });
     resize();
-    createStars(120);
+    initParticles(60);
     draw();
-
-    window.addEventListener('resize', function () {
-        resize();
-        createStars(120);
-    });
-
-    /* ---------- SCROLL REVEAL ---------- */
-    const revealEls = document.querySelectorAll('.master-card, .master-preview-card, .master-stats, .master-cta');
-    const obs = new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = entry.target.style.transform.replace('translateY(30px)', 'translateY(0)');
-                obs.unobserve(entry.target);
-            }
-        });
-    }, { threshold: 0.12 });
-
-    revealEls.forEach(function (el) { obs.observe(el); });
-
-}());
+})();
 </script>
 {% endblock %}

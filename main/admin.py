@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Song, Playlist
+from .models import Song, Playlist, UserProfile
 
 
 @admin.register(Song)
@@ -61,4 +61,18 @@ class PlaylistAdmin(admin.ModelAdmin):
         'song',
         'is_featured',
         'cover_image',
+    )
+
+
+@admin.register(UserProfile)
+class UserProfileAdmin(admin.ModelAdmin):
+
+    list_display = (
+        'user',
+        'profile_picture',
+    )
+
+    search_fields = (
+        'user__username',
+        'user__email',
     )

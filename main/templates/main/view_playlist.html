@@ -1,819 +1,474 @@
 {% extends 'main/base.html' %}
 
 {% block heading %}
-    <title>{{ playlist.name }} - My Music Clone</title>
-
-    <style>
-        .playlist-page {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 50px 20px 140px;
-        }
-
-        .playlist-header {
-            margin-bottom: 35px;
-        }
-
-        .playlist-header h1 {
-            margin: 0 0 8px;
-            color: #f5f7fb;
-            font-size: 2.4rem;
-            font-weight: 800;
-        }
-
-        .playlist-header p {
-            margin: 0;
-            color: #8f9bad;
-            font-size: 1rem;
-        }
-
-        .playlist-cover {
-    width: 220px;
-    height: 220px;
-    object-fit: cover;
-    border-radius: 18px;
-    display: block;
-    margin-bottom: 22px;
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
-}
-
-        .playlist-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-top: 22px;
-        }
-
-        .shuffle-button {
-            border: 1px solid rgba(255, 255, 255, 0.10);
-            border-radius: 10px;
-            padding: 10px 18px;
-            background: #171d27;
-            color: #e8edf5;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s ease;
-        }
-
-        .shuffle-button:hover {
-            background: #202936;
-            border-color: rgba(74, 222, 128, 0.35);
-            color: #4ade80;
-        }
-
-        .delete-playlist-button {
-    border: 1px solid rgba(248, 113, 113, 0.22);
-    border-radius: 10px;
-    padding: 10px 18px;
-    background: rgba(239, 68, 68, 0.08);
-    color: #fca5a5;
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.2s ease;
-}
-
-.delete-playlist-button:hover {
-    background: rgba(239, 68, 68, 0.16);
-    border-color: rgba(248, 113, 113, 0.40);
-    color: #ffffff;
-    transform: translateY(-1px);
-}
-
-        .songs-section {
-            margin-top: 30px;
-        }
-
-        .songs-title {
-            margin-bottom: 15px;
-            color: #f5f7fb;
-            font-size: 1.2rem;
-            font-weight: 700;
-        }
-
-        .songs-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .song-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 20px;
-            padding: 15px 18px;
-            border: 1px solid rgba(255, 255, 255, 0.07);
-            border-radius: 14px;
-            background: #141923;
-            transition: 0.2s ease;
-        }
-
-        .song-item:hover {
-            background: #19202b;
-            border-color: rgba(74, 222, 128, 0.22);
-            transform: translateY(-1px);
-        }
-
-        .song-info {
-            min-width: 0;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        .song-number {
-            width: 30px;
-            color: #7f8a9b;
-            text-align: center;
-            font-size: 0.9rem;
-        }
-
-        .song-details {
-            min-width: 0;
-        }
-
-        .song-title {
-            margin: 0;
-            color: #f5f7fb;
-            font-size: 1rem;
-            font-weight: 700;
-        }
-
-        .song-artist {
-            margin: 4px 0 0;
-            color: #8f9bad;
-            font-size: 0.85rem;
-        }
-
-        .song-play-button {
-            flex-shrink: 0;
-            width: 42px;
-            height: 42px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: none;
-            border-radius: 50%;
-            background: #22c55e;
-            color: #052e16;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: 0.2s ease;
-        }
-
-        .song-play-button:hover {
-            background: #4ade80;
-            transform: scale(1.06);
-            box-shadow: 0 8px 20px rgba(34, 197, 94, 0.22);
-        }
-
-        .empty-playlist {
-            padding: 45px 20px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.07);
-            border-radius: 16px;
-            background: #141923;
-        }
-
-        .empty-playlist h3 {
-            margin: 0 0 8px;
-            color: #f5f7fb;
-        }
-
-        .empty-playlist p {
-            margin: 0;
-            color: #8f9bad;
-        }
-
-        @media (max-width: 600px) {
-            .playlist-page {
-                padding: 35px 15px 140px;
-            }
-
-            .playlist-header h1 {
-                font-size: 2rem;
-            }
-
-            .song-item {
-                padding: 13px 14px;
-            }
-
-            .song-number {
-                display: none;
-            }
-        }
-
-       /* =========================================================
-   SONG ACTIONS
-   ========================================================= */
-
-.song-actions {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-shrink: 0;
-}
-
-
-/* =========================================================
-   THREE DOT MENU
-   ========================================================= */
-
-.playlist-song-menu {
-    position: relative;
-    flex-shrink: 0;
-}
-
-
-.playlist-song-menu summary {
-    width: 42px;
-    height: 42px;
-
-    display: grid;
-    place-items: center;
-
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 50%;
-
-    background: #171d27;
-    color: #ffffff;
-
-    cursor: pointer;
-
-    font-size: 1.35rem;
-    font-weight: 800;
-    line-height: 1;
-
-    list-style: none;
-
-    transition:
-        background 0.2s ease,
-        color 0.2s ease,
-        border-color 0.2s ease;
-}
-
-
-.playlist-song-menu summary::-webkit-details-marker {
-    display: none;
-}
-
-
-.playlist-song-menu summary:hover,
-.playlist-song-menu[open] summary {
-    background: #22c55e;
-    border-color: #22c55e;
-    color: #052e16;
-}
-
-
-/* =========================================================
-   MENU POPUP
-   ========================================================= */
-
-.playlist-song-popup {
-    position: absolute;
-    top: 48px;
-    right: 0;
-
-    z-index: 100;
-
-    width: 220px;
-    max-width: calc(100vw - 40px);
-
-    padding: 8px;
-
-    border: 1px solid rgba(255,255,255,0.10);
-    border-radius: 13px;
-
-    background: #1b202a;
-
-    box-shadow:
-        0 18px 40px rgba(0,0,0,0.45);
-}
-
-
-/* =========================================================
-   MENU ITEMS
-   ========================================================= */
-
-.playlist-song-form {
-    margin: 0;
-}
-
-
-.playlist-song-action {
-    display: flex;
-    align-items: center;
-
-    width: 100%;
-
-    gap: 10px;
-
-    padding: 10px 11px;
-
-    border: 0;
-    border-radius: 8px;
-
-    background: transparent;
-
-    color: #ffffff;
-
-    text-align: left;
-    text-decoration: none;
-
-    cursor: pointer;
-
-    font-size: 0.82rem;
-    font-weight: 600;
-
-    box-sizing: border-box;
-
-    transition:
-        background 0.18s ease,
-        color 0.18s ease;
-}
-
-
-.playlist-song-action:hover {
-    background: rgba(34,197,94,0.14);
-    color: #4ade80;
-}
-
-
-.playlist-song-action.active {
-    background: rgba(34, 197, 94, 0.14);
-    color: #4ade80;
-
-    border: 1px solid rgba(74, 222, 128, 0.18);
-}
-
-.playlist-song-action.active:hover {
-    background: rgba(34, 197, 94, 0.20);
-    color: #86efac;
-}
-
-.playlist-song-action.added {
-    cursor: default;
-}
-
-.playlist-song-action.added:hover {
-    background: rgba(34, 197, 94, 0.20);
-    color: #86efac;
-}
-
-
-.playlist-song-action-icon {
-    width: 20px;
-
-    flex-shrink: 0;
-
-    text-align: center;
-
-    font-size: 1rem;
-}
-
-
-/* =========================================================
-   MENU HEADING
-   ========================================================= */
-
-.playlist-song-menu-heading {
-    margin: 6px 8px 7px;
-
-    color: #8d98a9;
-
-    font-size: 0.72rem;
-    font-weight: 700;
-}
-
-
-/* =========================================================
-   MENU DIVIDER
-   ========================================================= */
-
-.playlist-song-divider {
-    height: 1px;
-
-    margin: 7px 4px;
-
-    background: rgba(255,255,255,0.08);
-}
-
-
-/* =========================================================
-   REMOVE ACTION
-   ========================================================= */
-
-.playlist-song-remove {
-    color: #fda4af;
-}
-
-
-.playlist-song-remove:hover {
-    background: rgba(239,68,68,0.12);
-    color: #fb7185;
-}
-
-
-/* =========================================================
-   MOBILE
-   ========================================================= */
-
-@media (max-width: 600px) {
-
-    .playlist-song-popup {
-        right: 0;
-        width: 205px;
+<title>{{ playlist.name }} — SoundWave</title>
+<style>
+    /* =========================================================
+       PLAYLIST HERO BANNER
+       ========================================================= */
+    .playlist-hero {
+        display: flex;
+        align-items: flex-end;
+        gap: 34px;
+        margin-bottom: 36px;
+        padding: 44px 38px;
+        border-radius: var(--radius-xl);
+        background: radial-gradient(circle at 12% 25%, rgba(34, 197, 94, 0.22), transparent 55%),
+                    linear-gradient(135deg, #121926 0%, #090d14 100%);
+        border: 1px solid rgba(74, 222, 128, 0.28);
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55), 0 0 35px rgba(34, 197, 94, 0.1);
+        position: relative;
+        overflow: hidden;
     }
 
-}
+    .playlist-hero::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #4ade80, #06b6d4, transparent);
+    }
 
-.playlist-message {
-    margin: 0 0 22px;
-    padding: 13px 16px;
-    border: 1px solid rgba(74, 222, 128, 0.25);
-    border-radius: 12px;
-    background: rgba(34, 197, 94, 0.10);
-    color: #bbf7d0;
-    font-size: 0.9rem;
-    font-weight: 600;
-}
-    </style>
+    .playlist-cover-box {
+        width: 170px;
+        height: 170px;
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        background: linear-gradient(135deg, #064e3b, #022c22);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4.5rem;
+        color: var(--accent-light);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+        flex-shrink: 0;
+        position: relative;
+    }
+
+    .playlist-cover-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .playlist-hero-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .playlist-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 14px;
+        border-radius: 999px;
+        background: rgba(34, 197, 94, 0.14);
+        border: 1px solid rgba(74, 222, 128, 0.4);
+        color: var(--accent-light);
+        font-size: 0.75rem;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        margin-bottom: 12px;
+    }
+
+    .playlist-hero-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: clamp(2.2rem, 4.2vw, 3.4rem);
+        font-weight: 850;
+        letter-spacing: -0.03em;
+        color: #ffffff;
+        line-height: 1.1;
+        margin-bottom: 12px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .playlist-hero-meta {
+        font-size: 0.92rem;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 600;
+    }
+
+    .playlist-hero-meta span.dot {
+        opacity: 0.4;
+    }
+
+    /* Actions Bar */
+    .playlist-actions-bar {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 30px;
+    }
+
+    .btn-play-playlist {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 32px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, var(--accent-light), var(--accent));
+        color: #052e16 !important;
+        font-weight: 800;
+        font-size: 0.98rem;
+        box-shadow: 0 6px 24px var(--accent-glow);
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        text-decoration: none !important;
+    }
+
+    .btn-play-playlist:hover {
+        transform: translateY(-2px) scale(1.03);
+        box-shadow: 0 10px 32px rgba(34, 197, 94, 0.5);
+    }
+
+    .btn-shuffle-playlist {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 14px 26px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid var(--border-subtle);
+        color: #ffffff !important;
+        font-weight: 700;
+        font-size: 0.92rem;
+        transition: all 0.2s ease;
+        text-decoration: none !important;
+    }
+
+    .btn-shuffle-playlist:hover {
+        background: rgba(255, 255, 255, 0.12);
+        color: var(--accent-light);
+        transform: translateY(-2px);
+    }
+
+    .btn-delete-full-playlist {
+        margin-left: auto;
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        color: #fca5a5;
+        padding: 10px 20px;
+        border-radius: 999px;
+        font-size: 0.84rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .btn-delete-full-playlist:hover {
+        background: rgba(239, 68, 68, 0.25);
+        border-color: #f87171;
+        color: #ffffff;
+        transform: translateY(-1px);
+    }
+
+    /* Tracklist Container */
+    .playlist-tracklist {
+        background: var(--card-bg);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-xl);
+        overflow: visible;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+    }
+
+    .tracklist-header-row {
+        display: flex;
+        align-items: center;
+        padding: 14px 22px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        font-size: 0.78rem;
+        font-weight: 750;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+    }
+
+    .track-row {
+        display: flex;
+        align-items: center;
+        padding: 12px 22px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        transition: all 0.15s ease;
+        text-decoration: none !important;
+        color: inherit !important;
+    }
+
+    .track-row:last-child {
+        border-bottom: none;
+    }
+
+    .track-row:hover {
+        background: rgba(255, 255, 255, 0.055);
+    }
+
+    .track-row.active {
+        background: rgba(34, 197, 94, 0.1);
+        border-left: 3px solid var(--accent);
+    }
+
+    .track-col-num {
+        width: 36px;
+        text-align: center;
+        font-size: 0.88rem;
+        color: var(--text-muted);
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    .track-col-thumb {
+        width: 46px;
+        height: 46px;
+        border-radius: var(--radius-sm);
+        object-fit: cover;
+        background: #18202d;
+        flex-shrink: 0;
+        margin-right: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .track-col-main {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .track-row-title {
+        font-size: 0.96rem;
+        font-weight: 750;
+        color: #ffffff;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-decoration: none;
+        display: block;
+        margin-bottom: 2px;
+    }
+
+    .track-row-title:hover {
+        color: var(--accent-light);
+    }
+
+    .track-row-artist {
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .track-col-duration {
+        font-size: 0.86rem;
+        color: var(--text-muted);
+        font-weight: 600;
+        width: 60px;
+        text-align: right;
+        flex-shrink: 0;
+        margin-right: 16px;
+    }
+
+    .track-col-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-shrink: 0;
+    }
+
+    .btn-remove-track {
+        background: transparent;
+        border: 0;
+        color: var(--text-muted);
+        font-size: 1.25rem;
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 4px;
+        transition: color 0.15s ease, transform 0.15s ease;
+        line-height: 1;
+    }
+
+    .btn-remove-track:hover {
+        color: #f87171;
+        transform: scale(1.2);
+    }
+
+    @media (max-width: 768px) {
+        .playlist-hero {
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 28px 20px;
+            gap: 20px;
+        }
+        .playlist-cover-box {
+            width: 110px;
+            height: 110px;
+            font-size: 3rem;
+        }
+        .playlist-actions-bar {
+            flex-wrap: wrap;
+        }
+    }
+</style>
 {% endblock %}
 
-
 {% block body %}
+<div style="max-width: 1320px; margin: 0 auto;">
 
-<div class="playlist-page">
-
+    <!-- Messages -->
     {% if messages %}
-    {% for message in messages %}
-        <div class="playlist-message">
-            {{ message }}
+        <div style="margin-bottom: 20px;">
+            {% for message in messages %}
+                <div style="padding: 12px 18px; border-radius: var(--radius-md); background: rgba(34, 197, 94, 0.12); border: 1px solid rgba(34, 197, 94, 0.3); color: #bbf7d0; font-size: 0.88rem; font-weight: 600; margin-bottom: 8px;">
+                    {{ message }}
+                </div>
+            {% endfor %}
         </div>
-    {% endfor %}
-{% endif %}
-
-    <div class="playlist-header">
-
-        {% if playlist.cover_image %}
-    <img
-        src="{{ playlist.cover_image.url }}"
-        alt="{{ playlist.name }}"
-        class="playlist-cover"
-    >
-{% endif %}
-
-        <h1>{{ playlist.name }}</h1>
-
-        <p>
-            {{ playlist.song.count }} song{{ playlist.song.count|pluralize }}
-        </p>
-
-        <div class="playlist-actions">
-
-    {% if not playlist.is_featured %}
-
-        <form method="GET">
-
-            {% if play_song %}
-                <input
-                    type="hidden"
-                    name="play"
-                    value="{{ play_song.id }}"
-                >
-            {% endif %}
-
-            <input
-                type="hidden"
-                name="shuffle"
-                value="{% if shuffle %}false{% else %}true{% endif %}"
-            >
-
-            <button type="submit" class="shuffle-button">
-                {% if shuffle %}
-                    🔀 Disable Shuffle
-                {% else %}
-                    🔀 Shuffle
-                {% endif %}
-            </button>
-
-        </form>
-
     {% endif %}
 
-
+    <!-- Playlist Hero Header -->
+    <div class="playlist-hero">
+        <div class="playlist-cover-box">
+            {% if playlist.cover_image %}
+                <img src="{{ playlist.cover_image.url }}" alt="{{ playlist.name }}">
+            {% else %}
+                🎧
+            {% endif %}
         </div>
-        <!-- Delete Playlist -->
-         {% if not playlist.is_featured %}
-        <form
-            method="POST"
-            action="{% url 'delete_playlist' playlist.pk %}"
-            onsubmit="return confirm('Are you sure you want to delete &quot;{{ playlist.name }}&quot;? This cannot be undone.');"
-        >
-            {% csrf_token %}
 
-            <button
-                type="submit"
-                class="delete-playlist-button"
-            >
-                🗑️ Delete Playlist
-            </button>
-        </form>
-        {% endif %}
-
+        <div class="playlist-hero-info">
+            <div class="playlist-badge">{% if playlist.is_featured %}⭐ Featured Playlist{% else %}📁 Custom Playlist{% endif %}</div>
+            <h1 class="playlist-hero-title">{{ playlist.name }}</h1>
+            <div class="playlist-hero-meta">
+                <span>Curated by {{ playlist.user.username }}</span>
+                <span class="dot">•</span>
+                <span>{{ playlist_songs|length }} track{{ playlist_songs|length|pluralize }}</span>
+                <span class="dot">•</span>
+                <span>Studio Audio Ready</span>
+            </div>
+        </div>
     </div>
 
-
-    <div class="songs-section">
-
-        <h2 class="songs-title">
-            Songs
-        </h2>
-
-
+    <!-- Actions Bar -->
+    <div class="playlist-actions-bar">
         {% if playlist_songs %}
-
-            <ul class="songs-list">
-
-               {% for song in playlist_songs %}
-
-                    <li class="song-item">
-
-                        <div class="song-info">
-
-                            <div class="song-number">
-                                {{ forloop.counter }}
-                            </div>
-
-                            <div class="song-details">
-
-                                <p class="song-title">
-                                    {{ song.title }}
-                                </p>
-
-                                <p class="song-artist">
-                                    {{ song.artist }}
-                                </p>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="song-actions">
-
-    <!-- =====================================================
-         PLAY
-         ===================================================== -->
-
-    <a
-        href="?play={{ song.id }}&shuffle={{ shuffle }}"
-        class="song-play-link"
-        aria-label="Play {{ song.title }}"
-    >
-        <button
-            type="button"
-            class="song-play-button"
-        >
-            ▶
-        </button>
-    </a>
-
-
-    <!-- =====================================================
-         THREE DOT SONG MENU
-         ===================================================== -->
-
-    <details class="playlist-song-menu">
-
-        <summary
-            aria-label="More options for {{ song.title }}"
-            title="More options"
-        >
-            ⋮
-        </summary>
-
-
-        <div class="playlist-song-popup">
-
-            {% if user.is_authenticated %}
-
-                <!-- =================================================
-                     LIKE / UNLIKE
-                     ================================================= -->
-
-                <form
-                    method="post"
-                    action="{% url 'toggle_like' song.id %}"
-                    class="playlist-song-form"
-                >
-                    {% csrf_token %}
-
-                    <button
-                        type="submit"
-                        class="playlist-song-action {% if user in song.liked_by.all %}active{% endif %}"
-                        aria-label="{% if user in song.liked_by.all %}Unlike{% else %}Like{% endif %} {{ song.title }}"
-                    >
-
-                        <span class="playlist-song-action-icon">
-
-                            {% if user in song.liked_by.all %}
-                                ♥
-                            {% else %}
-                                ♡
-                            {% endif %}
-
-                        </span>
-
-                        {% if user in song.liked_by.all %}
-                            Liked
-                        {% else %}
-                            Like
-                        {% endif %}
-
-                    </button>
-
-                </form>
-
-
-                <div class="playlist-song-divider"></div>
-
-
-                <!-- =================================================
-                     ADD TO PLAYLIST
-                     ================================================= -->
-
-                <p class="playlist-song-menu-heading">
-                    Add to playlist
-                </p>
-
-
-{% for user_playlist in playlists %}
-
-    {% if song in user_playlist.song.all %}
-
-        <!-- =================================================
-             SONG ALREADY EXISTS IN THIS PLAYLIST
-             ================================================= -->
-
-        <div
-            class="playlist-song-action active added"
-            title="Already in {{ user_playlist.name }}"
-        >
-
-            <span class="playlist-song-action-icon">
-                ✓
-            </span>
-
-            {{ user_playlist.name }}
-
-        </div>
-
-    {% else %}
-
-        <!-- =================================================
-             SONG NOT IN THIS PLAYLIST
-             ================================================= -->
-
-        <form
-            method="post"
-            action="{% url 'index' %}"
-            class="playlist-song-form"
-        >
-            {% csrf_token %}
-
-            <input
-                type="hidden"
-                name="song_id"
-                value="{{ song.id }}"
-            >
-
-            <input
-                type="hidden"
-                name="playlist_id"
-                value="{{ user_playlist.id }}"
-            >
-
-            <button
-                type="submit"
-                class="playlist-song-action"
-            >
-
-                <span class="playlist-song-action-icon">
-                    ＋
-                </span>
-
-                {{ user_playlist.name }}
-
-            </button>
-
-        </form>
-
-    {% endif %}
-
-{% empty %}
-
-    <a
-        href="{% url 'create_playlist' %}"
-        class="playlist-song-action"
-    >
-
-        <span class="playlist-song-action-icon">
-            ＋
-        </span>
-
-        Create playlist
-
-    </a>
-
-{% endfor %}
-
-
-                <!-- =================================================
-                     REMOVE FROM CURRENT PLAYLIST
-                     ONLY NORMAL PLAYLISTS
-                     ================================================= -->
-
-                {% if not playlist.is_featured %}
-
-                    <div class="playlist-song-divider"></div>
-
-                    <form
-                        method="post"
-                        class="playlist-song-form"
-                        onsubmit="return confirm('Remove {{ song.title }} from this playlist?');"
-                    >
-                        {% csrf_token %}
-
-                        <input
-                            type="hidden"
-                            name="remove_song_id"
-                            value="{{ song.id }}"
-                        >
-
-                        <button
-                            type="submit"
-                            class="playlist-song-action playlist-song-remove"
-                            aria-label="Remove {{ song.title }} from this playlist"
-                        >
-
-                            <span class="playlist-song-action-icon">
-                                ✕
-                            </span>
-
-                            Remove from playlist
-
-                        </button>
-
-                    </form>
-
-                {% endif %}
-
-
-            {% endif %}
-
-        </div>
-
-    </details>
-
-</div>
-
-                    </li>
-
-                {% endfor %}
-
-            </ul>
-
-        {% else %}
-
-            <div class="empty-playlist">
-
-                <h3>This playlist is empty</h3>
-
-                <p>
-                    Add some songs from the Home page.
-                </p>
-
+            <a href="?play={{ playlist_songs.0.id }}" class="btn-play-playlist" title="Play All">
+                ▶ Play All
+            </a>
+
+            <a href="?play={{ playlist_songs.0.id }}&shuffle=true" class="btn-shuffle-playlist">
+                🔀 Shuffle
+            </a>
+        {% endif %}
+
+        {% if not playlist.is_featured and playlist.user == request.user %}
+            <form method="POST" action="{% url 'delete_playlist' playlist.pk %}" style="margin-left: auto;" onsubmit="return confirm('Are you sure you want to permanently delete &quot;{{ playlist.name }}&quot;?');">
+                {% csrf_token %}
+                <button type="submit" class="btn-delete-full-playlist">
+                    🗑️ Delete Playlist
+                </button>
+            </form>
+        {% endif %}
+    </div>
+
+    <!-- Tracks List Table -->
+    {% if playlist_songs %}
+        <div class="playlist-tracklist">
+            <div class="tracklist-header-row">
+                <div class="track-col-num">#</div>
+                <div style="width: 62px;"></div>
+                <div style="flex: 1;">Title & Artist</div>
+                <div class="track-col-duration">Time</div>
+                <div style="width: 100px; text-align: right;">Actions</div>
             </div>
 
-        {% endif %}
+            {% for song in playlist_songs %}
+                <div class="track-row {% if play_song and play_song.id == song.id %}active{% endif %}">
+                    <div class="track-col-num">
+                        {% if play_song and play_song.id == song.id %}
+                            <span style="color: var(--accent);">▶</span>
+                        {% else %}
+                            {{ forloop.counter }}
+                        {% endif %}
+                    </div>
 
-    </div>
+                    {% if song.cover_image %}
+                        <img src="{{ song.cover_image.url }}" class="track-col-thumb" alt="Cover" loading="lazy">
+                    {% else %}
+                        <div class="track-col-thumb" style="display:flex;align-items:center;justify-content:center;font-size:1.3rem;color:var(--accent);">🎵</div>
+                    {% endif %}
+
+                    <div class="track-col-main">
+                        <a href="?play={{ song.id }}" class="track-row-title">{{ song.title }}</a>
+                        <div class="track-row-artist">{{ song.artist }}</div>
+                    </div>
+
+                    <div class="track-col-duration">
+                        {{ song.duration|default:"3:30" }}
+                    </div>
+
+                    <div class="track-col-actions">
+                        <a href="{% url 'toggle_like' song.id %}" style="color: {% if request.user in song.liked_by.all %}#f87171{% else %}var(--text-muted){% endif %}; font-size: 1.1rem; text-decoration: none;" title="Like">
+                            {% if request.user in song.liked_by.all %}❤️{% else %}🤍{% endif %}
+                        </a>
+
+                        <details class="card-dropdown">
+                            <summary class="card-dots-btn" title="Add to Playlist">⋮</summary>
+                            <div class="card-dropdown-menu">
+                                <div class="card-dropdown-header">Add to Playlist</div>
+                                {% for pl in playlists %}
+                                    {% if song in pl.song.all %}
+                                        <div class="card-dropdown-item added" title="Already in {{ pl.name }}">
+                                            <span class="card-dropdown-icon">✓</span>
+                                            <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ pl.name }}</span>
+                                            <span class="card-dropdown-badge">Added</span>
+                                        </div>
+                                    {% else %}
+                                        <form method="POST" action="{% url 'index' %}" style="margin: 0;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="song_id" value="{{ song.id }}">
+                                            <input type="hidden" name="playlist_id" value="{{ pl.id }}">
+                                            <button type="submit" class="card-dropdown-item">
+                                                <span class="card-dropdown-icon">＋</span>
+                                                <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ pl.name }}</span>
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                {% empty %}
+                                    <a href="{% url 'create_playlist' %}" class="card-dropdown-item">
+                                        <span class="card-dropdown-icon">＋</span>
+                                        <span>Create Playlist</span>
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        </details>
+
+                        {% if not playlist.is_featured and playlist.user == request.user %}
+                            <form method="POST" action="{% url 'view_playlist' playlist.pk %}" style="margin: 0;">
+                                {% csrf_token %}
+                                <input type="hidden" name="remove_song_id" value="{{ song.id }}">
+                                <button type="submit" class="btn-remove-track" title="Remove from playlist">
+                                    &times;
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 80px 20px; background: var(--card-bg); border-radius: var(--radius-xl); border: 1px dashed var(--border-subtle);">
+            <div style="font-size: 3.5rem; margin-bottom: 12px;">🎵</div>
+            <h3 style="color: #fff; font-size: 1.5rem; font-family: 'Outfit', sans-serif; margin-bottom: 8px;">This playlist is empty</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 24px; max-width: 440px; margin-left: auto; margin-right: auto;">
+                Add songs to this playlist from the home page by clicking the ⋮ options menu on any track card.
+            </p>
+            <a href="{% url 'index' %}" class="btn-play-playlist" style="display: inline-flex;">
+                Explore Songs
+            </a>
+        </div>
+    {% endif %}
 
 </div>
-{% if play_song %}
-    <iframe
-        class="hidden-player"
-        src="{{ play_song.youtube_url_modify }}{% if upcoming_songs %}&playlist={{ play_song.youtube_video_id }},{% for queued_song in upcoming_songs %}{{ queued_song.youtube_video_id }}{% if not forloop.last %},{% endif %}{% endfor %}{% endif %}"        allow="autoplay; encrypted-media"
-        referrerpolicy="strict-origin-when-cross-origin"
-        allowfullscreen>
-    </iframe>
-{% endif %}
-
 {% endblock %}

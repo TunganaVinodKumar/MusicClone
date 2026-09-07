@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.shortcuts import render, get_object_or_404, redirect
+from django.http import JsonResponse
 from django.db.models import Q
 from .models import Song, Playlist, UserProfile
 from django.contrib.auth import authenticate, login, logout
@@ -15,40 +16,37 @@ import re
 
 # Home page
 def index(request):
-
     if not request.user.is_authenticated:
         return render(
             request,
             "main/master_home.html"
         )
-    
-    songs = Song.objects.all()
+
+    songs = Song.objects.all().prefetch_related('liked_by')
 
     # --------------------------------------------------------
     # Popular Songs - remove duplicate title + artist entries
     # --------------------------------------------------------
 
     popular_songs = Song.objects.filter(
-    is_popular=True
-).order_by('-id')[:15]
+        is_popular=True
+    ).prefetch_related('liked_by').order_by('-id')[:15]
     recent_songs = Song.objects.order_by(
-    '-created_at'
-)[:6]
-
-    
+        '-created_at'
+    ).prefetch_related('liked_by')[:6]
 
     featured_playlists = Playlist.objects.filter(
         is_featured=True
-        )
+    )
 
     search_songs = list(
         songs.values(
-                'id',
-                'title',
-                'artist',
-                'gerne'
-            ) 
-)
+            'id',
+            'title',
+            'artist',
+            'gerne'
+        ) 
+    )
 
     search_query = request.GET.get('q', '').strip()
 
@@ -62,7 +60,6 @@ def index(request):
         search_results = Song.objects.none()
 
     play_song_id = request.GET.get('play', None)
-
     shuffle_mode = request.GET.get('shuffle') == 'true'
 
     play_song = None
@@ -72,15 +69,19 @@ def index(request):
     shuffle_song = None
     upcoming_songs = []
     youtube_queue = []
+    is_auto_playing = False
 
     playlists = Playlist.objects.none()
 
     # User playlists
     if request.user.is_authenticated:
 
-        playlists = Playlist.objects.filter(
-            user=request.user
-        )
+        if request.user.is_superuser:
+            playlists = Playlist.objects.all().distinct().prefetch_related('song')
+        else:
+            playlists = Playlist.objects.filter(
+                user=request.user
+            ).prefetch_related('song')
 
         # Add song to playlist
         if request.method == "POST":
@@ -90,11 +91,17 @@ def index(request):
 
             if song_id and playlist_id:
 
-                playlist = get_object_or_404(
-                    Playlist,
-                    id=playlist_id,
-                    user=request.user
-                )
+                if request.user.is_superuser:
+                    playlist = get_object_or_404(
+                        Playlist,
+                        id=playlist_id
+                    )
+                else:
+                    playlist = get_object_or_404(
+                        Playlist,
+                        id=playlist_id,
+                        user=request.user
+                    )
 
                 song = get_object_or_404(
                     Song,
@@ -114,7 +121,7 @@ def index(request):
                         f'Added "{song.title}" to "{playlist.name}".'
     )
                 
-                return redirect('index')
+                return redirect(request.META.get('HTTP_REFERER') or 'index')
 
 
     # Currently playing song
@@ -124,9 +131,13 @@ def index(request):
             Song,
             id=play_song_id
         )
+        is_auto_playing = True
+    elif songs.exists():
+        play_song = popular_songs.first() or songs.first()
+        is_auto_playing = False
 
-        player_origin = request.build_absolute_uri('/')
-        player_origin = player_origin.rstrip('/')
+    if play_song:
+        player_origin = request.build_absolute_uri('/').rstrip('/')
 
         # Convert songs into a list
         song_list = list(songs)
@@ -141,7 +152,6 @@ def index(request):
 
             if shuffle_mode:
                 random_shuffle(upcoming_songs)
-    
 
             youtube_queue = [play_song] + upcoming_songs
 
@@ -157,7 +167,7 @@ def index(request):
             else:
                 next_song = song_list[0]
 
-        except ValueError:
+        except (ValueError, IndexError):
             pass
 
         # Shuffle
@@ -170,7 +180,6 @@ def index(request):
             shuffle_song = choice(
                 possible_shuffle_songs
             )
-
 
     return render(
         request,
@@ -197,7 +206,7 @@ def index(request):
             'shuffle_mode': shuffle_mode,
             'upcoming_songs': upcoming_songs,
             'youtube_queue': youtube_queue,
-            
+            'is_auto_playing': is_auto_playing,
         }
     )
 
@@ -209,14 +218,26 @@ def index(request):
 def toggle_like(request, song_id):
 
     if not request.user.is_authenticated:
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest" or request.GET.get("format") == "json":
+            return JsonResponse({"status": "error", "message": "Login required", "redirect": "/login_user/"}, status=401)
         return redirect('login_user')
 
     song = get_object_or_404(Song, id=song_id)
 
     if song.liked_by.filter(id=request.user.id).exists():
         song.liked_by.remove(request.user)
+        liked = False
     else:
         song.liked_by.add(request.user)
+        liked = True
+
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest" or request.GET.get("format") == "json":
+        return JsonResponse({
+            "status": "success",
+            "liked": liked,
+            "song_id": song.id,
+            "total_likes": song.liked_by.count()
+        })
 
     return redirect(request.META.get('HTTP_REFERER', 'index'))
 
@@ -229,12 +250,17 @@ def toggle_like(request, song_id):
 def liked_songs(request):
 
     liked_songs = request.user.liked_songs.all()
+    if request.user.is_superuser:
+        user_playlists = Playlist.objects.all().distinct().prefetch_related('song')
+    else:
+        user_playlists = Playlist.objects.filter(user=request.user).prefetch_related('song')
 
     return render(
         request,
         'main/liked_songs.html',
         {
             'liked_songs': liked_songs,
+            'playlists': user_playlists,
         }
     )
 
@@ -677,32 +703,26 @@ def remove_profile_picture(request):
 # CREATE PLAYLIST
 # ============================================================
 
+@login_required
 def create_playlist(request):
 
     if request.method == "POST":
 
-        name_playlist = request.POST.get(
-            "name-playlist"
+        name_playlist = (request.POST.get("name-playlist") or "").strip()
+        cover_image = request.FILES.get("cover_image")
+
+        if not name_playlist:
+            messages.error(request, "Please enter a valid playlist name.")
+            return render(request, 'main/create_playlist.html')
+
+        playlist = Playlist.objects.create(
+            name=name_playlist,
+            user=request.user,
+            cover_image=cover_image if cover_image else None
         )
 
-        if request.user.is_authenticated:
-
-            playlist = Playlist.objects.create(
-                name=name_playlist,
-                user=request.user
-            )
-
-            playlist.save()
-
-            return redirect(
-                "index"
-            )
-
-        else:
-
-            return redirect(
-                'index'
-            )
+        messages.success(request, f'Playlist "{playlist.name}" created successfully!')
+        return redirect("view_playlist", pk=playlist.pk)
 
     return render(
         request,
@@ -718,12 +738,8 @@ def create_playlist(request):
 # VIEW PLAYLIST
 # ============================================================
 
+@login_required
 def view_playlist(request, pk):
-
-    if not request.user.is_authenticated:
-        return redirect(
-            'index'
-        )
 
     # --------------------------------------------------------
     # Playlist access
@@ -836,8 +852,8 @@ def view_playlist(request, pk):
     # Current song
     # --------------------------------------------------------
 
+    is_auto_playing = False
     if play_song_id:
-
         play_song = get_object_or_404(
             Song,
             id=play_song_id
@@ -845,8 +861,12 @@ def view_playlist(request, pk):
 
         # Make sure the song belongs to this playlist.
         if play_song not in playlist_list:
-
             play_song = None
+        else:
+            is_auto_playing = True
+    elif playlist_list:
+        play_song = playlist_list[0]
+        is_auto_playing = False
 
     # --------------------------------------------------------
     # Playlist navigation
@@ -908,9 +928,10 @@ def view_playlist(request, pk):
                 possible_songs
             )
 
-    user_playlists = Playlist.objects.filter(
-    user=request.user
-)
+    if request.user.is_superuser:
+        user_playlists = Playlist.objects.all().distinct().prefetch_related('song')
+    else:
+        user_playlists = Playlist.objects.filter(user=request.user).prefetch_related('song')
 
     # --------------------------------------------------------
     # Render playlist
@@ -930,6 +951,7 @@ def view_playlist(request, pk):
             'shuffle': shuffle,
             'upcoming_songs': upcoming_songs,
             'youtube_queue': youtube_queue,
+            'is_auto_playing': is_auto_playing,
         }
     )
 
@@ -938,22 +960,17 @@ def view_playlist(request, pk):
 # ALL PLAYLISTS
 # ============================================================
 
+@login_required
 def all_playlists(request):
-
-    if not request.user.is_authenticated:
-
-        return redirect(
-            'index'
-        )
-
-    playlists = Playlist.objects.filter(
-        user=request.user
-    )
+    featured_playlists = Playlist.objects.filter(is_featured=True)
+    user_playlists = Playlist.objects.filter(user=request.user)
 
     return render(
         request,
         'main/all_playlists.html',
         {
-            'playlists': playlists
+            'playlists': user_playlists,
+            'user_playlists': user_playlists,
+            'featured_playlists': featured_playlists,
         }
     )
